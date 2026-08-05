@@ -11,6 +11,13 @@ exactly one of **three outcomes**, and nothing else:
 2. **Success with no value (empty)** — just `onComplete()`, like "not found."
 3. **Failure** — `onError(throwable)`.
 
+These three outcomes aren't a special `Mono` rule — they're the universal Reactive
+Streams signal grammar (`onSubscribe onNext* (onError | onComplete)?`, see
+[[the-three-signal-types]] in the previous topic) with one extra constraint:
+`onNext` is capped at **at most once** instead of unlimited. Internalizing this one
+grammar is, honestly, 80% of understanding reactive programming — everything else
+is operators reacting to these same three signals.
+
 The biggest practical skill in this topic is choosing the right **factory method**
 to create a `Mono` for your situation — and the biggest trap is mixing up *eager*
 (`Mono.just()`) vs *lazy* (`Mono.fromSupplier()`, `Mono.fromCallable()`,

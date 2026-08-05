@@ -47,7 +47,7 @@ for CPU-bound work, low-concurrency apps, or teams reliant on blocking libraries
 | 5 | **Resilient** | Failures in one part (a downstream service) don't cascade into a total system outage. |
 | 6 | **Elastic** | Stays responsive across a wide range of load, without needing proportionally more hardware. |
 | 7 | **Message Driven** | Components communicate via async events, not direct blocking calls — the foundation enabling the other 3 traits. |
-| 8 | **Publisher/Subscriber model** | Everything in WebFlux — requests, DB calls, HTTP calls — speaks the same Mono/Flux publisher language. |
+| 8 | **Publisher/Subscriber model** | Everything in WebFlux speaks the same Mono/Flux publisher language, built from exactly 3 signals: `onNext`/`onComplete`/`onError`. |
 | 9 | **Backpressure** | Lets a slow client control how fast a server streams data, preventing memory overload. |
 | 10 | **Why WebFlux scales better than MVC** | Small event-loop pool never blocks vs. MVC's thread-per-request pool that freezes on I/O. |
 | 11 | **When NOT to use WebFlux** | CPU-bound work, low concurrency, or heavy reliance on blocking libraries (JPA) with no migration plan. |

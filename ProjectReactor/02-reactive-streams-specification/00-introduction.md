@@ -21,6 +21,13 @@ Every stream follows a strict lifecycle: `onSubscribe()` sets things up, then ze
 or more `onNext()` calls deliver items, and finally exactly one of `onComplete()`
 (success) or `onError()` (failure) ends it — never both, and nothing after.
 
+**Memorize this above everything else in this topic:** the entire data-flow
+vocabulary of Reactive Streams is exactly **three signal types** —
+`onNext` (repeatable), `onComplete` (terminal, success), `onError` (terminal,
+failure) — plus the one-time `onSubscribe` handshake that isn't itself a data
+signal. Every operator you'll ever use is just code reacting to one of these three.
+See [[the-three-signal-types]] for the full breakdown.
+
 ```java
 Publisher<Integer> publisher = subscriber -> {
     subscriber.onSubscribe(new Subscription() {
@@ -54,6 +61,7 @@ built on.
 | 10 | **onNext()** | Signal for a single new item; called 0+ times for a `Flux`, at most once for a `Mono`. |
 | 11 | **onComplete()** | Terminal "success, no more data coming" signal; called at most once, only on success. |
 | 12 | **onError()** | Terminal "something went wrong" signal; called at most once, ends the stream immediately. |
+| 13 | **The Three Signal Types** | The whole vocabulary in one rule: `onSubscribe onNext* (onError \| onComplete)?` — memorize this grammar. |
 
 ## How It All Fits Together
 

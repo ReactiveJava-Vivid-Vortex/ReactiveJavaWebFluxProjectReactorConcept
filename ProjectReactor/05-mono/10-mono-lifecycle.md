@@ -57,3 +57,9 @@ Knowing there are exactly these three, mutually-exclusive outcomes makes writing
 `StepVerifier` tests and reasoning about `Mono`-returning methods much simpler — you
 always know a `Mono` will settle into exactly one of these three states, never a
 mixture.
+
+**This isn't a Mono-specific rule** — it's the universal Reactive Streams signal
+grammar (`onSubscribe onNext* (onError | onComplete)?`) applied with one extra
+constraint: `onNext` is capped at *at most once*. A `Flux` allows unlimited
+`onNext` calls; a `Mono` allows 0 or 1. Same three signals, same terminal rules,
+just a different cap. See [[the-three-signal-types]] for the full picture.
