@@ -2,15 +2,15 @@
 
 ## In Simple Terms
 
-"Throughput" measures how many requests a system can process per unit of time
-(e.g., requests per second). This is the primary metric where WebFlux's
-architecture tends to shine over traditional Spring MVC, specifically under
+"Throughput" is how many requests a system can get through per unit of
+time (like requests per second). This is the main metric where WebFlux
+tends to shine over traditional Spring MVC, especially under
 high-concurrency, I/O-heavy workloads.
 
 ## Simple Example
 
-Illustrative benchmark comparison for an I/O-bound endpoint (calling a downstream
-service with ~50ms latency), under high concurrent load:
+Illustrative benchmark comparison for an I/O-bound endpoint (calling a
+downstream service with ~50ms latency), under high concurrent load:
 
 ```
 Spring MVC (thread-per-request, 200 threads):
@@ -25,8 +25,8 @@ Spring WebFlux (event-loop, non-blocking):
 
 ## Why It Matters
 
-Throughput is the metric that actually matters for capacity planning — "how many
-requests per second can this service handle before it falls over?" Understanding
-that WebFlux's throughput advantage is most pronounced for I/O-bound workloads (not
-CPU-bound ones) helps set realistic expectations when benchmarking and comparing
-architectures.
+Throughput is the number that actually matters for capacity planning —
+"how many requests per second can this service take before it falls
+over?" Knowing WebFlux's throughput edge is biggest for I/O-bound work
+(not CPU-bound) helps you set realistic expectations when benchmarking and
+comparing architectures.

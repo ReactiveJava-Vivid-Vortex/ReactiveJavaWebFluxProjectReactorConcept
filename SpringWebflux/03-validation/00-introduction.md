@@ -1,36 +1,55 @@
-# Validation — Topic Overview
+# Q1. Does Bean Validation (`@Valid`) Just Work the Same as Spring MVC?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of a Security Checkpoint With Two Doors)
 
-Validation makes sure incoming request data is well-formed and meets your business
-rules **before** it reaches your service/repository logic. In WebFlux, most of this
-looks exactly like traditional Spring — Bean Validation annotations
-(`@NotBlank`, `@Positive`) on your DTO fields, triggered by `@Valid`:
+Imagine an airport security checkpoint with two doors: Door A (a person walks
+through, fully scanned before they're let in) and Door B (a conveyor belt still
+delivering their bags). Validation on Door A is straightforward. Validation on
+Door B needs to wait for the belt to finish arriving first.
+
+```java
+// Door A: @Valid reliably triggers
+@PostMapping
+public Mono<ProductDto> create(@Valid @RequestBody ProductDto dto) { ... }
+
+// Door B: @Valid does NOT reliably auto-trigger!
+@PostMapping
+public Mono<ProductDto> create(@Valid @RequestBody Mono<ProductDto> dtoMono) { ... }
+```
+
+This is the single most important, easy-to-miss nuance in this whole topic.
+
+---
+
+## Q2. What Does Simple Field Validation Look Like?
 
 ```java
 public record ProductDto(
-    @NotBlank String name,
-    @Positive double price
+    @NotBlank(message = "Name is required") String name,
+    @Positive(message = "Price must be positive") double price
 ) {}
 
 @PostMapping
 public Mono<ProductDto> create(@Valid @RequestBody ProductDto dto) {
-    return productService.create(dto);
+    return productService.create(dto); // @Valid triggers automatically HERE
 }
 ```
 
-**The one important WebFlux-specific gotcha:** `@Valid` reliably triggers on a
-plain `@RequestBody ProductDto`, but does **not** automatically trigger if the body
-is wrapped as `Mono<ProductDto>` — a subtle trap that's easy to miss until a bad
-request slips through untested.
+Violations throw a `WebExchangeBindException`, typically handled centrally by a
+`@ControllerAdvice` (covered in the Reactive Error Handling topic).
 
-Beyond simple field checks, some rules need a database lookup (e.g., "this email
-must not already exist") — these can't be expressed as a simple annotation, since
-they're inherently asynchronous. That's where **custom validators** come in,
-returning a `Mono<Void>` that you `.then()` before proceeding:
+---
+
+## Q3. What About Rules That Need a Database Lookup?
+
+Simple annotations can't express "this email must not already exist" — that needs
+an async check. Write a **custom validator** returning `Mono<Void>`:
 
 ```java
 public Mono<Void> validate(ProductDto dto) {
+    if (dto.price() <= 0) {
+        return Mono.error(new ValidationException("Price must be positive"));
+    }
     return repository.existsByName(dto.name())
         .flatMap(exists -> exists
             ? Mono.error(new ValidationException("Name already exists"))
@@ -38,32 +57,72 @@ public Mono<Void> validate(ProductDto dto) {
 }
 ```
 
-## Quick Revision Cheat Sheet
+```java
+public Mono<ProductDto> createProduct(ProductDto dto) {
+    return validator.validate(dto)
+        .then(Mono.defer(() -> repository.save(ProductMapper.toEntity(dto))))
+        .map(ProductMapper::toDto);
+}
+```
 
-| # | Concept | One-Line Summary |
-|---|---|---|
-| 1 | **Custom Validators** | Your own async validation logic (e.g., DB lookups) — expressed as a `Mono<Void>`-returning method. |
-| 2 | **Bean Validation discussion** | `@NotBlank`/`@Positive` etc. still work, but `@Valid` doesn't auto-trigger on a `Mono<Dto>` request body — verify with a test! |
-| 3 | **DTO validation** | Annotate DTO fields directly so malformed requests are caught before reaching business logic. |
-| 4 | **Validation inside reactive pipelines** | Weave async validation into the chain with `.flatMap()`/`Mono.error()`, so a failure short-circuits the rest. |
+---
 
-## How It All Fits Together
+## Q4. How Do I Weave Validation Into a Larger Reactive Chain?
+
+```java
+public Mono<OrderDto> createOrder(CreateOrderRequest request) {
+    return validateInventory(request)                 // async check #1
+        .then(validateCustomer(request.customerId()))  // async check #2
+        .then(Mono.defer(() -> orderRepository.save(OrderMapper.toEntity(request))))
+        .map(OrderMapper::toDto);
+}
+```
+
+If any validation step emits `Mono.error(...)`, the whole chain short-circuits and
+the error propagates to the controller — ready for centralized handling.
+
+---
+
+## Q5. Interview-Style Q&A
+
+### If I switch `@RequestBody ProductDto` to `@RequestBody Mono<ProductDto>`, does my existing `@Valid` still work?
+
+**Not reliably** — this is exactly the trap from Q1. Verify with a test whenever
+you use the `Mono<T>` form, and validate explicitly if it doesn't trigger.
+
+### Can validation logic call the database?
+
+**Yes** — but it must be expressed as a `Mono`-returning method (async), not a
+synchronous Bean Validation annotation, since annotations can't await a database
+call.
+
+### What happens if I forget to call `.then()` after a validator?
+
+The validation `Mono<Void>` is built but never subscribed to as part of the main
+chain — the validation silently never runs. Always `.then()` (or `.flatMap()`) it
+into the pipeline.
+
+---
+
+## Q6. Summary
 
 ```
 Incoming request body
       │
       ▼
-Simple field rules (NotBlank, Positive, ...)  ──▶ @Valid @RequestBody Dto  (works)
-                                                    @Valid @RequestBody Mono<Dto> (does NOT auto-trigger!)
-      │
+Simple field rules (@NotBlank, @Positive, ...)
+      │  @Valid @RequestBody Dto           -> WORKS reliably
+      │  @Valid @RequestBody Mono<Dto>     -> does NOT auto-trigger reliably!
       ▼
-Business rules needing a DB/external check  ──▶ custom Mono<Void> validator, chained with .then()
-      │
+Business rules needing a DB/external check
+      │  custom Mono<Void> validator, chained with .then()
       ▼
 Passes all checks → proceed to service logic
-Fails any check    → Mono.error(...) short-circuits, handled by Reactive Error Handling (next topic)
+Fails any check    → Mono.error(...) short-circuits → Reactive Error Handling topic
 ```
 
-Remember the golden rule of this topic: **whenever your request body is wrapped as
-`Mono<Dto>`, double-check that `@Valid` is actually firing** — don't assume it works
-just because it looks the same as Spring MVC.
+### One sentence to remember
+
+> **"`@Valid` works reliably on a plain DTO body, but NOT reliably on a
+> `Mono<Dto>` body — always double-check with a test whenever you use the
+> Mono form."**

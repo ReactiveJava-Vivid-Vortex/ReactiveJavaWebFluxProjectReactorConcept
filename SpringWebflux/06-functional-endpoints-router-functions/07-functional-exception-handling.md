@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-In the functional model, `@ControllerAdvice`/`@ExceptionHandler` still work
-globally, but you can also handle errors **locally**, right within a handler
-function's reactive chain, using the same `onErrorResume()`/`onErrorReturn()`
+In the functional model, `@ControllerAdvice`/`@ExceptionHandler` still
+work globally, but you can also handle errors locally, right inside a
+handler function's chain, using the same `onErrorResume()`/`onErrorReturn()`
 operators you'd use anywhere else in Project Reactor.
 
 ## Simple Example
@@ -26,13 +26,14 @@ public Mono<ServerResponse> getProduct(ServerRequest request) {
 }
 ```
 
-For truly global handling across all functional routes, Spring also lets you register
-a custom `WebExceptionHandler` bean, which behaves similarly to
+For truly global handling across all functional routes, Spring also lets
+you register a custom `WebExceptionHandler` bean, which acts a lot like
 `@ControllerAdvice` but fits the functional style.
 
 ## Why It Matters
 
-Handling errors locally, right in the handler function's reactive chain, keeps error
-handling logic close to the specific operation it applies to — useful when different
-endpoints need meaningfully different error responses for the same exception type,
-which a single global `@ControllerAdvice` handler can't easily express.
+Handling errors right there in the handler's own chain keeps the
+error-handling logic close to the operation it applies to — useful when
+different endpoints need meaningfully different responses for the same
+exception, something a single global `@ControllerAdvice` handler can't
+easily express.

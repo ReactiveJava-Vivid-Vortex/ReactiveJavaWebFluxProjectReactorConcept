@@ -2,11 +2,12 @@
 
 ## In Simple Terms
 
-`WebFilter` is Spring WebFlux's equivalent of the traditional Servlet `Filter` — it
-lets you intercept every incoming request (and outgoing response) **before** and
-**after** it reaches your controller, for cross-cutting concerns like logging,
-authentication, or adding headers. Unlike Servlet filters, `WebFilter` is fully
-reactive — its `filter()` method returns a `Mono<Void>`.
+`WebFilter` is Spring WebFlux's version of the traditional Servlet
+`Filter` — it lets you intercept every incoming request (and outgoing
+response) before and after it reaches your controller, for things like
+logging, authentication, or adding headers. Unlike Servlet filters,
+`WebFilter` is fully reactive — its `filter()` method hands back a
+`Mono<Void>`.
 
 ## Simple Example
 
@@ -25,12 +26,12 @@ public class LoggingWebFilter implements WebFilter {
 }
 ```
 
-Simply defining this as a `@Component` registers it automatically — every request to
-your WebFlux application now passes through this filter first.
+Just defining this as a `@Component` registers it automatically — every
+request to your app now passes through this filter first.
 
 ## Why It Matters
 
-`WebFilter` is the standard extension point for cross-cutting concerns that should
-apply uniformly across your entire application (not just one controller) — logging,
-security, request/response modification — all expressed reactively, consistent with
-the rest of the non-blocking request pipeline.
+`WebFilter` is the standard place to put logic that should apply
+everywhere across your app, not just one controller — logging, security,
+tweaking requests/responses — all written reactively, in step with the
+rest of the non-blocking request flow.

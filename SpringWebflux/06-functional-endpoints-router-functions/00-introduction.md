@@ -1,12 +1,11 @@
-# Functional Endpoints (Router Functions) — Topic Overview
+# Q1. What Are Functional Endpoints, and Why Would I Use Them Instead of Annotations?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of a Restaurant Menu vs a Chef Taking Verbal Orders)
 
-Instead of scattering `@GetMapping`/`@PostMapping` annotations across controller
-classes, WebFlux offers a completely different, **functional** style of declaring
-routes — many production teams actually prefer this for its explicitness. You
-declare a `RouterFunction` that maps URL patterns to plain `HandlerFunction`
-methods, all visible in one place:
+`@GetMapping`/`@PostMapping` annotations are like a chef who reacts to whatever
+orders come in, wherever they're scribbled (scattered across many controller
+classes). Functional routing is a **printed menu** — every route is listed
+explicitly, in one place, mapped directly to what makes it:
 
 ```java
 @Bean
@@ -19,39 +18,103 @@ public RouterFunction<ServerResponse> productRoutes(ProductHandler handler) {
 }
 ```
 
-A `HandlerFunction` is just a method with the signature
-`Mono<ServerResponse> handle(ServerRequest request)` — no annotations at all. You
-read request data explicitly (`request.pathVariable("id")`,
-`request.bodyToMono(Dto.class)`) and build the response explicitly
-(`ServerResponse.ok().bodyValue(...)`):
+Both styles produce **identical runtime behavior** — this is purely about whether
+your team prefers implicit annotations or explicit function composition.
+
+---
+
+## Q2. What Does a Handler Function Look Like?
+
+A `HandlerFunction` is just a plain method: `Mono<ServerResponse> handle(ServerRequest)`
+— no annotations at all.
 
 ```java
 public Mono<ServerResponse> getProduct(ServerRequest request) {
-    String id = request.pathVariable("id");
+    String id = request.pathVariable("id");           // read data EXPLICITLY
     return productService.getProduct(id)
-        .flatMap(product -> ServerResponse.ok().bodyValue(product))
+        .flatMap(product -> ServerResponse.ok().bodyValue(product))  // build response EXPLICITLY
         .switchIfEmpty(ServerResponse.notFound().build());
 }
 ```
 
-**Important gotcha:** since there's no `@Valid` annotation to auto-trigger, both
-validation and exception handling must be done **explicitly inside the handler
-function** — using a `Validator` bean directly, and `onErrorResume()` in the
-reactive chain (or a registered `WebExceptionHandler` for global handling).
+---
 
-## Quick Revision Cheat Sheet
+## Q3. `ServerRequest` and `ServerResponse` — The Explicit Read/Write API
 
-| # | Concept | One-Line Summary |
-|---|---|---|
-| 1 | **RouterFunction** | Explicit, centralized route declarations (URL + method → handler) — the functional alternative to `@GetMapping`. |
-| 2 | **HandlerFunction** | A plain method: `Mono<ServerResponse> handle(ServerRequest)` — contains the actual logic, no annotations. |
-| 3 | **ServerRequest** | Explicit access to path variables, query params, headers, and body — no annotation injection. |
-| 4 | **ServerResponse** | Fluent builder for status/headers/body (e.g. `ServerResponse.ok().bodyValue(...)`) — like `ResponseEntity`. |
-| 5 | **Functional Routing** | Composing multiple `RouterFunction`s together with `.and()` for a modular, centralized routing table. |
-| 6 | **Functional Validation** | No auto `@Valid` — validate explicitly inside the handler using a `Validator` bean. |
-| 7 | **Functional Exception Handling** | Handle errors locally with `onErrorResume()` in the handler, or globally via a custom `WebExceptionHandler`. |
+```java
+// ServerRequest — reading
+String id = request.pathVariable("id");
+Optional<String> category = request.queryParam("category");
+Mono<ProductDto> body = request.bodyToMono(ProductDto.class);
 
-## How It All Fits Together
+// ServerResponse — writing
+ServerResponse.ok().bodyValue(product);                        // 200 OK
+ServerResponse.status(HttpStatus.CREATED).bodyValue(created);   // 201 Created
+ServerResponse.notFound().build();                              // 404, no body
+```
+
+---
+
+## Q4. How Do I Compose Multiple Route Groups Together?
+
+```java
+@Bean
+public RouterFunction<ServerResponse> allRoutes(ProductHandler p, OrderHandler o) {
+    RouterFunction<ServerResponse> productRoutes = RouterFunctions.route()
+        .GET("/products", p::getAll).GET("/products/{id}", p::getById).build();
+
+    RouterFunction<ServerResponse> orderRoutes = RouterFunctions.route()
+        .GET("/orders", o::getAll).POST("/orders", o::create).build();
+
+    return productRoutes.and(orderRoutes); // compose independently-defined groups
+}
+```
+
+---
+
+## Q5. What Happens to `@Valid` in Functional Endpoints?
+
+**It doesn't exist here — there's no annotation to auto-trigger.** Validation and
+error handling must be done **explicitly, inside the handler function:**
+
+```java
+public Mono<ServerResponse> createProduct(ServerRequest request) {
+    return request.bodyToMono(ProductDto.class)
+        .flatMap(dto -> {
+            Errors errors = new BeanPropertyBindingResult(dto, "productDto");
+            validator.validate(dto, errors);
+            if (errors.hasErrors()) {
+                return ServerResponse.badRequest().bodyValue(new ErrorResponse(errors.getAllErrors().get(0).getDefaultMessage()));
+            }
+            return productService.create(dto).flatMap(created -> ServerResponse.status(HttpStatus.CREATED).bodyValue(created));
+        })
+        .onErrorResume(ProductNotFoundException.class, e -> ServerResponse.status(404).bodyValue(new ErrorResponse(e.getMessage())));
+}
+```
+
+---
+
+## Q6. Interview-Style Q&A
+
+### Can I mix functional and annotated endpoints in the same application?
+
+**Yes.** Nothing stops you — both are registered by the same underlying WebFlux
+infrastructure, side by side, with no conflict.
+
+### Does `@ControllerAdvice` still work with functional endpoints?
+
+Not automatically the same way — you handle errors locally with `.onErrorResume()`
+in the handler, or register a global `WebExceptionHandler` bean for
+functional-style centralized handling.
+
+### Is one style faster than the other at runtime?
+
+**No** — they compile down to the same underlying routing/handling machinery.
+Choice is purely stylistic/organizational.
+
+---
+
+## Q7. Summary
 
 ```
 RouterFunction (declared centrally, e.g. in @Configuration)
@@ -60,12 +123,12 @@ RouterFunction (declared centrally, e.g. in @Configuration)
 HandlerFunction: Mono<ServerResponse> getProduct(ServerRequest request)
       │
       ├── request.pathVariable("id")   ← read request data explicitly
-      ├── (explicit validation here, if needed)
-      ├── call productService...
+      ├── (explicit validation, if needed — no @Valid here)
       └── ServerResponse.ok().bodyValue(...)   ← build response explicitly
 ```
 
-Both styles (annotation-based and functional) produce the exact same runtime
-behavior — the choice is purely about whether your team prefers annotations
-(implicit, less code) or explicit function composition (more visible, more
-testable as plain Java methods).
+### One sentence to remember
+
+> **"Functional endpoints trade annotation 'magic' for explicit, centralized,
+> plain-Java-method routing — same runtime behavior, more visible code, no
+> auto-validation."**

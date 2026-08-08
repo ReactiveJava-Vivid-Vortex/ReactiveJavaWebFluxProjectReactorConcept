@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-A "reactive controller" is a regular Spring `@RestController`, but every method
-returns a `Mono`/`Flux` instead of a plain object or blocking `List`. Aside from the
-return types, the annotations (`@GetMapping`, `@PostMapping`, `@PathVariable`,
-`@RequestBody`, etc.) all look and behave exactly like traditional Spring MVC.
+A "reactive controller" is just a regular Spring `@RestController` where
+every method returns a `Mono`/`Flux` instead of a plain object or a
+blocking `List`. Aside from the return types, all the familiar annotations
+(`@GetMapping`, `@PostMapping`, `@PathVariable`, `@RequestBody`) look and
+work exactly like traditional Spring MVC.
 
 ## Simple Example
 
@@ -32,13 +33,14 @@ public class OrderController {
 }
 ```
 
-Notice you can even accept `@RequestBody Mono<Order>` instead of a plain `Order` —
-this lets Spring WebFlux start processing the request body reactively as it arrives
-over the network, rather than waiting for the entire body to be fully read first.
+You can even accept `@RequestBody Mono<Order>` instead of a plain `Order`
+— this lets WebFlux start reactively processing the request body as it
+arrives over the network, rather than waiting for the whole body to load
+first.
 
 ## Why It Matters
 
-Reactive controllers keep the same familiar Spring MVC annotation-based programming
-model, minimizing the learning curve — the shift to WebFlux is mostly about *return
-types* and *how you compose logic inside the method body* (using reactive operators
-instead of blocking calls), not a wholesale rewrite of how controllers are declared.
+Reactive controllers keep the same familiar Spring MVC annotation style,
+which keeps the learning curve small — moving to WebFlux is mostly about
+*return types* and *how you write the logic inside* (reactive operators
+instead of blocking calls), not a whole new way of declaring controllers.

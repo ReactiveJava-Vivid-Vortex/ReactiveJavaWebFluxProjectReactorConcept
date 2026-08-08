@@ -2,10 +2,9 @@
 
 ## In Simple Terms
 
-"Client streaming" means your WebFlux endpoint accepts a **request body that itself
-streams data incrementally** — e.g., a client uploading a large number of records
-one at a time — rather than requiring the entire request body to be fully received
-before processing begins.
+"Client streaming" means your endpoint accepts a request body that itself
+arrives incrementally — a client uploading lots of records one at a time —
+instead of requiring the whole body to show up before processing starts.
 
 ## Simple Example
 
@@ -21,12 +20,13 @@ public Mono<UploadSummary> uploadProducts(@RequestBody Flux<ProductDto> productS
 ```
 
 As the client sends each NDJSON line, the server processes and saves it
-incrementally — it doesn't need to buffer the entire request body in memory before
-starting work, even if the client is uploading millions of records.
+right away — it doesn't need to hold the whole request body in memory
+first, even if the client is uploading millions of records.
 
 ## Why It Matters
 
-Client streaming is essential for handling large uploads efficiently — without it,
-processing a huge upload would require buffering the entire request body in memory
-first, which doesn't scale for very large or continuous data feeds (e.g., a client
-continuously streaming sensor readings to the server).
+Client streaming is what makes handling big uploads practical — without
+it, processing a huge upload would mean buffering the entire body in
+memory first, which just doesn't scale for very large or ongoing data
+feeds (like a client continuously streaming sensor readings to the
+server).

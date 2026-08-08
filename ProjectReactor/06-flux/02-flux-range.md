@@ -2,10 +2,9 @@
 
 ## In Simple Terms
 
-`Flux.range(start, count)` creates a `Flux<Integer>` that emits a sequence of
-consecutive integers, starting at `start`, emitting `count` total values. It's a
-lazy, memory-efficient way to generate a numeric sequence without pre-building a
-`List`.
+`Flux.range(start, count)` creates a `Flux<Integer>` that counts out a sequence
+of numbers, starting at `start`, for `count` total values. It's a lightweight way
+to generate a number sequence without building a `List` first.
 
 ## Simple Example
 
@@ -23,7 +22,7 @@ Number: 4
 Number: 5
 ```
 
-Combined with other operators, it's great for generating test data or simple loops:
+Handy for generating quick test data:
 
 ```java
 Flux.range(1, 3)
@@ -36,7 +35,7 @@ Flux.range(1, 3)
 
 ## Why It Matters
 
-`Flux.range()` produces values **on demand**, respecting backpressure — it doesn't
-pre-compute a giant list in memory even if `count` is very large. This makes it
-excellent for demonstrating backpressure/demand concepts and for generating simple
-sequences for pagination, retries, or batch indices.
+`Flux.range()` only produces a number **when asked for it**, respecting
+backpressure — it never pre-builds a giant list in memory, even for a huge count.
+That makes it a great teaching tool for backpressure, and a handy way to generate
+sequences for pagination, retries, or batch indexes.

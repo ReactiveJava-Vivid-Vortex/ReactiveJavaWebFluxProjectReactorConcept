@@ -2,15 +2,16 @@
 
 ## In Simple Terms
 
-"Thread utilization" measures how effectively your available threads are being used
-— ideally, every thread should be doing real work almost all the time, rather than
-sitting idle waiting on I/O. Reactive programming's main performance win comes from
-dramatically improving thread utilization compared to blocking, thread-per-request
-models.
+"Thread utilization" is just how well you're using the threads you have —
+ideally, every thread should be doing real work almost all the time,
+instead of just sitting around waiting for something slow to finish.
+Reactive programming's biggest performance win comes from making thread
+usage dramatically more efficient compared to the old one-thread-per-request
+approach.
 
 ## Simple Example
 
-Blocking model — poor utilization under high concurrency:
+Blocking model — poor use of threads under load:
 
 ```
 1000 concurrent requests, each waiting 200ms on a DB call
@@ -18,7 +19,7 @@ Blocking model — poor utilization under high concurrency:
 -> huge memory overhead, most threads doing nothing useful at any instant
 ```
 
-Reactive model — high utilization:
+Reactive model — much better use of threads:
 
 ```
 1000 concurrent requests, using non-blocking I/O
@@ -29,7 +30,8 @@ Reactive model — high utilization:
 
 ## Why It Matters
 
-High thread utilization is precisely why a reactive server can handle vastly more
-concurrent connections with far fewer threads (and therefore far less memory) than
-an equivalent blocking server — the same hardware serves dramatically more traffic,
-provided blocking calls are correctly isolated (see [[non-blocking-execution]]).
+Good thread utilization is exactly why a reactive server can handle way
+more concurrent connections with far fewer threads (and therefore way less
+memory) than an equivalent blocking server — the same hardware ends up
+serving a lot more traffic, as long as blocking calls are properly isolated
+(see [[non-blocking-execution]]).

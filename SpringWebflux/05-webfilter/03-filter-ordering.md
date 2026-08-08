@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-When you have multiple `WebFilter`s, their execution order matters — you control it
-using the `@Order` annotation (lower values run first) or by implementing
-`Ordered`. Getting the order right ensures dependent concerns (like "authenticate
-before authorizing," or "authenticate before logging the authenticated user") happen
-in the correct sequence.
+When you have several `WebFilter`s, the order they run in matters — you
+control it with `@Order` (lower numbers run first) or by implementing
+`Ordered`. Getting the order right makes sure dependent steps (like
+"authenticate before authorizing," or "authenticate before logging who's
+authenticated") happen in the right sequence.
 
 ## Simple Example
 
@@ -34,7 +34,8 @@ public class AuditLoggingFilter implements WebFilter {
 }
 ```
 
-Alternative: implementing `Ordered` directly instead of using the annotation:
+Alternative: implementing `Ordered` directly instead of using the
+annotation:
 
 ```java
 @Component
@@ -49,7 +50,7 @@ public class AuthenticationFilter implements WebFilter, Ordered {
 
 ## Why It Matters
 
-Incorrect filter ordering is a subtle source of bugs — e.g., a logging filter trying
-to read authenticated user info that hasn't been set yet because the authentication
-filter runs *after* it. Being deliberate about `@Order` values prevents these
-ordering-dependent failures.
+Getting filter order wrong is a sneaky source of bugs — like a logging
+filter trying to read authenticated user info that hasn't been set yet
+because the auth filter actually runs *after* it. Being deliberate about
+`@Order` values avoids these ordering-dependent failures.

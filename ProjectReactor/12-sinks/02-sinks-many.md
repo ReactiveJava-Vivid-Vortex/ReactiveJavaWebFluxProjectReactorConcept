@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-`Sinks.Many<T>` is the modern way to manually produce a **stream of multiple values**
-(like a programmatic `Flux`), replacing older `Processor` implementations
-(`DirectProcessor`, `EmitterProcessor`, etc.). You build one with a specific
-distribution strategy (multicast, unicast, or replay), then call `tryEmitNext()`
-whenever you have a new item to push.
+`Sinks.Many<T>` is the modern way to manually push out a stream of multiple
+values — a `Flux` you control by hand, replacing older tools like
+`DirectProcessor` and `EmitterProcessor`. You build one with a specific
+"who gets what" strategy (multicast, unicast, or replay), then call
+`tryEmitNext()` every time you have something new to send out.
 
 ## Simple Example
 
@@ -29,7 +29,7 @@ Subscriber got: Event 2
 
 ## Why It Matters
 
-`Sinks.Many` is the modern building block for any "manually push events into a
-reactive stream" scenario — internal event buses, bridging message queues, or
-broadcasting live updates (e.g., SSE endpoints) — replacing the older, harder-to-use
-`Processor` API entirely.
+`Sinks.Many` is the go-to building block for any "manually push events into
+a stream" situation — an internal event bus, bridging a message queue, or
+broadcasting live updates (like SSE endpoints) — replacing the old, harder
+to use `Processor` API entirely.

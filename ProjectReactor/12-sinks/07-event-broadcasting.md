@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-"Event broadcasting" is the overall pattern of using a `Sinks.Many` (typically
-multicast) to notify **multiple independent parts of your application** whenever
-something happens — like a lightweight, in-process publish/subscribe event bus, built
-entirely with Project Reactor primitives.
+Event broadcasting is the overall pattern of using a `Sinks.Many` (usually
+multicast) to let multiple independent parts of your app know when
+something happened — a lightweight, in-process version of publish/subscribe,
+built entirely out of Reactor pieces.
 
 ## Simple Example
 
@@ -38,7 +38,9 @@ bus.publish(new OrderEvent("ORD-123", "CREATED"));
 
 ## Why It Matters
 
-Event broadcasting via `Sinks` lets you decouple the *producer* of an event (e.g., an
-order service) from its many independent *consumers* (email, audit, analytics) —
-each can subscribe and react without the producer needing to know about them
-individually, a foundational pattern for building loosely-coupled reactive systems.
+Event broadcasting through `Sinks` lets you keep the thing that *produces*
+an event (say, an order service) separate from the many things that
+*react* to it (email, audit, analytics) — each one can just subscribe and
+do its own thing, without the producer ever needing to know they exist.
+It's a foundational trick for building reactive systems where the pieces
+don't need to know much about each other.

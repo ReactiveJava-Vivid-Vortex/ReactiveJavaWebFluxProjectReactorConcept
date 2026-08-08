@@ -2,14 +2,15 @@
 
 ## In Simple Terms
 
-Building on the Reactive Manifesto's "Resilient" principle ([[resilient]]), real-world
-microservices combine several concrete patterns together: timeouts, retries with
-backoff, fallbacks, and sometimes circuit breakers (via libraries like Resilience4j)
-— layered together to handle the many different ways a downstream call can fail.
+Building on the Reactive Manifesto's "Resilient" idea ([[resilient]]),
+real microservices usually stack several patterns together: timeouts,
+retries with a growing delay, fallbacks, and sometimes circuit breakers
+(via libraries like Resilience4j) — layered up to handle the many
+different ways a downstream call can go wrong.
 
 ## Simple Example
 
-A comprehensive resilience strategy combining multiple patterns:
+A layered resilience strategy combining multiple patterns:
 
 ```java
 public Mono<InventoryStatus> checkInventory(String productId) {
@@ -25,13 +26,14 @@ public Mono<InventoryStatus> checkInventory(String productId) {
 }
 ```
 
-The circuit breaker (from Resilience4j's reactive integration) prevents repeatedly
-calling a service that's clearly down, "failing fast" instead of continuing to send
-requests (and consuming resources) to a service that's known to be unhealthy.
+The circuit breaker (from Resilience4j's reactive support) stops you from
+repeatedly hitting a service that's clearly down, "failing fast" instead
+of continuing to send requests (and burning resources) at something known
+to be unhealthy.
 
 ## Why It Matters
 
-Layering these patterns together — rather than relying on just one — provides
-defense in depth against the many different failure modes real distributed systems
-experience: slow responses (timeout), transient blips (retry), sustained outages
-(circuit breaker), and complete unavailability (fallback).
+Layering these patterns together — instead of relying on just one — gives
+you defense in depth against the many ways distributed systems actually
+fail: slow responses (timeout), brief hiccups (retry), sustained outages
+(circuit breaker), and total unavailability (fallback).

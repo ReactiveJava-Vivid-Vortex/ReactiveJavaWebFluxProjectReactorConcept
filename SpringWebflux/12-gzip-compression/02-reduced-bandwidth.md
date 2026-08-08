@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-"Reduced bandwidth" is the direct, measurable benefit of enabling compression —
-less data physically transmitted over the network for the same logical response
-content. This matters both for server-side network costs (many cloud providers
-charge for egress bandwidth) and client-side experience (faster downloads,
-especially on constrained connections).
+"Reduced bandwidth" is the direct, measurable payoff of turning on
+compression — less data physically going over the network for the same
+content. It matters for both server costs (many cloud providers charge for
+data leaving their network) and for the client's experience (faster
+downloads, especially on a spotty connection).
 
 ## Simple Example
 
@@ -17,13 +17,14 @@ Uncompressed response size: ~250 KB
 Gzip-compressed response size: ~35 KB   (roughly 85% smaller)
 ```
 
-The exact compression ratio depends heavily on the data's structure — repetitive
-JSON (similar field names repeated across many objects) compresses extremely well,
-while already-compressed data (images, video) sees little to no benefit from gzip.
+The exact savings depend a lot on the data's shape — repetitive JSON
+(similar field names repeated across many objects) compresses really
+well, while already-compressed data (images, video) barely benefits from
+gzip at all.
 
 ## Why It Matters
 
-Reduced bandwidth translates directly into lower cloud hosting costs (many providers
-bill for data egress) and faster response delivery to end users — particularly
-impactful for APIs serving large collections or verbose JSON structures, and for
-clients on slower or metered network connections.
+Less bandwidth means directly lower cloud hosting bills (many providers
+charge for outgoing data) and faster delivery to end users — especially
+noticeable for APIs serving large collections or verbose JSON, and for
+clients on slower or metered connections.

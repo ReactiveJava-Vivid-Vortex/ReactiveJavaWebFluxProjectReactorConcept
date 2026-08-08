@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-`WebClient` supports **filters** (via `ExchangeFilterFunction`) — a way to intercept
-and modify every outgoing request and incoming response, similar in spirit to
-`WebFilter` for incoming server requests. Common uses include adding authentication
-headers, logging, or retry logic uniformly across all calls made through a given
-`WebClient` instance.
+`WebClient` supports filters (through `ExchangeFilterFunction`) — a way to
+intercept and tweak every outgoing request and incoming response, similar
+in spirit to `WebFilter` for incoming server requests. Common uses include
+adding auth headers, logging, or retry logic uniformly across every call
+made through a given `WebClient`.
 
 ## Simple Example
 
@@ -29,13 +29,13 @@ WebClient webClient = WebClient.builder()
     .build();
 ```
 
-Every request made through this `webClient` instance now automatically includes the
-auth header and logs the response status — no need to repeat that logic in every
-individual call site.
+Every request made through this `webClient` now automatically gets the
+auth header and logs the response status — no need to repeat that logic
+at every single call site.
 
 ## Why It Matters
 
-`WebClient` filters centralize cross-cutting HTTP client concerns (auth, logging,
-retries, metrics) in one place, applied consistently to every outgoing call made
-through a shared client instance — the same "cross-cutting concerns" principle that
-`WebFilter` applies to incoming requests, but for outgoing ones.
+`WebClient` filters gather up cross-cutting HTTP client concerns (auth,
+logging, retries, metrics) in one place, applied consistently to every
+outgoing call from a shared client — the same "cross-cutting concerns"
+idea `WebFilter` applies to incoming requests, just for outgoing ones.

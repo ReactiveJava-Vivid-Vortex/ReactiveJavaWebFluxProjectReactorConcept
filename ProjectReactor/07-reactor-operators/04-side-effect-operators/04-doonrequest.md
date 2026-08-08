@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`.doOnRequest(consumer)` lets you observe every time downstream requests more items
-(i.e., calls `request(n)`) at this point in the pipeline. It's a diagnostic tool for
-understanding exactly how much demand is flowing upstream, and when.
+`.doOnRequest()` lets you watch every time the downstream side asks for more
+items ("send me `n` more") at this point in the pipeline. It's a diagnostic
+window into exactly how much a consumer is asking for, and when.
 
 ## Simple Example
 
@@ -38,6 +38,7 @@ Got: 3
 
 ## Why It Matters
 
-`.doOnRequest()` is invaluable when debugging backpressure-related issues — e.g.,
-figuring out why a slow consumer seems to be stalling, or verifying that a custom
-subscriber is correctly requesting data in the batch sizes you expect.
+`.doOnRequest()` is a lifesaver when you're debugging a backpressure
+mystery — like figuring out why a slow consumer seems stuck, or checking
+that a custom subscriber is really asking for data in the batch sizes you
+expect it to.

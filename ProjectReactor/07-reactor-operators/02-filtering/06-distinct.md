@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.distinct()` filters out duplicate items from a `Flux`, letting through only the
-first occurrence of each unique value (based on `equals()`/`hashCode()`, or a custom
-key extractor you provide). It's the reactive equivalent of removing duplicates from
-a list.
+`.distinct()` weeds out repeats — the first time it sees a value, it lets it
+through; if that same value shows up again later, it gets quietly dropped.
+It works the same way as removing duplicates from a list, just applied to a
+stream as it flows.
 
 ## Simple Example
 
@@ -23,8 +23,8 @@ Unique: 3
 Unique: 4
 ```
 
-Using a custom key selector — e.g., deduplicating orders by customer ID instead of
-the whole object:
+You can also tell it what counts as "the same" — for example, deduplicating
+orders by customer instead of comparing whole objects:
 
 ```java
 Flux.just(order1, order2, order3)
@@ -32,13 +32,13 @@ Flux.just(order1, order2, order3)
     .subscribe(order -> System.out.println("First order per customer: " + order));
 ```
 
-**Note:** `.distinct()` keeps track of every unique value it has seen so far in
-memory (to detect future duplicates), so it's not suitable for extremely large or
-infinite streams with high cardinality — memory usage grows with the number of
-distinct values seen.
+**Good to know:** `.distinct()` has to remember every unique value it has
+seen so far, so it can spot repeats later. That means it's not a great fit
+for a stream that runs forever with lots of different values — its memory
+usage just keeps growing.
 
 ## Why It Matters
 
-`.distinct()` is a handy, concise way to deduplicate data flowing through a pipeline
-— common when merging multiple sources that might contain overlapping records (e.g.,
-combining results from a cache and a database).
+`.distinct()` is a quick, clean way to remove duplicates — handy when
+combining data from more than one source, like a cache and a database, where
+the same record might show up twice.

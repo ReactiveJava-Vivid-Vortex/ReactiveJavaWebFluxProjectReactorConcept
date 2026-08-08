@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-**Demand** is the number of items a subscriber has asked for (via `request(n)`) that
-haven't been delivered yet. **Demand management** is the bookkeeping the publisher
-does to make sure it never sends more items than the outstanding demand allows.
+**Demand** is simply how many items a subscriber has asked for that haven't
+arrived yet. **Demand management** is just the publisher keeping track of that
+number so it never sends more than it should.
 
-Think of demand as a running balance:
+Think of it as a running balance:
 
 ```
 Subscriber calls request(5)   -> demand = 5
@@ -32,7 +32,7 @@ Flux.range(1, 100)
             received++;
             System.out.println("Got: " + value);
             if (received % 5 == 0) {
-                request(5); // replenish demand every 5 items
+                request(5); // top up the demand every 5 items
             }
         }
     });
@@ -40,8 +40,7 @@ Flux.range(1, 100)
 
 ## Why It Matters
 
-Good demand management is what prevents both **overproduction** (publisher racing
-ahead and building up an unbounded buffer) and **underutilization** (subscriber
-starving because it never asks for more). Operators like `.limitRate()` and
-`.prefetch()` in Project Reactor are essentially fine-tuning demand management for
-you automatically.
+Keeping this balance right prevents two problems: a publisher racing way ahead
+and piling up unsent data in memory, or a subscriber sitting idle because it
+never asked for more. Operators like `.limitRate()` and `.prefetch()` in Project
+Reactor are basically doing this bookkeeping for you, automatically.

@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-"Completing a stream" means the publisher has finished sending all its data
-successfully and calls `onComplete()` exactly once. After that, the subscriber knows
-for certain no more items are coming — it's a clean, successful end to the sequence.
+A stream "completes" when the publisher has successfully sent everything it has
+and calls `onComplete()` exactly once. After that, the subscriber knows for sure
+nothing else is coming — it's a clean, successful ending.
 
 ## Simple Example
 
@@ -17,9 +17,9 @@ Flux.just("a", "b", "c")
     );
 ```
 
-For an infinite stream, completion may never happen naturally (e.g.,
-`Flux.interval(...)` never completes on its own) — you'd need an operator like
-`.take(5)` to force completion after 5 items:
+An endless stream might never complete on its own — `Flux.interval(...)`, for
+example, never does. You'd need something like `.take(5)` to force it to stop
+after 5 items:
 
 ```java
 Flux.interval(Duration.ofSeconds(1))
@@ -33,7 +33,7 @@ Flux.interval(Duration.ofSeconds(1))
 
 ## Why It Matters
 
-Knowing exactly when (and if) a stream completes matters for cleanup logic and for
-composing pipelines correctly — for example, `.collectList()` needs the source to
-complete before it can hand back the full aggregated list; an infinite, never-
-completing `Flux` would make `.collectList()` wait forever.
+Knowing when (and if) a stream actually completes matters for cleanup logic and
+for chaining operators correctly. For example, `.collectList()` needs the stream
+to finish before it can hand you the full list — an endless `Flux` would leave
+`.collectList()` waiting forever.

@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-"Message Driven" is the foundational trait of the Reactive Manifesto: components
-communicate through **asynchronous messages/events** rather than direct, synchronous
-calls that block the caller. This loose coupling is what makes the other three
-traits (Responsive, Resilient, Elastic) achievable.
+"Message Driven" is the foundational idea behind the Reactive Manifesto:
+parts of a system talk to each other through async messages or events,
+instead of direct calls that freeze the caller until they get an answer.
+This loose coupling is what actually makes the other three traits
+(Responsive, Resilient, Elastic) possible.
 
 ## Simple Example
 
@@ -24,14 +25,16 @@ otherService.doSomethingReactive(request)
     .subscribe(result -> handleResult(result));
 ```
 
-In Spring WebFlux, every request/response is internally handled this way — `Mono`s
-and `Flux`es represent asynchronous message streams flowing between the HTTP layer
-and your application code, rather than direct blocking calls.
+In Spring WebFlux, every request and response is handled this way
+internally — `Mono`s and `Flux`es are async message streams flowing
+between the HTTP layer and your code, instead of direct calls that freeze
+and wait.
 
 ## Why It Matters
 
-Message-driven architecture decouples components in **time** — the sender doesn't
-need the receiver to be immediately available or fast, since communication happens
-via asynchronous signals rather than a direct, blocking call-and-wait. This
-decoupling is what allows reactive systems to isolate failures (resilience), absorb
-load spikes (elasticity), and remain responsive under varying conditions.
+Message-driven architecture decouples parts of a system in *time* — the
+sender doesn't need the receiver to be instantly available or fast, since
+they're talking through async signals instead of a direct call-and-wait.
+That decoupling is exactly what lets reactive systems keep failures
+contained (resilience), absorb sudden spikes (elasticity), and stay
+responsive no matter what's going on.

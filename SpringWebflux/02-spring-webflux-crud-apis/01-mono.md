@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-In a Spring WebFlux controller, `Mono<T>` is the return type you use whenever an
-endpoint produces **at most one** result — a single entity, a boolean success flag,
-or nothing at all (e.g., `Mono<Void>` for a DELETE operation). Spring WebFlux
-subscribes to the `Mono` you return and streams the resulting single value back to
-the HTTP client as the response body once it's available.
+In a WebFlux controller, `Mono<T>` is what you return whenever an endpoint
+gives back at most one result — a single record, a true/false flag, or
+nothing at all (`Mono<Void>` for something like a DELETE). WebFlux
+subscribes to whatever `Mono` you return and streams that one value back to
+the client as the response once it's ready.
 
 ## Simple Example
 
@@ -29,13 +29,13 @@ public class ProductController {
 }
 ```
 
-If `repository.findById(id)` completes empty (product not found), Spring WebFlux
-automatically responds with `404 Not Found` by default for a `Mono` that resolves
-empty in a controller method.
+If `repository.findById(id)` comes back empty (product not found), Spring
+WebFlux automatically responds with `404 Not Found` by default for an
+empty `Mono` returned from a controller method.
 
 ## Why It Matters
 
-Using `Mono` correctly in controller signatures is the foundation of writing
-non-blocking WebFlux endpoints — it tells Spring (and future readers of your code)
-exactly how many results to expect, and lets the framework handle empty/error cases
-according to well-defined, consistent conventions.
+Using `Mono` correctly in your controller signatures is the foundation for
+writing non-blocking endpoints — it tells Spring (and anyone reading your
+code later) exactly how many results to expect, and lets the framework
+handle empty/error cases in a predictable, consistent way.

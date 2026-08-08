@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`Flux.concat(source1, source2, ...)` combines multiple publishers **sequentially** —
-it fully exhausts the first source (waits for its `onComplete()`) before starting to
-subscribe to the next one. The order is strictly preserved, and no interleaving
-happens between sources.
+`Flux.concat()` runs multiple streams one after another, like a playlist —
+it plays the first one all the way through before starting the second one.
+Order is always preserved, and nothing ever plays at the same time as
+anything else.
 
 ## Simple Example
 
@@ -27,12 +27,12 @@ Got: 5
 Got: 6
 ```
 
-Even if `second` could produce values faster, `concat()` will not start it until
-`first` fully completes.
+Even if `second` could go faster, `concat()` waits until `first` is
+completely done before it even starts it.
 
 ## Why It Matters
 
-`.concat()` (and its instance-method sibling `.concatWith()`) is the right tool
-whenever **order matters** and sources must not interleave — e.g., processing a
-"setup" stream completely before starting a "main" stream, or combining paginated
-results from multiple sources in a specific sequence.
+`.concat()` (and its chainable sibling `.concatWith()`) is the right tool
+whenever order matters and things shouldn't run at the same time — like
+finishing a "setup" step completely before starting the "main" step, or
+combining paginated results from several sources in a specific sequence.

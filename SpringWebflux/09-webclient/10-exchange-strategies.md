@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`ExchangeStrategies` configure how `WebClient` encodes/decodes HTTP message bodies
-— things like maximum in-memory buffer size for a response, or custom
-encoders/decoders for non-standard content types. The most commonly adjusted setting
-is the default in-memory buffer size limit for reading response bodies.
+`ExchangeStrategies` control how `WebClient` reads and writes HTTP message
+bodies — things like the maximum amount of a response it'll hold in
+memory, or custom encoders/decoders for unusual content types. The setting
+people run into most often is the default in-memory buffer size limit for
+reading response bodies.
 
 ## Simple Example
 
@@ -23,14 +24,13 @@ WebClient webClient = WebClient.builder()
     .build();
 ```
 
-Without this adjustment, attempting to fully buffer a response body larger than the
-default limit (256KB) throws a
-`DataBufferLimitException` — a common surprise when calling APIs that return large
-JSON payloads.
+Without this adjustment, trying to fully buffer a response body bigger
+than the default 256KB limit throws a `DataBufferLimitException` — a
+common surprise when calling APIs that return large JSON payloads.
 
 ## Why It Matters
 
-Understanding `ExchangeStrategies` (and specifically the default in-memory buffer
-size limit) helps you avoid a common, confusing error when `WebClient` calls fail
-against APIs returning larger-than-expected responses — and lets you configure
-custom encoding/decoding behavior when integrating with non-standard external APIs.
+Knowing about `ExchangeStrategies` (especially the default in-memory
+buffer limit) saves you from a confusing error when `WebClient` calls fail
+against APIs returning bigger-than-expected responses — and lets you set
+up custom encoding/decoding when talking to non-standard external APIs.

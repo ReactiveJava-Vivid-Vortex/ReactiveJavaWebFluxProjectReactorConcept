@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`Schedulers.boundedElastic()` provides a thread pool designed specifically for
-**blocking** or slow I/O work that you can't avoid (e.g., a legacy blocking JDBC
-call, file I/O). It grows its thread pool dynamically as needed (up to a large but
-bounded cap, e.g., 10x CPU cores), reusing idle threads when possible.
+`Schedulers.boundedElastic()` is a thread pool made specifically for slow
+or blocking work you can't avoid — an old-style blocking database call, or
+reading a file. It grows as needed (up to a fairly generous cap, like 10x
+your CPU count), reusing threads when it can, kind of like a rideshare
+company adding more drivers when demand spikes.
 
 ## Simple Example
 
@@ -26,13 +27,13 @@ Got: Blocking result on boundedElastic-1
 
 ## Why It Matters
 
-`boundedElastic()` exists specifically so that unavoidable blocking calls don't tie
-up the small, precious pool of event-loop threads (used by `parallel()` / Netty)
-that are meant to handle many concurrent non-blocking requests. Running a blocking
-JDBC call directly on an event-loop thread can stall many unrelated requests; wrapping
-it with `.subscribeOn(Schedulers.boundedElastic())` isolates the damage to a
-dedicated pool built to absorb blocking work.
+`boundedElastic()` exists so blocking calls don't clog up the small,
+precious set of threads meant to juggle lots of concurrent, non-blocking
+requests. Run a blocking database call directly on one of those precious
+threads, and it can stall a bunch of unrelated requests at once. Move it to
+`boundedElastic()` instead, and the damage stays contained to a pool built
+to soak it up.
 
-**Rule of thumb:** any call you can't make non-blocking (legacy libraries, blocking
-JDBC, `Thread.sleep()`) should run on `boundedElastic()`, never on `parallel()` or an
-event-loop thread.
+**Rule of thumb:** anything you can't make non-blocking — old libraries,
+blocking JDBC, `Thread.sleep()` — belongs on `boundedElastic()`, never on
+`parallel()` or an event-loop thread.

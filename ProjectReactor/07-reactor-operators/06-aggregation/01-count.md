@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`.count()` waits for a `Flux` to complete, then emits a single `Mono<Long>` with the
-**total number of items** it saw. It's the reactive equivalent of counting the size
-of a list.
+`.count()` waits for a `Flux` to finish and then tells you exactly how many
+items went by — a single number, wrapped in a `Mono`. It's the same idea as
+checking `list.size()`, just for a stream instead of a list.
 
 ## Simple Example
 
@@ -19,7 +19,7 @@ Output:
 Total items: 4
 ```
 
-Combined with `.filter()` to count matching items:
+Paired with `.filter()` to count only the items that match something:
 
 ```java
 Flux.range(1, 100)
@@ -31,6 +31,7 @@ Flux.range(1, 100)
 
 ## Why It Matters
 
-`.count()` is a simple, common building block for reporting/metrics — e.g., "how many
-orders were processed today," or validating that an expected number of items came
-through a pipeline before proceeding with the next step.
+`.count()` is a simple, everyday tool for reporting and metrics — things
+like "how many orders came in today," or double-checking that the expected
+number of items actually made it through a pipeline before moving on to the
+next step.

@@ -2,19 +2,20 @@
 
 ## In Simple Terms
 
-Every reactive pipeline has two completely separate "times" you need to keep apart
-in your head:
+Every reactive pipeline has two completely separate moments you need to
+keep straight in your head:
 
 - **Assembly time** — when the pipeline is *built* (`Flux.just(...).map(...)...`).
-  This runs exactly once, top-to-bottom, like normal Java code, the instant that
-  line executes.
-- **Subscription time** — when the pipeline actually *runs*, once `.subscribe()` is
-  called. This is when your lambdas' *bodies* actually execute, potentially many
-  times (once per item, or once per subscriber).
+  This happens exactly once, top to bottom, the instant that line of code
+  runs, just like regular Java.
+- **Subscription time** — when the pipeline actually *runs*, once
+  `.subscribe()` gets called. This is when the bodies of your lambdas
+  actually execute — possibly many times, once per item, or once per
+  subscriber.
 
-Confusing these two is the deeper reason behind laziness surprises — code inside a
-lambda passed to an operator doesn't run at assembly time, only later, at
-subscription time.
+Mixing these two up is the real reason behind most "laziness surprises" —
+code inside a lambda you hand to an operator doesn't run when you build the
+pipeline, only later, when someone actually subscribes.
 
 ## Simple Example
 
@@ -42,20 +43,21 @@ Output:
 4. Received: B
 ```
 
-Notice line "2" prints **before** any lambda body runs — assembly only wires the
-pipeline together; it doesn't execute your logic.
+Notice line "2" prints *before* any lambda body runs at all — assembling
+the pipeline just wires it together, it doesn't run any of your logic yet.
 
 ## Why It Matters
 
-This distinction explains a whole category of confusing behavior:
+This distinction explains a whole family of confusing behavior:
 
-- Code **outside** any operator lambda (like a `System.out.println` between two
-  chained calls at the top level of your method) runs at **assembly time** — once,
+- Code **outside** any operator lambda (like a stray `System.out.println`
+  sitting between two chained calls) runs at assembly time — once,
   immediately.
 - Code **inside** an operator lambda (`.map(x -> ...)`, `.filter(x -> ...)`,
-  `.flatMap(x -> ...)`) runs at **subscription time** — later, per item, possibly
-  never if nobody subscribes, and possibly many times if multiple subscribers
-  attach to a cold publisher.
+  `.flatMap(x -> ...)`) runs at subscription time — later, per item,
+  possibly never if nobody ever subscribes, and possibly many times if
+  several subscribers attach to a cold publisher.
 
-Whenever a reactive pipeline "does something at the wrong time," ask: **"is this
-code at assembly time, or subscription time?"** — it's very often the answer.
+Whenever a reactive pipeline seems to "do something at the wrong time,"
+ask yourself: is this assembly time, or subscription time? Nine times out
+of ten, that's your answer.

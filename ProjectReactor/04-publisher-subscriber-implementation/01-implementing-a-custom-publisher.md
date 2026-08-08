@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-Before using `Mono`/`Flux`, it helps to build a `Publisher` completely from scratch,
-by hand, using only the raw Reactive Streams interfaces. This strips away all the
-convenience methods Reactor gives you and shows exactly what a publisher has to do:
-respond to `subscribe()` by handing the subscriber a `Subscription`, and only emit
-items when `request(n)` is called.
+Before relying on `Mono`/`Flux`, it's worth building a `Publisher` completely by
+hand, using nothing but the raw Reactive Streams interfaces. This strips away all
+of Reactor's convenience and shows you exactly what a publisher actually has to
+do: respond to `subscribe()` by handing over a `Subscription`, and only send items
+when `request(n)` is called.
 
 ## Simple Example
 
@@ -59,7 +59,7 @@ new RangePublisher(1, 5).subscribe(new Subscriber<>() {
 
 ## Why It Matters
 
-Writing this by hand reveals just how much boilerplate and careful bookkeeping (like
-tracking `remaining` and `cancelled`) is required to be a correct, spec-compliant
-publisher. This is exactly why Project Reactor's `Flux.range(1, 5)` — a single line —
-is so valuable: it handles all of this correctly and safely for you.
+Writing this by hand shows exactly how much careful bookkeeping — tracking
+`remaining`, tracking `cancelled` — goes into being a correct publisher. That's
+exactly why `Flux.range(1, 5)`, a single line, is so valuable: it handles all of
+this correctly for you, every time.

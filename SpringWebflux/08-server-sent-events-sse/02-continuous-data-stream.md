@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-A "continuous data stream" is an SSE endpoint that keeps the connection open
-indefinitely (or for a long time), continuously emitting events over time — as
-opposed to a normal HTTP response that completes once. In WebFlux, this is naturally
-expressed as a `Flux` that doesn't necessarily ever complete.
+A "continuous data stream" is an SSE endpoint that keeps its connection
+open for a long time (or forever), constantly sending events — unlike a
+normal HTTP response, which finishes once it's sent. In WebFlux, this
+naturally comes out as a `Flux` that doesn't necessarily ever complete.
 
 ## Simple Example
 
@@ -17,14 +17,15 @@ public Flux<SystemMetrics> streamMetrics() {
 }
 ```
 
-The client receives a fresh `SystemMetrics` snapshot every 2 seconds, indefinitely,
-until it disconnects (at which point WebFlux automatically cancels the underlying
-`Flux.interval()` — see [[cancellation-of-requests]]).
+The client gets a fresh `SystemMetrics` snapshot every 2 seconds,
+indefinitely, until it disconnects (at which point WebFlux automatically
+shuts down the underlying `Flux.interval()` — see
+[[cancellation-of-requests]]).
 
 ## Why It Matters
 
-Continuous data streams power dashboards, monitoring displays, and any UI that
-needs to reflect changing server-side state in near real time — the reactive model
-handles this naturally, since an SSE endpoint returning `Flux<T>` is exactly the same
-programming model as any other WebFlux endpoint, just with a media type that keeps
-the connection open.
+Continuous data streams power dashboards, monitoring displays, and any UI
+that needs to reflect changing server-side state close to real time — the
+reactive model handles this naturally, since an SSE endpoint returning
+`Flux<T>` is exactly the same programming model as any other WebFlux
+endpoint, just with a media type that keeps the connection open.

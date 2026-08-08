@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`Flux.mergeSequential(source1, source2, ...)` is a hybrid: it **subscribes to all
-sources concurrently** (like `merge()`, so they all start working in parallel right
-away), but it **emits their results in source order** (like `concat()`) — buffering
-faster sources' output until it's their turn.
+`Flux.mergeSequential()` gets you the best of both `merge()` and
+`concat()`: it kicks off all sources at the same time (so they all start
+working right away, just like `merge()`), but it still hands you the
+results back in the original source order (like `concat()`) — quietly
+holding onto faster results until it's their proper turn.
 
 ## Simple Example
 
@@ -17,7 +18,8 @@ Flux.mergeSequential(fast, slow)
     .subscribe(item -> System.out.println("Got: " + item));
 ```
 
-Even though `fast` finishes well before `slow`, the output order is guaranteed:
+Even though `fast` finishes well before `slow`, the output order is
+guaranteed:
 ```
 Got: A1
 Got: A2
@@ -25,12 +27,13 @@ Got: B1
 Got: B2
 ```
 
-Both sources started working (concurrently) as soon as `mergeSequential` subscribed
-— `fast`'s results are just held back internally until `slow`'s turn is over.
+Both sources started working concurrently the moment `mergeSequential`
+subscribed — `fast`'s results are just held back internally until `slow`
+has had its turn.
 
 ## Why It Matters
 
-`.mergeSequential()` gives you the best of both worlds when you need **deterministic
-output ordering** but still want to kick off all the underlying work concurrently for
-speed — e.g., calling multiple APIs in parallel but needing to display/process their
-results in a fixed, predictable order.
+`.mergeSequential()` is the answer when you need predictable, ordered
+output but still want all the underlying work to start at once for speed —
+like calling several APIs in parallel but needing to show or process their
+results in a fixed, known order.

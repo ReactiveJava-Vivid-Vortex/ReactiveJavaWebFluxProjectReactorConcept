@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-Similarly, WebFlux can stream large file **downloads** to a client incrementally —
-reading the file's bytes as a `Flux<DataBuffer>` and writing them directly to the
-HTTP response as they're read, without ever loading the entire file into server
-memory.
+The same idea works in reverse for downloads: WebFlux can stream a big
+file to the client incrementally — reading its bytes as a
+`Flux<DataBuffer>` and writing them straight into the HTTP response as
+they're read, without ever loading the whole file into server memory.
 
 ## Simple Example
 
@@ -25,13 +25,13 @@ public Mono<Void> downloadFile(@PathVariable String filename, ServerHttpResponse
 }
 ```
 
-The file is read from disk and written to the HTTP response in small chunks,
-streamed continuously — the server never holds more than a small buffer's worth of
-the file in memory at any given moment, regardless of the total file size.
+The file gets read from disk and written to the response in small chunks,
+continuously — the server never holds more than a small buffer's worth of
+the file in memory at any moment, no matter how big the file actually is.
 
 ## Why It Matters
 
-Streaming large downloads keeps server memory usage constant and predictable, even
-when serving very large files (videos, backups, datasets) to many concurrent
-clients simultaneously — a naive "load the whole file into a byte array first"
-approach would risk exhausting server memory under concurrent large downloads.
+Streaming downloads keeps server memory usage flat and predictable, even
+when serving huge files (videos, backups, datasets) to lots of clients at
+once — a naive "load the whole file into a byte array first" approach
+risks running the server out of memory under concurrent large downloads.

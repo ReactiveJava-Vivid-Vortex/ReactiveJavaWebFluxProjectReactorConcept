@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.onErrorMap(mappingFunction)` catches an error and **transforms it into a different
-exception**, then re-throws that new exception downstream (i.e., the stream still
-fails — just with a different, usually more meaningful, error type). It's the
-reactive equivalent of catching an exception and wrapping it before re-throwing.
+`.onErrorMap()` catches an error and swaps it for a *different* error
+before sending it downstream — the stream still fails, just with something
+more meaningful attached. It's the same idea as catching an exception,
+wrapping it in a clearer one, and throwing that instead.
 
 ## Simple Example
 
@@ -18,8 +18,8 @@ public Mono<User> getUser(String id) {
 }
 ```
 
-Now callers only need to know about `ServiceException`, not low-level details like
-`SQLException`:
+Now callers only need to know about `ServiceException`, not low-level
+details like `SQLException`:
 
 ```java
 getUser("123").subscribe(
@@ -34,7 +34,7 @@ getUser("123").subscribe(
 
 ## Why It Matters
 
-`.onErrorMap()` is essential for maintaining clean **error abstraction boundaries** in
-layered applications — a repository layer might throw low-level database exceptions,
-but a service layer should translate those into meaningful, domain-specific
-exceptions before they reach the controller/API layer.
+`.onErrorMap()` keeps things clean across layers of an app — a repository
+might throw raw database exceptions, but a service layer should translate
+those into meaningful, domain-specific errors before they ever reach the
+controller or API layer.

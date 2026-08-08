@@ -2,11 +2,10 @@
 
 ## In Simple Terms
 
-Some sink configurations (like plain `Sinks.many().multicast().directBestEffort()` or
-the underlying "direct" strategies) don't buffer at all — if a subscriber isn't
-currently ready to receive (has no outstanding demand), the emission is simply
-**dropped** for that subscriber, on a "best effort" basis, rather than being queued
-up in memory.
+Some sink setups (like `Sinks.many().multicast().directBestEffort()`) don't
+buffer anything at all — if a subscriber isn't ready to receive right that
+second, the item is simply dropped for them, on a "best effort" basis,
+rather than being held in memory until they catch up.
 
 ## Simple Example
 
@@ -24,13 +23,15 @@ for (int i = 1; i <= 5; i++) {
 }
 ```
 
-If a subscriber is slow to request more items, some emissions may report a failure
-result (like `FAIL_OVERFLOW` or similar) instead of being buffered indefinitely.
+If a subscriber is slow to ask for more items, some emissions may come back
+as a failure (like `FAIL_OVERFLOW`) instead of quietly piling up in memory
+forever.
 
 ## Why It Matters
 
-"Direct, best effort" semantics are appropriate when **losing some data under
-backpressure is acceptable** — e.g., broadcasting live sensor readings where the
-absolute latest value matters more than never missing one, or a UI live-update
-stream where dropping an intermediate frame is fine as long as the latest state
-eventually arrives. This trades guaranteed delivery for bounded memory usage.
+"Direct, best effort" behavior makes sense when it's actually fine to lose
+some data under pressure — like broadcasting live sensor readings, where
+the freshest value matters more than never missing a single one, or a
+live-updating UI where skipping an intermediate frame is harmless as long
+as the latest state eventually shows up. You're trading guaranteed delivery
+for keeping memory usage bounded.

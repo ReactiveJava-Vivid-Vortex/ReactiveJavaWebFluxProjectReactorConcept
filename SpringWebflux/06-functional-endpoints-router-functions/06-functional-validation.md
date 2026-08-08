@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-In the functional WebFlux model, since there's no `@Valid` annotation on a method
-parameter to trigger automatically, validation is performed **explicitly** inside
-your handler function — typically using a `Validator` bean or custom validation
-logic applied directly to the parsed request body.
+In the functional WebFlux model, there's no `@Valid` annotation on a
+method parameter to trigger checks automatically, so validation happens
+explicitly inside your handler function — usually with a `Validator` bean
+or custom logic applied directly to the parsed request body.
 
 ## Simple Example
 
@@ -36,7 +36,7 @@ public class ProductHandler {
 
 ## Why It Matters
 
-Because functional endpoints don't get automatic annotation-driven validation, being
-explicit about validation inside each handler is essential — it's slightly more
-verbose than `@Valid`, but it makes validation logic fully visible and controllable
-directly in your handler code, with no hidden "magic" behavior to account for.
+Since functional endpoints don't get automatic validation from
+annotations, being explicit about it in each handler is a must — it's a
+bit more code than `@Valid`, but it makes validation fully visible right
+there in your handler, with no hidden framework behavior to keep track of.

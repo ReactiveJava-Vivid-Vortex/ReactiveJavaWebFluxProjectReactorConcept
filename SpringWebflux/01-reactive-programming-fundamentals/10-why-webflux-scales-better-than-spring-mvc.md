@@ -2,12 +2,11 @@
 
 ## In Simple Terms
 
-Spring MVC uses a **thread-per-request** model built on the Servlet API: each
-incoming HTTP request is handled by a dedicated thread from a pool (often sized
-around 200 by default), which blocks for the entire duration of any I/O the request
-performs. Spring WebFlux uses a small, fixed number of **event-loop threads** (via
-Netty) that never block — they're always free to service whichever request has data
-ready.
+Spring MVC hands each incoming request its own dedicated thread from a
+pool (often around 200 by default) — and that thread freezes for however
+long the request's I/O takes. Spring WebFlux instead uses a small, fixed
+handful of event-loop threads (via Netty) that never freeze — they're
+always free to service whichever request happens to have data ready.
 
 ## Simple Example
 
@@ -27,8 +26,9 @@ Spring WebFlux (event-loop), ~8-16 threads:
 
 ## Why It Matters
 
-This difference is most dramatic for **I/O-bound, high-concurrency** workloads —
-exactly the profile of most public APIs and microservices. For CPU-bound workloads
-with modest concurrency, Spring MVC often performs just as well (or is simpler to
-reason about), which is why choosing WebFlux should be a deliberate decision based on
-your actual traffic profile, not a default choice for every project.
+This difference matters most for I/O-heavy workloads with lots of
+concurrent traffic — exactly the shape of most public APIs and
+microservices. For CPU-heavy workloads with modest concurrency, plain
+Spring MVC often does just as well (and is simpler to reason about), which
+is why choosing WebFlux should be a deliberate call based on your actual
+traffic, not just a default for every project.

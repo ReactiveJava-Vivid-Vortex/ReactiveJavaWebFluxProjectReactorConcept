@@ -1,20 +1,30 @@
-# Flux — Topic Overview
+# Q1. What Is a Flux?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of a Playlist vs a Live Radio)
 
-If `Mono` is "0 or 1 value," then `Flux<T>` is its bigger sibling: **0 to
-potentially infinite values**, emitted over time. Everything you learned about
-`Mono` (laziness, the three-outcome lifecycle, factory methods) applies here too —
-just repeated for many items instead of one.
+If `Mono` is a vending machine slot (0 or 1 item), `Flux<T>` is a **playlist** —
+0, 1, or even infinitely many items, delivered one at a time, over time.
 
-The main skill in this topic is picking the right way to **create** a `Flux` for
-your data source:
+```
+Mono:  🎵           (0 or 1 song)
+Flux:  🎵 🎵 🎵 🎵 ... (0 to N songs, could be a whole playlist, could be a live stream)
+```
 
-- Already have the data? → `Flux.just()` / `Flux.fromIterable()`
-- Need to generate values one at a time, synchronously? → `Flux.generate()`
-- Need to bridge an external, asynchronous, push-based source (a listener, a
-  message queue)? → `Flux.create()` / `Flux.push()`
-- Need a repeating timer? → `Flux.interval()`
+Everything you know about `Mono` (laziness, cold-by-default, the three signal
+types) applies to `Flux` too — just without the "at most one" cap on `onNext`.
+
+---
+
+## Q2. How Do I Create a Flux? (Pick Based on Your Source)
+
+| Source Shape | Factory | Example |
+|---|---|---|
+| Already have fixed values | `Flux.just()` | `Flux.just("a", "b", "c")` |
+| A sequence of numbers | `Flux.range()` | `Flux.range(1, 5)` |
+| An existing collection | `Flux.fromIterable()` | `Flux.fromIterable(myList)` |
+| Generate one at a time, synchronously | `Flux.generate()` | Fibonacci sequence, stateful counters |
+| External async/push source | `Flux.create()` / `Flux.push()` | Message listeners, sensors |
+| A repeating timer | `Flux.interval()` | Heartbeats, polling |
 
 ```java
 Flux.range(1, 5)
@@ -23,43 +33,104 @@ Flux.range(1, 5)
 // Square: 1, 4, 9, 16, 25
 ```
 
-A second key idea is the distinction between **finite** streams (they eventually
-call `onComplete()` on their own, like `Flux.range()`) and **infinite** streams
-(they never complete unless you force them to, like `Flux.interval()`) — infinite
-streams must always be bounded explicitly with something like `.take(n)`, or they'll
-run forever.
+---
 
-## Quick Revision Cheat Sheet
+## Q3. `Flux.generate()` vs `Flux.create()` — What's the Real Difference?
 
-| # | Concept | One-Line Summary |
-|---|---------|-------------------|
-| 1 | **Flux.just()** | Emits a small, fixed, already-known set of values, then completes. |
-| 2 | **Flux.range()** | Lazily emits a sequence of consecutive integers, respecting backpressure. |
-| 3 | **Flux.fromIterable()** | Emits each element of an existing `List`/collection, one at a time. |
-| 4 | **Flux.generate()** | Synchronously produces items one at a time, in direct response to demand — great for stateful sequences. |
-| 5 | **Flux.create()** | Bridges external, async, push-based sources (listeners, queues) — supports multi-threaded emission. |
-| 6 | **Flux.push()** | Like `create()`, but optimized for a single-threaded producer only. |
-| 7 | **Flux.interval()** | Emits an incrementing counter on a fixed time interval, forever, until bounded (e.g., with `.take()`). |
-| 8 | **Infinite streams** | Never call `onComplete()` on their own — must be explicitly bounded (`.take(n)`, `.take(Duration)`). |
-| 9 | **Finite streams** | Eventually complete on their own once their known, bounded data is exhausted. |
-| 10 | **FluxSink** | The manual emission "microphone" inside `Flux.create()`/`Flux.push()` — call `next()` many times, then `complete()`/`error()`. |
-| 11 | **Custom publishers** | Wrapping a proprietary/legacy data source behind `Flux.create()`/`generate()` so the rest of your code treats it like any other stream. |
-| 12 | **Event generation** | The broader pattern of producing application events as a `Flux` for others to react to (foundation for `Sinks`, covered later). |
+```java
+// generate(): ONE item per callback invocation, synchronous, naturally demand-aware
+Flux<Integer> generated = Flux.generate(sink -> {
+    sink.next((int) (Math.random() * 100)); // exactly one item, respects backpressure automatically
+});
 
-## How It All Fits Together
-
-```
-Data source shape?
-   │
-   ├── Already in memory (List, fixed values) ──▶ Flux.just() / Flux.fromIterable()
-   │
-   ├── Generate synchronously, one at a time ───▶ Flux.generate()
-   │
-   ├── External, async, push-based source ──────▶ Flux.create() / Flux.push()
-   │
-   └── Repeating timer ──────────────────────────▶ Flux.interval()  (bound with .take()!)
+// create(): can push MANY items per callback, from ANY thread, async sources
+Flux<String> created = Flux.create(sink -> {
+    externalEventSource.onEvent(event -> sink.next(event)); // called from any thread, any time
+    externalEventSource.onClose(sink::complete);
+});
 ```
 
-Once you're comfortable creating a `Flux` the right way for any given source, the
-next topic — Reactor Operators — is where you'll learn to transform, filter, and
-reshape everything flowing through it.
+| | `generate()` | `create()` / `push()` |
+|---|---|---|
+| Emission | One item per call, synchronous | Many items, can be async/multi-threaded |
+| Backpressure | Automatic (demand-aware) | You must configure an `OverflowStrategy` |
+| Best for | Stateful sequences (Fibonacci, counters) | Bridging external push-based sources |
+
+---
+
+## Q4. Finite vs Infinite Streams — Why Does It Matter?
+
+```
+Flux.range(1, 5)          -> FINITE (completes after 5 items, on its own)
+Flux.fromIterable(list)   -> FINITE (completes after the list is exhausted)
+Flux.interval(Duration)   -> INFINITE (never completes on its own!)
+```
+
+```java
+Flux.interval(Duration.ofSeconds(1))
+    .take(5) // MUST bound an infinite stream explicitly, or it runs forever
+    .subscribe(tick -> System.out.println("Tick: " + tick));
+```
+
+**Operators that don't work on infinite streams:** `.collectList()`, `.count()`,
+`.reduce()` — they all need `onComplete()` to ever fire, which never happens on a
+truly infinite `Flux`.
+
+---
+
+## Q5. What Is `FluxSink`?
+
+The manual emission "microphone" inside `Flux.create()`/`Flux.push()` — call
+`.next(item)` many times, then `.complete()` or `.error()` once.
+
+```java
+Flux<Integer> flux = Flux.create(sink -> {
+    for (int i = 1; i <= 5; i++) sink.next(i);
+    sink.complete();
+});
+```
+
+Unlike `MonoSink` (one emission only), `FluxSink` supports repeated `.next()`
+calls — and needs an `OverflowStrategy` (`BUFFER`, `DROP`, `LATEST`, `ERROR`) for
+when the producer outpaces demand.
+
+---
+
+## Q6. Interview-Style Q&A
+
+### Does `Flux.just("a", "b", "c")` re-run for every subscriber?
+
+**Yes** — it's cold by default, like most Reactor sources. Each subscription gets
+a fresh, independent emission of `"a", "b", "c"`.
+
+### If I don't call `.take(n)` on `Flux.interval()`, what happens?
+
+It runs **forever**, ticking indefinitely, unless externally cancelled — this is a
+very common beginner bug in demos/tests.
+
+### Can `Flux.generate()` push more than one item per invocation?
+
+**No** — that's the key distinction from `Flux.create()`. `generate()` is strictly
+one item per call, which is what makes it automatically backpressure-safe.
+
+### What's the simplest way to turn a `List<T>` into a Flux?
+
+`Flux.fromIterable(myList)`.
+
+---
+
+## Q7. Summary
+
+| Concept | Key Takeaway |
+|---|---|
+| Flux | 0 to N async values — the "big sibling" of Mono, same rules, no upper cap |
+| Flux.generate() | Synchronous, one-at-a-time, automatically demand-aware |
+| Flux.create()/push() | Async/push-based bridge, needs an overflow strategy |
+| Finite vs Infinite | Infinite streams (`interval()`) must be explicitly bounded (`.take()`) |
+| FluxSink | Manual "microphone" for emitting many items into a Flux.create() |
+
+### One sentence to remember
+
+> **"A Flux is a playlist, not a jukebox slot — it can hand you nothing, one
+> song, or an endless live stream, and you decide how many tracks you're ready
+> to hear next."**

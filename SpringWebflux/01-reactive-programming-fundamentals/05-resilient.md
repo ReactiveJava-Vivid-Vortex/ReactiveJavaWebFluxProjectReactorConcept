@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-"Resilient" means a system stays responsive even when **parts of it fail** — a
-single failing dependency shouldn't cascade into a total outage. Resilience is
-achieved through isolation (failures contained to one component) and graceful
-recovery (fallbacks, retries, circuit breaking).
+"Resilient" means a system keeps working even when parts of it break — one
+failing dependency shouldn't drag the whole thing down with it. Resilience
+comes from keeping failures contained to one spot, and recovering
+gracefully (fallbacks, retries, and so on).
 
 ## Simple Example
 
@@ -21,14 +21,14 @@ public Mono<Recommendations> getRecommendations(String userId) {
 }
 ```
 
-Even if the recommendation service is completely down, the rest of the
-application (and this endpoint specifically) continues to function — just with a
-generic fallback instead of personalized recommendations.
+Even if the recommendation service goes completely down, the rest of the
+app (and this endpoint specifically) keeps working — just with a generic
+fallback instead of personalized recommendations.
 
 ## Why It Matters
 
-In a microservices architecture with many interdependent services, resilience is
-what prevents a single failing service from taking down the entire system (a
-"cascading failure"). Reactive error-handling operators (`onErrorResume`, `retry`,
-`timeout`) give you the building blocks to design resilience directly into your
-service composition.
+In a system made up of many interdependent services, resilience is what
+stops one failing service from taking the whole thing down with it (a
+"cascading failure"). Tools like `onErrorResume`, `retry`, and `timeout`
+give you the building blocks to design resilience directly into how your
+services talk to each other.

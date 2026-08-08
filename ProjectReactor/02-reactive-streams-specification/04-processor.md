@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-A `Processor` is both a `Subscriber` **and** a `Publisher` at the same time. It sits
-in the *middle* of a pipeline: it subscribes to an upstream source (consuming data),
-optionally transforms it, and re-publishes it downstream to its own subscribers.
+A `Processor` is both a `Subscriber` **and** a `Publisher` at the same time. It
+sits in the middle of a pipeline: it listens to data coming in from one side,
+maybe changes it, and passes it along to whoever's listening on the other side.
 
 ```java
 public interface Processor<T, R> extends Subscriber<T>, Publisher<R> {
@@ -13,16 +13,16 @@ public interface Processor<T, R> extends Subscriber<T>, Publisher<R> {
 
 ## Simple Example
 
-Think of a processor like a relay station: it receives a signal, maybe amplifies or
-converts it, and re-broadcasts it.
+Think of it like a relay station: it picks up a signal, maybe boosts or converts
+it, and rebroadcasts it further.
 
 ```
 Publisher(raw sensor data) -> Processor(converts Celsius to Fahrenheit) -> Subscriber
 ```
 
-In modern Project Reactor code, you rarely implement `Processor` directly anymore —
-it has largely been **replaced by `Sinks`** (covered in a later section), which offer
-a safer, easier-to-use API for the same "bridge" role.
+In modern Project Reactor code, you almost never build a `Processor` by hand
+anymore — it's been mostly replaced by `Sinks` (covered later in this course),
+which do the same job but are much harder to get wrong.
 
 ```java
 // Modern replacement using Sinks instead of a raw Processor:
@@ -33,6 +33,5 @@ sink.asFlux().subscribe(System.out::println);
 
 ## Why It Matters
 
-Understanding `Processor` explains historically how you'd manually bridge
-"push data in, push transformed data out" before Reactor introduced `Sinks`. Knowing
-this helps you understand *why* `Sinks` exist and what problem they solve.
+Knowing what a `Processor` is helps explain *why* `Sinks` exist — they solve the
+exact same "receive data, push data back out" problem, just more safely.

@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.onErrorResume(fallbackFunction)` catches an error and switches to an **entirely
-different Mono/Flux** (which can itself be asynchronous — e.g., a fallback service
-call), based on the error that occurred. It's more powerful than `.onErrorReturn()`
-because the recovery itself can be a full reactive operation.
+`.onErrorResume()` catches an error and switches over to a completely
+different `Mono`/`Flux` — which can itself go do more async work, like
+calling a backup service. It's more powerful than `.onErrorReturn()`
+because your "plan B" can be a full operation, not just a static value.
 
 ## Simple Example
 
@@ -19,7 +19,7 @@ public Mono<String> getWeather(String city) {
 }
 ```
 
-Matching specific exception types for targeted recovery:
+Matching specific error types for targeted recovery:
 
 ```java
 callExternalService()
@@ -30,7 +30,7 @@ callExternalService()
 
 ## Why It Matters
 
-`.onErrorResume()` is the go-to tool for **resilience patterns** in microservices —
-falling back to a cache, a secondary service, or a degraded-but-functional response
-when a primary dependency fails, all expressed as a natural part of the reactive
-chain rather than a separate try/catch block.
+`.onErrorResume()` is the go-to tool for resilience in microservices —
+falling back to a cache, a secondary service, or a scaled-down but working
+response when the main dependency fails, all written as a natural part of
+the chain instead of a separate try/catch block.

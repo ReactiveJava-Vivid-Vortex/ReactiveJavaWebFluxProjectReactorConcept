@@ -2,10 +2,9 @@
 
 ## In Simple Terms
 
-`cancel()` is how a `Subscriber` tells the `Publisher`: **"Stop sending me data, I'm
-no longer interested."** After calling `cancel()`, the publisher should stop emitting
-`onNext()` signals to that subscriber and release any resources tied to that
-subscription.
+`cancel()` is how a subscriber tells the publisher: **"Stop, I don't want any more
+data."** After this is called, the publisher should stop sending items and clean
+up anything tied to that subscriber.
 
 ```java
 public interface Subscription {
@@ -24,14 +23,14 @@ Disposable subscription = Flux.interval(Duration.ofSeconds(1))
 subscription.dispose(); // internally calls cancel() on the underlying Subscription
 ```
 
-In Project Reactor, you rarely call `Subscription.cancel()` directly — instead, the
-`subscribe()` call returns a `Disposable`, and calling `.dispose()` on it triggers
-cancellation under the hood.
+In everyday Project Reactor code, you almost never call `cancel()` yourself —
+`.subscribe()` gives you back a `Disposable`, and calling `.dispose()` on that
+does the cancelling for you.
 
 ## Why It Matters
 
-Cancellation is essential for **resource cleanup**. Imagine an infinite stream (like
-`Flux.interval(...)`) tied to a browser connection — when the user closes their
-browser tab, the HTTP connection closes, and Spring WebFlux automatically cancels the
-underlying subscription so the server stops doing unnecessary work for a client that's
-no longer listening.
+Cancellation is how resources get cleaned up. Picture an endless stream (like
+`Flux.interval()`) hooked up to a browser tab. The moment the user closes that
+tab, the connection drops, and Spring WebFlux automatically cancels the stream
+behind it — so the server stops doing pointless work for a client that's already
+gone.

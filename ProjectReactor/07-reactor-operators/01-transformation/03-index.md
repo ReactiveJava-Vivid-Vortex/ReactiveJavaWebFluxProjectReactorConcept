@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.index()` pairs each item in a `Flux` with its **zero-based position** in the
-sequence, wrapping each into a `Tuple2<Long, T>` (index, value). It's the reactive
-equivalent of Java's `IntStream.range()` combined with an element, or Python's
-`enumerate()`.
+`.index()` sticks a position number on every item as it goes by — like a
+deli-counter ticket machine, except instead of "take a number," it's "here's
+your number, now go." The first item gets 0, the second gets 1, and so on.
+Each item comes out paired as (number, item).
 
 ## Simple Example
 
@@ -22,7 +22,7 @@ Output:
 2: Cherry
 ```
 
-You can also supply a custom index-mapping function:
+You can also format it however you like instead of getting a raw pair back:
 
 ```java
 Flux.just("A", "B", "C")
@@ -39,7 +39,7 @@ Item #2 = C
 
 ## Why It Matters
 
-`.index()` is handy whenever you need positional information — e.g., logging
-"processing item 5 of N," numbering rows in a generated report, or implementing
-simple pagination-like logic within a stream — without needing to maintain a manual
-counter variable yourself.
+Whenever you need to know "which one is this" — for logging like "processing
+item 5 of N," numbering rows in a report, or anything positional — `.index()`
+gives you that number for free, instead of you having to keep a counter
+variable and manually increment it yourself.

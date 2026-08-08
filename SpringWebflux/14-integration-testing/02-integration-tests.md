@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-An "integration test" verifies that multiple layers of your application (controller,
-service, repository, and often a real or embedded database) work correctly together
-— as opposed to a unit test, which tests a single class in isolation with mocked
-dependencies.
+An "integration test" checks that several layers of your app (controller,
+service, repository, and often a real or embedded database) actually work
+together correctly — unlike a unit test, which tests one class on its own
+with mocked dependencies.
 
 ## Simple Example
 
@@ -53,7 +53,7 @@ class ProductIntegrationTest {
 
 ## Why It Matters
 
-Integration tests catch issues that unit tests (with mocked dependencies) miss —
-incorrect SQL queries, serialization mismatches, misconfigured routes — by exercising
-the real interaction between your application's layers, ideally against a real (or
-realistic, containerized) database.
+Integration tests catch things unit tests (with mocked dependencies) just
+can't see — wrong SQL queries, mismatched serialization, misconfigured
+routes — by actually exercising the real interaction between your app's
+layers, ideally against a real (or realistic, containerized) database.

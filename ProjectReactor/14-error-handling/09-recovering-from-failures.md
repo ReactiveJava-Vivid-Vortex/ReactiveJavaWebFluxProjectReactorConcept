@@ -2,14 +2,14 @@
 
 ## In Simple Terms
 
-"Recovering from failures" means designing your reactive pipelines so that errors
-don't simply propagate and crash the whole operation — instead, you use the right
-combination of `onErrorResume`, `retryWhen`, `timeout`, and fallback values to keep
-the system functioning, in a degraded but acceptable way, when something goes wrong.
+"Recovering from failures" is about designing your pipelines so errors
+don't just crash the whole operation — instead, you combine
+`onErrorResume`, `retryWhen`, `timeout`, and fallback values to keep things
+running, maybe in a scaled-back way, whenever something goes wrong.
 
 ## Simple Example
 
-A realistic, layered recovery strategy for calling an unreliable external API:
+A realistic, layered recovery plan for calling an unreliable external API:
 
 ```java
 public Mono<ExchangeRate> getExchangeRate(String currency) {
@@ -24,14 +24,15 @@ public Mono<ExchangeRate> getExchangeRate(String currency) {
 }
 ```
 
-This pipeline: waits at most 2 seconds, retries transient failures with backoff twice,
-falls back to a cached rate if the API keeps failing, and finally falls back to a
-sensible default if even the cache has nothing.
+This pipeline waits at most 2 seconds, retries a couple of times with a
+growing delay if things fail, falls back to a cached rate if the API keeps
+failing, and finally falls back to a sensible default if even the cache
+comes up empty.
 
 ## Why It Matters
 
-Thoughtful failure recovery is what separates a fragile system (one bad dependency
-takes down everything) from a resilient one (failures are contained and gracefully
-degraded). This is one of the core promises of the Reactive Manifesto — resilience —
-and Project Reactor gives you all the tools needed to implement it directly in your
-pipelines.
+Thinking through failure recovery ahead of time is what separates a
+fragile system (where one bad dependency drags everything else down with
+it) from a resilient one (where failures stay contained and things degrade
+gracefully). This is exactly the kind of resilience reactive programming
+promises — and Reactor gives you all the pieces to actually build it.

@@ -2,11 +2,12 @@
 
 ## In Simple Terms
 
-`.refCount()` (called on a `ConnectableFlux`, typically after `.publish()`)
-automatically manages the connection lifecycle based on the number of active
-subscribers: it connects (starts the source) when the **first** subscriber arrives,
-and disconnects (stops the source) when the **last** subscriber leaves. In fact,
-`.share()` is essentially shorthand for `.publish().refCount()`.
+`.refCount()` (used on a `ConnectableFlux`, usually right after
+`.publish()`) automatically starts the source the moment the first
+subscriber shows up, and shuts it down the moment the last one leaves —
+like a motion-sensor light that turns on when someone walks in and off when
+the room is empty. In fact, `.share()` is really just shorthand for
+`.publish().refCount()`.
 
 ## Simple Example
 
@@ -26,13 +27,13 @@ sub1.dispose();
 sub2.dispose(); // last subscriber leaves -> "Source stopped" prints
 ```
 
-There's also `.refCount(minSubscribers)`, which waits for a minimum number of
-subscribers before connecting — useful for coordinating multiple consumers before
-starting an expensive shared resource.
+There's also `.refCount(minSubscribers)`, which waits for a minimum number
+of subscribers before it even starts — useful for coordinating several
+consumers before firing up an expensive shared resource.
 
 ## Why It Matters
 
-`.refCount()` automates connection management so you don't have to manually call
-`.connect()`/`.dispose()` yourself — the source naturally starts when needed and
-cleans itself up when no one is listening anymore, which is exactly the behavior
-`.share()` provides as a convenient shorthand.
+`.refCount()` takes the manual work out of connection management — no more
+calling `.connect()`/`.dispose()` yourself. The source starts naturally when
+it's needed and cleans itself up once nobody's listening, which is exactly
+the convenience `.share()` bundles up for you.

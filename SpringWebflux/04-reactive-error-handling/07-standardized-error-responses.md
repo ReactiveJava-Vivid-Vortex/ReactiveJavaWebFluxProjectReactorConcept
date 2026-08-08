@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-Beyond just using `ProblemDetail`, "standardized error responses" means designing a
-**consistent overall error contract** for your entire API — the same fields, the
-same structure, the same conventions — so any client integrating with any endpoint
+Beyond just using `ProblemDetail`, "standardized error responses" means
+designing one consistent error format for your whole API — same fields,
+same structure, same conventions — so any client hitting any endpoint
 knows exactly what shape to expect when something goes wrong.
 
 ## Simple Example
@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
 
 ## Why It Matters
 
-Whether you adopt the RFC standard `ProblemDetail` format or a custom shape,
-consistency is what actually matters most — client applications can write one
-generic error-handling routine that works across your entire API, instead of custom
-parsing logic per endpoint.
+Whether you go with the RFC standard `ProblemDetail` format or your own
+custom shape, what really matters is consistency — client apps can write
+one generic error-handling routine that works across your whole API,
+instead of writing custom parsing logic for every single endpoint.

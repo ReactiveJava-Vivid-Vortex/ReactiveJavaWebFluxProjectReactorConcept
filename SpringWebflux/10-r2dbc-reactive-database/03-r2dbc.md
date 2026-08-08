@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-**R2DBC** (Reactive Relational Database Connectivity) is a specification (and set of
-drivers) providing truly non-blocking access to relational databases (PostgreSQL,
-MySQL, SQL Server, H2, etc.) — the reactive counterpart to JDBC, which is
-fundamentally blocking by design and can't be made non-blocking no matter how it's
-wrapped.
+R2DBC (Reactive Relational Database Connectivity) is a spec and set of
+drivers for truly non-blocking access to relational databases (PostgreSQL,
+MySQL, SQL Server, H2, and more) — the reactive counterpart to JDBC, which
+is blocking by nature and can't be turned non-blocking no matter how you
+wrap it.
 
 ## Simple Example
 
@@ -33,13 +33,13 @@ Required dependency:
 </dependency>
 ```
 
-With this configured, `ReactiveCrudRepository` and `R2dbcEntityTemplate` beans become
-available for fully non-blocking database access.
+With this set up, `ReactiveCrudRepository` and `R2dbcEntityTemplate` beans
+become available for fully non-blocking database access.
 
 ## Why It Matters
 
-R2DBC exists specifically because JDBC's blocking nature is fundamentally
-incompatible with a truly non-blocking application — no amount of wrapping a JDBC
-call in a `Mono` (other than isolating it on `boundedElastic()`, which still uses a
-thread per blocking call) achieves the same efficiency as a genuinely non-blocking
-database driver built from the ground up around asynchronous I/O.
+R2DBC exists specifically because JDBC's blocking nature just doesn't fit
+with a genuinely non-blocking app — wrapping a JDBC call in a `Mono`
+(other than isolating it on `boundedElastic()`, which still burns one
+thread per blocking call) can't match the efficiency of a database driver
+actually built from scratch around async I/O.

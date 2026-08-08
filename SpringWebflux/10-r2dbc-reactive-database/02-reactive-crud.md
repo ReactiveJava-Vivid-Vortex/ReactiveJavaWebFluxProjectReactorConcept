@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`ReactiveCrudRepository` provides all the standard CRUD operations
-(Create/Read/Update/Delete) out of the box — `save()`, `findById()`, `findAll()`,
-`deleteById()`, `count()`, and more — each returning `Mono`/`Flux`, matching the
-familiar Spring Data programming model you'd already know from JPA.
+`ReactiveCrudRepository` gives you all the standard CRUD operations
+(Create/Read/Update/Delete) right out of the box — `save()`, `findById()`,
+`findAll()`, `deleteById()`, `count()`, and more — each returning
+`Mono`/`Flux`, following the same Spring Data model you already know from
+JPA.
 
 ## Simple Example
 
@@ -37,7 +38,7 @@ public class ProductService {
 
 ## Why It Matters
 
-Getting all standard CRUD operations "for free" — just by extending an interface —
-means you can build a fully-functional reactive data access layer for a new entity
-in minutes, exactly like with traditional Spring Data JPA, just non-blocking from
-the ground up.
+Getting all the standard CRUD operations for free — just by extending one
+interface — means you can spin up a fully working reactive data layer for
+a new entity in minutes, exactly like traditional Spring Data JPA, just
+non-blocking from the ground up.

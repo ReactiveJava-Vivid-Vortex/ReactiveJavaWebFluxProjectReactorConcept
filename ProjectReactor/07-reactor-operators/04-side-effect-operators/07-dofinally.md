@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`.doFinally(consumer)` runs a side effect **no matter how the stream ends** —
-successfully (`onComplete`), with an error (`onError`), or via cancellation. It
-receives a `SignalType` telling you exactly which of the three happened. It's the
-reactive equivalent of a `finally` block in traditional try/catch/finally.
+`.doFinally()` runs no matter how the stream ends — whether it finishes
+cleanly, fails with an error, or gets cancelled partway through. It tells
+you exactly which of the three happened. It's the reactive version of a
+`finally` block from regular try/catch/finally code — it always runs, no
+excuses.
 
 ## Simple Example
 
@@ -32,11 +33,11 @@ Flux.interval(Duration.ofSeconds(1))
     .subscribe();
 ```
 
-Possible `SignalType` values include `ON_COMPLETE`, `ON_ERROR`, and `CANCEL`.
+The signal you get back can be `ON_COMPLETE`, `ON_ERROR`, or `CANCEL`.
 
 ## Why It Matters
 
-`.doFinally()` is the go-to place for **guaranteed cleanup logic** — releasing a
-resource, closing a connection, decrementing an "active tasks" metric — that must
-run regardless of whether the stream succeeded, failed, or was cancelled midway
-(e.g., because a client disconnected).
+`.doFinally()` is the right place for cleanup you absolutely cannot skip —
+releasing a resource, closing a connection, bringing down an "active tasks"
+counter — regardless of whether the stream succeeded, blew up, or got cut
+off early (like a client disconnecting mid-request).

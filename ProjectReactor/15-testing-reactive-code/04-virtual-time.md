@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-"Virtual time" lets you test time-based operators (like `Flux.interval()`,
-`.delayElements()`) **without actually waiting in real time**. `StepVerifier`
-provides `.withVirtualTime()`, which fast-forwards a simulated clock instead of
-making your test suite slow (or flaky) by literally sleeping for seconds or minutes.
+"Virtual time" lets you test time-based operators (like `Flux.interval()`
+or `.delayElements()`) without actually sitting around and waiting for real
+time to pass. `StepVerifier` gives you `.withVirtualTime()`, which
+fast-forwards a fake clock instead of forcing your test to literally sleep
+for seconds or minutes.
 
 ## Simple Example
 
@@ -26,16 +27,18 @@ void testIntervalWithVirtualTime() {
 }
 ```
 
-Without virtual time, testing `Flux.interval(Duration.ofHours(1))` would require the
-test to literally run for 3 hours — completely impractical. With virtual time, this
-test completes in milliseconds.
+Without virtual time, testing `Flux.interval(Duration.ofHours(1))` would
+mean literally running the test for 3 hours — not exactly practical. With
+virtual time, the same test finishes in milliseconds.
 
-**Important:** the `Flux` (or `Mono`) must be created **inside** the lambda passed to
-`withVirtualTime()` — if it's created beforehand, the virtual clock won't be properly
-installed before the source starts using time-based operators.
+**Good to know:** the `Flux` (or `Mono`) has to be created *inside* the
+lambda you pass to `withVirtualTime()` — build it beforehand, and the fake
+clock won't be properly wired up before your time-based operators start
+using it.
 
 ## Why It Matters
 
-Virtual time is what makes it *practical* to properly test time-dependent reactive
-logic — retries with backoff, periodic polling, timeouts — without either skipping
-those tests entirely or making your test suite unbearably slow.
+Virtual time is what makes it actually practical to test time-dependent
+logic — retries with backoff, periodic polling, timeouts — without either
+skipping those tests entirely or making your whole test suite painfully
+slow.

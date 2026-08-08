@@ -2,15 +2,15 @@
 
 ## In Simple Terms
 
-"Cross-cutting concerns" are pieces of functionality that apply broadly across many
-(or all) parts of an application — logging, security, metrics, header validation —
-rather than being specific to any one feature. `WebFilter` is Spring WebFlux's
-primary mechanism for implementing these concerns in one centralized place, instead
-of duplicating the same logic across every controller.
+"Cross-cutting concerns" are bits of functionality that apply broadly
+across most (or all) of an app — logging, security, metrics, header
+checks — rather than being tied to any one feature. `WebFilter` is Spring
+WebFlux's main tool for handling these in one central place, instead of
+copying the same logic into every controller.
 
 ## Simple Example
 
-A typical filter chain addressing multiple cross-cutting concerns together:
+A typical filter chain covering several cross-cutting concerns together:
 
 ```java
 @Component @Order(1) public class AuthenticationFilter implements WebFilter { /* ... */ }
@@ -19,14 +19,14 @@ A typical filter chain addressing multiple cross-cutting concerns together:
 @Component @Order(4) public class MetricsWebFilter implements WebFilter { /* ... */ }
 ```
 
-Each filter addresses exactly one concern, composed together via the filter chain —
-none of this logic needs to be duplicated inside individual `@RestController`
-classes.
+Each filter handles exactly one concern, and they're composed together
+through the filter chain — none of this logic needs to be repeated inside
+individual `@RestController` classes.
 
 ## Why It Matters
 
-Centralizing cross-cutting concerns in filters (rather than scattering them across
-controllers) follows the broader software engineering principle of **separation of
-concerns** — your controllers stay focused purely on their specific business logic,
-while filters uniformly handle the "plumbing" that every request needs, regardless
-of which endpoint it targets.
+Centralizing cross-cutting concerns in filters — instead of scattering
+them across controllers — follows the broader idea of separation of
+concerns: your controllers stay focused purely on business logic, while
+filters handle the "plumbing" every request needs, no matter which
+endpoint it's headed to.

@@ -1,47 +1,103 @@
-# Server Sent Events (SSE) — Topic Overview
+# Q1. What Is SSE, and Why Not Just Poll Every Second?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of a News Alert Push vs Refreshing a Webpage)
 
-SSE is the simplest way to push **live updates** from a WebFlux server to a browser
-— no WebSockets, no extra libraries, just a regular HTTP response that stays open
-and streams events over time. You return a `Flux<T>` with the special
-`text/event-stream` media type, and the browser's built-in `EventSource` API
-consumes it directly:
+Polling is like refreshing a news website every second, hoping something new
+appeared — wasteful, most refreshes find nothing new. **SSE** is a **push
+notification**: the server tells you the instant something actually happens, over
+one connection that just stays open.
+
+```
+Polling:  GET /price -> nothing changed. GET /price -> nothing changed.
+          GET /price -> nothing changed. GET /price -> CHANGED! (wasted 3 calls)
+
+SSE:      ONE connection stays open. Server pushes ONLY when the price actually changes.
+```
 
 ```java
 @GetMapping(value = "/stock-price/{symbol}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 public Flux<StockPrice> streamPrice(@PathVariable String symbol) {
-    return priceService.getLivePriceUpdates(symbol); // pushes on every price change
+    return priceService.getLivePriceUpdates(symbol);
 }
 ```
 
 ```javascript
 const eventSource = new EventSource('/stock-price/AAPL');
 eventSource.onmessage = (event) => console.log('Price update:', event.data);
-// automatically reconnects on connection drop — no extra code needed!
+// Browser auto-reconnects if the connection drops — zero extra code needed!
 ```
 
-This is dramatically more efficient than the alternative — client-side polling
-(repeatedly calling `GET /stock-price/AAPL` every second, wasting requests even when
-nothing changed). SSE endpoints are naturally **continuous data streams** — they
-often never complete on their own (like `Flux.interval()`) — and WebFlux
-automatically cancels the underlying pipeline the moment the browser tab closes, so
-nothing is wasted on an absent client.
+---
 
-For a real application (not just a timer demo), you back the stream with a
-`Sinks.Many` — application code calls `sink.tryEmitNext(event)` whenever something
-actually happens, and every connected browser receives it live.
+## Q2. Why "Server-Sent," Specifically? (Direction Matters)
 
-## Quick Revision Cheat Sheet
+SSE is **one-directional**: server → client only. If you need the client to also
+send messages back over the same live connection, you need WebSockets instead —
+SSE is the simpler tool when you only need server-to-browser push.
 
-| # | Concept | One-Line Summary |
-|---|---|---|
-| 1 | **Live updates** | Push new data to a client as it happens — no repeated polling requests needed. |
-| 2 | **Continuous data stream** | An SSE endpoint that keeps the connection open, emitting events over time (often never completes on its own). |
-| 3 | **Browser EventSource** | Built-in browser JS API for consuming `text/event-stream` — auto-parses events and auto-reconnects. |
-| 4 | **Reactive streaming APIs** | Combine `Sinks.Many` (to broadcast real events) + `ServerSentEvent<T>` (for named, resumable events) + the SSE media type. |
+---
 
-## How It All Fits Together
+## Q3. Is an SSE Endpoint Finite or Infinite?
+
+Almost always **infinite** — it typically never calls `onComplete()` on its own,
+just like `Flux.interval()`. It keeps producing events as long as the connection
+stays open.
+
+```java
+@GetMapping(value = "/notifications", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+public Flux<String> streamNotifications() {
+    return Flux.interval(Duration.ofSeconds(3)).map(tick -> "Notification #" + tick);
+}
+```
+
+When the browser tab closes, WebFlux **automatically cancels** the underlying
+`Flux` — see [[cancellation-of-requests]] in the Reactive Programming Fundamentals
+topic — so nothing keeps running server-side for an absent client.
+
+---
+
+## Q4. How Do I Power SSE with REAL Application Events (Not Just a Timer)?
+
+```java
+@Service
+public class NotificationService {
+    private final Sinks.Many<String> sink = Sinks.many().multicast().onBackpressureBuffer();
+
+    public void notify(String message) { sink.tryEmitNext(message); }
+
+    public Flux<ServerSentEvent<String>> subscribe() {
+        return sink.asFlux().map(msg -> ServerSentEvent.<String>builder().data(msg).build());
+    }
+}
+```
+
+Every connected browser calls `subscribe()`, and any code anywhere can call
+`.notify(...)` to broadcast a live event to all of them — see the Sinks topic in
+the Project Reactor notes for the full mechanics of `Sinks.Many`.
+
+---
+
+## Q5. Interview-Style Q&A
+
+### Does the browser need a special library to consume SSE?
+
+**No** — `EventSource` is a built-in browser API, with automatic reconnection
+handled for you.
+
+### Can SSE send data from the client back to the server?
+
+**No** — it's one-directional (server → client). For bidirectional communication,
+use WebSockets instead.
+
+### Is an SSE `Flux` typically hot or cold?
+
+Typically **hot**, backed by a `Sinks.Many` — new subscribers only see events from
+the moment they connect onward, unless replay is explicitly configured (see the
+Hot & Cold Publishers topic).
+
+---
+
+## Q6. Summary
 
 ```
 Application event happens (price change, new message, etc.)
@@ -58,6 +114,8 @@ Browser: new EventSource('/endpoint') → eventSource.onmessage = ...
         (auto-reconnects if the connection drops)
 ```
 
-Reach for SSE specifically when the consumer is a **browser** and communication is
-**one-directional** (server → client) — for bidirectional communication, or non-browser
-clients, plain NDJSON streaming or WebSockets may be a better fit.
+### One sentence to remember
+
+> **"SSE is a push notification over plain HTTP — one open connection, server
+> pushes only when something actually happens, browser consumes it with zero
+> extra libraries."**

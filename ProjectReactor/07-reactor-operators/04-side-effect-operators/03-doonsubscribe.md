@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`.doOnSubscribe(consumer)` runs a side effect exactly when a new subscription is
-established at this point in the pipeline — useful for logging "the stream just
-started" or capturing a start timestamp for measuring duration.
+`.doOnSubscribe()` runs something the moment a subscription starts at this
+point in the pipeline — good for logging "we just started" or grabbing a
+timestamp so you can measure how long things take.
 
 ## Simple Example
 
@@ -14,7 +14,7 @@ Mono.just("data")
     .subscribe(value -> System.out.println("Value: " + value));
 ```
 
-Combining with `.doFinally()` to measure elapsed time:
+Pairing it with `.doFinally()` to measure how long something took:
 
 ```java
 long start = System.currentTimeMillis();
@@ -30,6 +30,6 @@ Mono.delay(Duration.ofMillis(500))
 
 ## Why It Matters
 
-`.doOnSubscribe()` is a natural hook point for setup logic tied specifically to
-subscription time — for instance, incrementing an "active requests" gauge metric
-when a request pipeline begins, later decremented in `.doFinally()`.
+`.doOnSubscribe()` is a natural spot for setup work tied to "the stream just
+began" — for example, bumping up an "active requests" counter when a
+request starts, which you'd then bring back down in `.doFinally()`.

@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-For queries beyond what `ReactiveCrudRepository`'s method-name conventions or simple
-`@Query` annotations can express, Spring Data R2DBC provides `R2dbcEntityTemplate` (or
-the lower-level `DatabaseClient`) for writing raw, custom SQL reactively — still
-returning `Mono`/`Flux`, still fully non-blocking.
+For queries too complex for `ReactiveCrudRepository`'s method-name
+conventions or simple `@Query` annotations, Spring Data R2DBC gives you
+`R2dbcEntityTemplate` (or the lower-level `DatabaseClient`) to write raw,
+custom SQL reactively — still returning `Mono`/`Flux`, still fully
+non-blocking.
 
 ## Simple Example
 
@@ -45,7 +46,7 @@ public class ProductQueryRepository {
 
 ## Why It Matters
 
-Having an escape hatch (`DatabaseClient`) for complex, dynamic SQL — while keeping
-everything fully reactive — means you're never forced to fall back to a blocking
-JDBC call just because a query is too complex for repository method-name
-conventions or simple `@Query` annotations.
+Having an escape hatch (`DatabaseClient`) for complex, dynamic SQL — while
+staying fully reactive the whole time — means you never need to fall back
+to a blocking JDBC call just because a query is too complicated for
+repository method-name conventions or a simple `@Query`.

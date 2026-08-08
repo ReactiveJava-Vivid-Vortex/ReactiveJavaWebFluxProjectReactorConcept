@@ -1,47 +1,138 @@
-# Testing Reactive Code — Topic Overview
+# Q1. Why Can't I Just Test Reactive Code with Plain JUnit Assertions?
 
-## What Is This Topic About? (In Simple Terms)
-
-Testing asynchronous code with plain JUnit assertions is awkward — by the time your
-assertion runs, has the async operation even finished? `StepVerifier` (from the
-`reactor-test` module) solves this by subscribing to your `Mono`/`Flux` and letting
-you declare **exactly** what should happen, step by step, blocking the test thread
-in a controlled way until each expectation is satisfied (or a timeout fails the
-test).
+## Simple Explanation (Think of Ordering Food vs Getting It Instantly)
 
 ```java
-StepVerifier.create(Flux.just(1, 2, 3))
-    .expectNext(1, 2, 3)
+User user = fetchUser(); // synchronous — by the time this line finishes, "user" is ready
+assertEquals("Alice", user.getName()); // safe to assert immediately
+
+Mono<User> userMono = fetchUserReactive(); // returns INSTANTLY — nothing has happened yet!
+assertEquals("Alice", userMono.???); // there's no value here to assert on YET
+```
+
+You can't just "read the result" of a `Mono`/`Flux` the way you read a return
+value — you have to **subscribe and wait, in a controlled way**, for the async
+result to actually arrive. `StepVerifier` does exactly that for you.
+
+---
+
+## Q2. What Does a Basic `StepVerifier` Test Look Like?
+
+```java
+@Test
+void testSimpleFlux() {
+    StepVerifier.create(Flux.just(1, 2, 3))
+        .expectNext(1)
+        .expectNext(2)
+        .expectNext(3)
+        .verifyComplete();
+}
+```
+
+It subscribes to the `Flux`, blocks the test thread until each expectation is
+satisfied (or a timeout fails the test), and asserts the exact sequence of
+signals.
+
+---
+
+## Q3. How Do I Test All Three `Mono` Outcomes?
+
+```java
+// Success
+StepVerifier.create(Mono.just("Hello")).expectNext("Hello").verifyComplete();
+
+// Empty — NOTE: no expectNext() call at all
+StepVerifier.create(Mono.empty()).verifyComplete();
+
+// Error
+StepVerifier.create(Mono.error(new IllegalArgumentException("bad")))
+    .expectErrorMatches(e -> e instanceof IllegalArgumentException
+        && e.getMessage().equals("bad"))
+    .verify();
+```
+
+**Test all three** — not just the happy path. This is the single biggest gap in
+poorly-tested reactive code.
+
+---
+
+## Q4. How Do I Test `Flux.interval()` Without Waiting 3 Real Hours?
+
+```java
+@Test
+void testIntervalWithVirtualTime() {
+    StepVerifier.withVirtualTime(() -> Flux.interval(Duration.ofHours(1)).take(3))
+        .expectSubscription()
+        .expectNoEvent(Duration.ofHours(1))
+        .expectNext(0L)
+        .thenAwait(Duration.ofHours(1))
+        .expectNext(1L)
+        .thenAwait(Duration.ofHours(1))
+        .expectNext(2L)
+        .verifyComplete();
+}
+```
+
+`.withVirtualTime()` fast-forwards a **simulated** clock instead of the test
+actually sleeping for hours. **Critical gotcha:** the `Flux`/`Mono` must be
+created **inside** the lambda passed to `withVirtualTime()` — creating it
+beforehand means the virtual clock isn't installed in time.
+
+---
+
+## Q5. How Do I Assert an Exact Sequence vs a Loose Condition?
+
+```java
+StepVerifier.create(Flux.range(1, 5))
+    .expectNext(1, 2, 3, 4, 5)      // exact sequence
+    .verifyComplete();
+
+StepVerifier.create(Flux.range(1, 100))
+    .expectNextCount(100)            // just the count, don't care about exact values
+    .verifyComplete();
+
+StepVerifier.create(Flux.range(1, 5))
+    .expectNextMatches(n -> n == 1)  // predicate-based, per item
+    .thenConsumeWhile(n -> n < 5)
     .verifyComplete();
 ```
 
-Because a `Mono` has exactly three possible outcomes (value, empty, error — see the
-Mono topic), your tests should cover all three, not just the happy path:
+---
+
+## Q6. How Do I Test Cancellation?
 
 ```java
-StepVerifier.create(Mono.empty()).verifyComplete();          // empty case
-StepVerifier.create(Mono.error(new RuntimeException("x")))
-    .expectErrorMessage("x").verify();                        // error case
+StepVerifier.create(Flux.range(1, 100))
+    .expectNext(1)
+    .thenCancel()   // cancel instead of waiting for completion
+    .verify();
 ```
 
-The trickiest — and most valuable — skill here is testing **time-based** operators
-(`Flux.interval()`, retries with backoff) without your test suite actually sitting
-there waiting for real seconds or hours to pass. `StepVerifier.withVirtualTime()`
-fast-forwards a simulated clock instead, turning what would be a 3-hour test into
-one that completes in milliseconds.
+---
 
-## Quick Revision Cheat Sheet
+## Q7. Interview-Style Q&A
 
-| # | Concept | One-Line Summary |
-|---|---|---|
-| 1 | **StepVerifier** | The core tool: subscribe to a Mono/Flux and declare expected signals step by step. |
-| 2 | **Verifying Mono** | Test all 3 possible outcomes explicitly: value (`expectNext`), empty (`verifyComplete` alone), error. |
-| 3 | **Verifying Flux** | Assert exact sequences (`expectNext(...)`), counts (`expectNextCount`), or predicates (`expectNextMatches`). |
-| 4 | **Virtual time** | `.withVirtualTime()` fast-forwards a simulated clock — test hours-long timers in milliseconds. |
-| 5 | **Error testing** | Assert exact exception type/message/predicate with `expectError()`/`expectErrorMessage()`/`expectErrorMatches()`. |
-| 6 | **Completion testing** | Verify HOW a stream ends: `verifyComplete()`, `thenCancel()`, or bounded waits with `expectNoEvent()`. |
+### Does `StepVerifier.create(mono)` automatically subscribe?
 
-## How It All Fits Together
+Building the verifier doesn't subscribe by itself — calling a terminal method like
+`.verify()`, `.verifyComplete()`, or `.verifyError()` triggers the actual
+subscription and blocks until the expected signals occur.
+
+### Why would a `StepVerifier` test hang forever?
+
+If you assert `.verifyComplete()` on a `Flux` that never actually completes (e.g.
+`Flux.interval()` without `.take()`), the test will hang until it times out and
+fails — always bound infinite sources in tests.
+
+### What's the difference between `expectNext()` and `expectNextMatches()`?
+
+`expectNext()` checks exact equality; `expectNextMatches()` takes a predicate,
+useful when you only care about some property of the value, not its exact
+identity.
+
+---
+
+## Q8. Summary
 
 ```
 StepVerifier.create(mono_or_flux)
@@ -54,6 +145,8 @@ StepVerifier.create(mono_or_flux)
       └── .verifyComplete() / .expectError(...) / .thenCancel().verify()    ← assert the ENDING
 ```
 
-Treat `StepVerifier` as non-negotiable for any non-trivial reactive method — it
-turns "I think this works" into "I've proven exactly how this behaves in all three
-outcome cases, including edge cases around timing and errors."
+### One sentence to remember
+
+> **"You can't read a Mono's value like a variable — StepVerifier subscribes
+> for you and waits, in a controlled way, for exactly the signals you
+> expect."**

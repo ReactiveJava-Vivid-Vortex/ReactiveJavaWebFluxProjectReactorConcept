@@ -2,11 +2,10 @@
 
 ## In Simple Terms
 
-`.autoConnect(minSubscribers)` (also called on a `ConnectableFlux`) automatically
-connects (starts the source) once at least `minSubscribers` subscribers have
-registered — but, unlike `.refCount()`, it does **not** disconnect when subscribers
-later leave. Once started, it keeps running regardless of how many subscribers
-remain.
+`.autoConnect(minSubscribers)` (also used on a `ConnectableFlux`)
+automatically starts the source once at least `minSubscribers` have
+registered — but unlike `.refCount()`, it never shuts things down again
+once subscribers start leaving. Once it's running, it just keeps running.
 
 ## Simple Example
 
@@ -33,7 +32,8 @@ System.out.println("2nd subscriber arrived - now it starts!");
 
 ## Why It Matters
 
-`.autoConnect()` is useful for expensive, long-lived shared resources that should
-start once enough consumers are ready, but shouldn't be torn down and restarted every
-time subscriber counts briefly dip to zero — e.g., a shared WebSocket connection that
-should stay open for the lifetime of the application after initial startup.
+`.autoConnect()` is a good fit for expensive, long-lived shared resources
+that should start once there are enough consumers ready, but shouldn't be
+torn down and restarted just because the subscriber count briefly dips to
+zero — like a shared WebSocket connection meant to stay open for the whole
+life of the application once it's up and running.

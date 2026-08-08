@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`.doFirst(runnable)` runs a side-effecting action **before** the subscription process
-even begins — it fires earlier than `doOnSubscribe()`. Unlike most `doOn*` operators
-which react to a signal as it passes through, `doFirst()` runs synchronously right at
-the moment `.subscribe()` is called, before anything else in the chain executes.
+`.doFirst()` runs something right at the very start, before the stream even
+begins hooking itself up — earlier than any other `doOn*` operator fires.
+Most `do*` operators react to something happening as it passes through;
+`doFirst()` is different — it just runs the instant `.subscribe()` is called,
+before anything else in the chain has had a chance to move.
 
 ## Simple Example
 
@@ -24,12 +25,13 @@ Output:
 3. Value: Hello
 ```
 
-Interestingly, if you have multiple `.doFirst()` calls in a chain, they execute in
-**reverse** order relative to their position (the last one added in the chain runs
-first) — this is a quirk worth knowing about, though it rarely matters in typical use.
+One quirk worth knowing: if you stack up several `.doFirst()` calls in a
+chain, they fire in **reverse order** — the last one you wrote runs first.
+It rarely matters in everyday code, but it can be confusing if you hit it
+unexpectedly.
 
 ## Why It Matters
 
-`.doFirst()` is useful for setup logic that must run exactly once, right before
-subscription kicks off — like starting a timer to measure total pipeline duration, or
-logging "starting operation X" before any other signal fires.
+`.doFirst()` is handy for one-time setup that has to happen right before
+subscription starts — like kicking off a stopwatch to time the whole
+pipeline, or logging "starting operation X" before anything else fires.

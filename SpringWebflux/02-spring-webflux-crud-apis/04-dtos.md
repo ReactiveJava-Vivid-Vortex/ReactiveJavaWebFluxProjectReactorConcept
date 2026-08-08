@@ -2,11 +2,12 @@
 
 ## In Simple Terms
 
-A **DTO (Data Transfer Object)** is a plain object shaped specifically for what an
-API exposes to clients — distinct from your internal database `Entity`. In WebFlux,
-you typically `.map()` an `Entity` (e.g., loaded via R2DBC) into a DTO before
-returning it from a controller, so you can control exactly what fields are exposed,
-independent of your database schema.
+A DTO (Data Transfer Object) is a plain object shaped specifically for
+what your API shows to the outside world — different from your internal
+database `Entity`. In WebFlux, you typically `.map()` an `Entity` (loaded
+via R2DBC, say) into a DTO before sending it back from a controller, so you
+control exactly what fields get exposed, independent of your database
+structure.
 
 ## Simple Example
 
@@ -26,12 +27,12 @@ public Mono<ProductDto> getProduct(@PathVariable String id) {
 }
 ```
 
-Notice `internalSku` from the entity never reaches the API response — the DTO
-deliberately excludes it.
+Notice `internalSku` from the entity never makes it into the API response
+— the DTO deliberately leaves it out.
 
 ## Why It Matters
 
-Using DTOs decouples your public API contract from your internal database schema —
-you can change how data is stored (renaming columns, restructuring tables) without
-breaking API consumers, and you avoid accidentally leaking internal-only fields
-(like `internalSku`) to external clients.
+DTOs keep your public API separate from your internal database structure —
+you can change how data is stored (renaming columns, restructuring tables)
+without breaking anyone using your API, and you avoid accidentally leaking
+internal-only fields (like `internalSku`) to the outside world.

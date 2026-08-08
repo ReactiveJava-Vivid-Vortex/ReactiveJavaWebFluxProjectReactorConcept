@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`.retry(n)` automatically **re-subscribes** to the upstream `Mono`/`Flux` up to `n`
-times if it errors, essentially "trying again from the start" on failure. If all `n`
-retries also fail, the last error is finally propagated downstream.
+`.retry(n)` just tries again from the start, up to `n` times, whenever the
+source fails — like retrying a phone call that dropped. If every attempt
+still fails, it finally gives up and lets the last error through.
 
 ## Simple Example
 
@@ -34,13 +34,14 @@ Attempt #3
 Result: Success!
 ```
 
-**Important gotcha:** plain `.retry(n)` retries **immediately**, with no delay
-between attempts — for real-world resilience (e.g., calling a flaky external
-service), you almost always want `.retryWhen()` with a backoff strategy instead.
+**Watch out for this:** plain `.retry(n)` tries again immediately, with no
+pause in between — for anything talking to the real world (like a flaky
+external service), you almost always want `.retryWhen()` with a proper
+backoff instead.
 
 ## Why It Matters
 
-`.retry()` is a simple tool for transient, quickly-resolving failures (e.g., a
-momentary network blip), but its lack of any delay between attempts can worsen load
-on an already-struggling downstream service — which is exactly why `.retryWhen()`
-exists for more sophisticated retry policies.
+`.retry()` is a simple fix for quick, transient hiccups (a momentary
+network blip), but hammering a struggling service with no delay between
+retries can actually make things worse — that's exactly why
+`.retryWhen()` exists, for smarter retry behavior.

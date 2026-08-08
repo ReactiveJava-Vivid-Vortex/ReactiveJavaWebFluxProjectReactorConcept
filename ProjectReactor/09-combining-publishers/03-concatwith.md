@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`.concatWith(other)` is the instance-method version of `Flux.concat()` — it appends
-another publisher's items **after** the current one fully completes, preserving
-strict ordering, just written as a fluent chain instead of a static method call.
+`.concatWith()` does the exact same thing as `Flux.concat()` — play one
+stream fully, then the next, in strict order — just written as a fluent
+chain (`a.concatWith(b)`) instead of a static call (`Flux.concat(a, b)`).
 
 ## Simple Example
 
@@ -24,7 +24,7 @@ Lunch
 Meeting
 ```
 
-Chaining multiple `.concatWith()` calls:
+You can chain several of these together:
 
 ```java
 Flux.just("Step 1")
@@ -36,6 +36,7 @@ Flux.just("Step 1")
 
 ## Why It Matters
 
-`.concatWith()` reads more naturally in a fluent chain than `Flux.concat(a, b)`, and
-is commonly used to append a "final summary" item, or chain together sequential
-stages of a multi-part reactive operation where order strictly matters.
+`.concatWith()` just reads more naturally in a fluent chain than
+`Flux.concat(a, b)` does. It's commonly used to tack on a "final summary"
+item, or to chain together the sequential steps of a multi-part operation
+where the order absolutely has to stay fixed.

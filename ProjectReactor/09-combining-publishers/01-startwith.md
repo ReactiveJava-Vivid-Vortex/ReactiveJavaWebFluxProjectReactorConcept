@@ -2,9 +2,10 @@
 
 ## In Simple Terms
 
-`.startWith(items...)` prepends one or more values (or another `Publisher`) **before**
-the original sequence starts — the extra items are emitted first, then the original
-`Flux`'s own items follow.
+`.startWith()` sticks one or more extra items at the very front of a
+stream, before anything else — like adding an opening line before the rest
+of a story starts. The extra stuff comes out first, then the original
+items follow in their normal order.
 
 ## Simple Example
 
@@ -21,7 +22,7 @@ Banana
 Cherry
 ```
 
-You can also prepend an entire other `Publisher`:
+You can also prepend a whole other stream instead of just one value:
 
 ```java
 Flux<String> header = Flux.just("--- Report Start ---");
@@ -40,6 +41,7 @@ Row 2
 
 ## Why It Matters
 
-`.startWith()` is a simple, readable way to inject a header, a default/sentinel
-value, or a cached "last known value" before a live stream begins — a common need
-when building UIs that should show something immediately, followed by live updates.
+`.startWith()` is a clean way to add a header, a default value, or a
+cached "last known value" before the live data shows up — useful for a UI
+that should display *something* right away, followed by real updates as
+they arrive.

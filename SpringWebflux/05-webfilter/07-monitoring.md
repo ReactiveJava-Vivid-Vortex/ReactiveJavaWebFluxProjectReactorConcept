@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-Beyond simple logging, a `WebFilter` can also feed metrics into a monitoring system
-(like Micrometer, feeding into Prometheus/Grafana) — tracking request counts,
-latencies, and error rates per endpoint, giving you visibility into your
-application's health and performance in production.
+Beyond plain logging, a `WebFilter` can also feed metrics into a
+monitoring system (like Micrometer, hooked up to Prometheus/Grafana) —
+tracking request counts, response times, and error rates per endpoint,
+giving you a picture of how your app is doing in production.
 
 ## Simple Example
 
@@ -40,7 +40,8 @@ public class MetricsWebFilter implements WebFilter {
 
 ## Why It Matters
 
-Centralized monitoring via a `WebFilter` gives you application-wide observability
-"for free" — every endpoint automatically reports metrics, letting you build
-dashboards and alerts (e.g., "alert if error rate on `/checkout` exceeds 5%") without
-needing to instrument each controller method by hand.
+Centralized monitoring through a `WebFilter` gives you app-wide
+visibility "for free" — every endpoint automatically reports metrics,
+letting you build dashboards and alerts (like "alert if the error rate on
+`/checkout` goes above 5%") without instrumenting each controller method
+by hand.

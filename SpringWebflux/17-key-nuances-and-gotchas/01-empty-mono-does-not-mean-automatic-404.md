@@ -2,11 +2,12 @@
 
 ## In Simple Terms
 
-A very common assumption: "if my controller returns an empty `Mono`, WebFlux will
-automatically send back a `404 Not Found`." **This is not automatically true.** By
-default, if an annotated `@RestController` method returns a `Mono<T>` that
-completes empty, Spring WebFlux responds with **`200 OK` and an empty body** — not
-`404`. You have to make the "empty means not found" decision **explicitly**.
+A really common assumption: "if my controller returns an empty `Mono`,
+WebFlux will just send back a `404 Not Found` automatically." That's not
+true. By default, if an annotated `@RestController` method returns a
+`Mono<T>` that finishes empty, WebFlux responds with `200 OK` and an empty
+body — not `404`. You have to decide "empty means not found" yourself,
+explicitly.
 
 ## Simple Example
 
@@ -19,9 +20,9 @@ public Mono<ProductDto> getProduct(@PathVariable String id) {
 }
 ```
 
-To actually get a `404`, you must explicitly convert the empty case into a
-`ResponseEntity.notFound()` (or throw/emit a custom exception handled by
-`@ControllerAdvice` — see the Reactive Error Handling topic):
+To actually get a `404`, you have to explicitly turn the empty case into
+a `ResponseEntity.notFound()` (or throw/emit a custom exception that a
+`@ControllerAdvice` handles — see the Reactive Error Handling topic):
 
 ```java
 @GetMapping("/products/{id}")
@@ -35,9 +36,10 @@ public Mono<ResponseEntity<ProductDto>> getProduct(@PathVariable String id) {
 
 ## Why It Matters
 
-Relying on an assumed default here is a genuinely common production bug: an API
-that silently returns `200 OK` with an empty body for missing resources, instead of
-a proper `404`, confuses API consumers and breaks REST conventions. Always be
-explicit about the empty case — either with `.defaultIfEmpty(ResponseEntity...)` as
-shown, or by turning "not found" into a custom exception via `.switchIfEmpty(Mono.error(...))`
-and letting a `@ControllerAdvice` handle it centrally.
+Relying on this assumed default is a genuinely common production bug: an
+API silently returning `200 OK` with an empty body for missing resources
+instead of a proper `404` confuses whoever's calling it and breaks REST
+conventions. Always spell out the empty case yourself — either with
+`.defaultIfEmpty(ResponseEntity...)` as shown, or by turning "not found"
+into a custom exception with `.switchIfEmpty(Mono.error(...))` and letting
+a `@ControllerAdvice` handle it centrally.

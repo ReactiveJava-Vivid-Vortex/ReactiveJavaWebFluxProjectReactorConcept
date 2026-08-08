@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`@ControllerAdvice` (combined with `@ExceptionHandler`) lets you handle exceptions
-**centrally**, across all controllers, translating each exception type into a
-consistent, appropriate HTTP response — instead of repeating try/catch-like logic
-(`onErrorResume`) in every single controller method.
+`@ControllerAdvice` (paired with `@ExceptionHandler`) lets you handle
+exceptions in one central place, across every controller, turning each
+exception type into a consistent, appropriate HTTP response — instead of
+repeating try/catch-style logic in every single controller method.
 
 ## Simple Example
 
@@ -33,9 +33,9 @@ public class GlobalExceptionHandler {
 }
 ```
 
-With this in place, controllers can stay clean and focused — errors bubbling up
-from a `Mono.error()` anywhere in the chain are automatically caught and translated
-by the matching `@ExceptionHandler`:
+With this set up, controllers stay clean and focused — errors bubbling up
+from a `Mono.error()` anywhere in the chain get automatically caught and
+translated by the matching `@ExceptionHandler`:
 
 ```java
 @GetMapping("/products/{id}")
@@ -46,7 +46,7 @@ public Mono<ProductDto> getProduct(@PathVariable String id) {
 
 ## Why It Matters
 
-Centralized exception handling ensures consistent, well-structured error responses
-across your entire API, avoids duplicated error-handling code in every controller,
-and makes it easy to add new exception types (and their corresponding HTTP status
-codes) in one place as your application grows.
+Handling exceptions in one central place keeps your whole API's error
+responses consistent and well-structured, avoids repeating error-handling
+code across every controller, and makes adding a new exception type (and
+its matching status code) a one-place change as your app grows.

@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-Most `Mono` factory methods (`fromSupplier`, `fromCallable`, `defer`) don't run their
-logic until subscription happens. This "laziness" means you can safely build up
-complex `Mono` chains as reusable blueprints, without triggering any real work (like
-network calls) until something actually subscribes to them.
+Most `Mono` factory methods (`fromSupplier`, `fromCallable`, `defer`) don't
+actually run anything until someone subscribes. Because of this, you can build up
+complicated `Mono` chains and pass them around freely, without accidentally
+triggering real work (like a network call) before it's actually needed.
 
 ## Simple Example
 
@@ -28,13 +28,12 @@ Fetching data from remote service...
 Received: Remote Data
 ```
 
-Contrast this with `Mono.just(fetchData())`, where `fetchData()` would run
-**immediately**, the instant that line executes — regardless of whether anyone ever
-subscribes.
+Compare with `Mono.just(fetchData())`, where `fetchData()` runs **immediately**
+the moment that line runs — no matter whether anyone ever subscribes.
 
 ## Why It Matters
 
-Lazy evaluation means a `Mono` can be safely passed around, stored, or reused as a
-"recipe" for an operation, without accidentally triggering side effects too early or
-too often. It also enables retry logic (`retry()`/`retryWhen()`) to work correctly —
-each retry re-subscribes, which re-triggers the lazy computation fresh.
+Laziness means a `Mono` can be safely stored, passed around, or reused as a
+"recipe" without accidentally triggering side effects too early or too many
+times. It's also exactly why retries (`retry()`/`retryWhen()`) work correctly —
+each retry subscribes again, which re-runs the lazy work from scratch.

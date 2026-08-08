@@ -2,10 +2,9 @@
 
 ## In Simple Terms
 
-"DTO validation" is the practice of validating the shape and business rules of
-incoming request data — annotated directly on your DTO fields — as early as possible
-in the request pipeline, before that data is used to create/update entities or
-trigger further logic.
+"DTO validation" means checking the shape and rules of incoming request
+data — right there on the DTO's fields — as early as possible in the
+request, before that data ever gets used to create or update anything.
 
 ## Simple Example
 
@@ -22,9 +21,9 @@ public record OrderItemRequest(
 ) {}
 ```
 
-Controller usage — `@Valid` triggers validation, and any violations throw a
-`WebExchangeBindException`, which you'd typically handle via `@ControllerAdvice`
-(covered in Reactive Error Handling):
+Controller usage — `@Valid` triggers the checks, and any violations throw a
+`WebExchangeBindException`, which you'd typically handle with
+`@ControllerAdvice` (covered under Reactive Error Handling):
 
 ```java
 @PostMapping("/orders")
@@ -35,7 +34,7 @@ public Mono<OrderDto> createOrder(@Valid @RequestBody CreateOrderRequest request
 
 ## Why It Matters
 
-Validating at the DTO layer (rather than deep inside business logic) catches
-malformed requests as early as possible, with clear, standardized error responses —
-preventing invalid data from ever reaching your service or repository layers in the
-first place.
+Validating right at the DTO layer (instead of deep inside your business
+logic) catches bad requests as early as possible, with clear, consistent
+error responses — stopping invalid data from ever reaching your service or
+repository layers in the first place.

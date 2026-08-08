@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-A `HandlerFunction<ServerResponse>` is the functional equivalent of a controller
-method — it's a function that takes a `ServerRequest` and returns a
-`Mono<ServerResponse>`. Handler functions contain the actual business logic that a
-`RouterFunction` routes requests to.
+A `HandlerFunction<ServerResponse>` is the functional equivalent of a
+controller method — a plain function that takes a `ServerRequest` and
+hands back a `Mono<ServerResponse>`. Handler functions hold the actual
+business logic that a `RouterFunction` routes requests to.
 
 ## Simple Example
 
@@ -34,12 +34,12 @@ public class ProductHandler {
 }
 ```
 
-Each method here matches the `HandlerFunction` signature:
+Each method here matches the `HandlerFunction` shape:
 `Mono<ServerResponse> handle(ServerRequest request)`.
 
 ## Why It Matters
 
-`HandlerFunction`s keep your business/HTTP-response logic as plain, easily testable
-Java methods — no annotations needed, no framework "magic" translating method
-signatures into HTTP semantics — everything about how the request is read and the
-response is built is explicit code you can trace and test directly.
+`HandlerFunction`s keep your logic as plain, easy-to-test Java methods —
+no annotations needed, no framework "magic" translating a method signature
+into HTTP behavior — everything about reading the request and building the
+response is code you can trace and test directly.

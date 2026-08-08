@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.doOnTerminate(runnable)` runs a side effect when the stream ends either
-successfully (`onComplete`) or with an error (`onError`) — but, unlike
-`.doFinally()`, it does **not** run on cancellation. Think of it as "finally, but not
-for cancellation."
+`.doOnTerminate()` runs when the stream ends naturally — either it finished
+successfully or it failed with an error — but, unlike `.doFinally()`, it
+does **not** run if someone just walks away and cancels the subscription.
+Think of it as "finally, minus the cancellation case."
 
 ## Simple Example
 
@@ -33,8 +33,9 @@ Terminated (success or error)
 
 ## Why It Matters
 
-Use `.doOnTerminate()` when you specifically want logic to run only on a "natural"
-end (success or failure), but explicitly **not** when a subscriber simply walks away
-(cancels). If you need truly universal cleanup — including on cancellation — prefer
-`.doFinally()` instead, since forgetting that distinction is a common source of
-resource leaks in cancellable streams (like an HTTP request that a client aborts).
+Reach for `.doOnTerminate()` when you want logic to run only on a "natural"
+ending (success or failure), but you deliberately do **not** want it running
+just because a subscriber cancelled. If you need cleanup that truly always
+happens — cancellation included — use `.doFinally()` instead. Mixing these
+two up is a common way resource leaks sneak into cancellable streams, like
+an HTTP request the client gives up on.

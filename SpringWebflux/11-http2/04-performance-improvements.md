@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-Beyond multiplexing, HTTP/2 brings several other performance improvements over
-HTTP/1.1: **header compression** (HPACK, reducing repetitive header overhead across
-many requests), **binary framing** (more efficient to parse than HTTP/1.1's
-text-based format), and optional **server push** (though largely deprecated in
-practice in favor of other techniques).
+On top of multiplexing, HTTP/2 brings a few other performance wins over
+HTTP/1.1: header compression (HPACK, which cuts down repeated header
+overhead across many requests), a binary format (quicker to parse than
+HTTP/1.1's plain text), and optional server push (though it's mostly fallen
+out of favor in practice).
 
 ## Simple Example
 
@@ -17,10 +17,10 @@ Request 1: Host: api.example.com, User-Agent: ..., Accept: application/json, ...
 Request 2: Host: api.example.com, User-Agent: ..., Accept: application/json, ... (repeated!)
 ```
 
-HTTP/2's HPACK compresses repeated header data across the connection, so subsequent
-requests don't need to resend identical header values in full.
+HTTP/2's HPACK compresses repeated header data across the connection, so
+later requests don't need to resend identical header values in full.
 
-Measuring the practical impact (rough illustrative comparison for a
+Measuring the practical impact (rough, illustrative comparison for a
 header-heavy, high-request-count API):
 
 ```
@@ -31,7 +31,8 @@ HTTP/2:   compressed headers + single multiplexed connection
 
 ## Why It Matters
 
-For APIs with many small, frequent requests (a common pattern in microservices and
-mobile clients), HTTP/2's combined improvements (multiplexing + header compression)
-can meaningfully reduce both latency and bandwidth usage — compounding well with
-WebFlux's own efficiency gains from non-blocking I/O.
+For APIs handling lots of small, frequent requests (common with
+microservices and mobile clients), HTTP/2's combined perks (multiplexing
+plus header compression) can meaningfully cut both latency and bandwidth
+use — and stack nicely with WebFlux's own efficiency gains from
+non-blocking I/O.

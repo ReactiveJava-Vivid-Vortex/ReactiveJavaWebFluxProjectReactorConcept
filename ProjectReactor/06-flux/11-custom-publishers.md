@@ -2,12 +2,11 @@
 
 ## In Simple Terms
 
-While Project Reactor gives you many built-in `Flux` factory methods, sometimes you
-need a fully custom publisher tailored to a unique data source — e.g., reading from a
-proprietary hardware device, or wrapping a third-party SDK with unusual semantics.
-You can build this either by implementing the raw `Publisher` interface (rarely
-needed) or, much more commonly, by combining `Flux.generate()` / `Flux.create()` with
-your own logic.
+Reactor gives you a lot of built-in ways to create a `Flux`, but sometimes you
+need to wrap something unusual — a proprietary device, a third-party SDK with its
+own quirks. You can do this by combining `Flux.generate()` or `Flux.create()`
+with your own logic (implementing the raw `Publisher` interface directly is
+almost never necessary).
 
 ## Simple Example
 
@@ -32,7 +31,7 @@ SensorReadingPublisher.readTemperatureStream(myDevice)
 
 ## Why It Matters
 
-Wrapping a proprietary or legacy data source behind a well-behaved custom `Flux`
-means the rest of your codebase can treat it exactly like any other reactive stream
-— composing it with `.map()`, `.filter()`, error handling, and backpressure, without
-needing to know the messy details of the original source.
+Wrapping a weird or legacy data source behind a well-behaved `Flux` means the
+rest of your code can treat it just like any other reactive stream — combining
+it with `.map()`, `.filter()`, error handling, and backpressure — without
+needing to know its messy internal details.

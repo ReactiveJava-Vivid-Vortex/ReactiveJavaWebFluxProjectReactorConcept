@@ -2,11 +2,10 @@
 
 ## In Simple Terms
 
-`Mono.fromRunnable(runnable)` creates a `Mono<Void>` that runs a piece of code (a
-`Runnable`, which returns nothing) when subscribed, and then completes empty — no
-value is emitted, just a side effect followed by successful completion. Use this when
-you only care about an action happening (like logging, or triggering a cleanup), not
-about getting a result back.
+`Mono.fromRunnable(runnable)` runs a piece of code that returns nothing, and then
+completes empty — no value, just "I did the thing, and now I'm done." Use this
+when you only care that something happened (logging, cleanup), not about getting
+a result back.
 
 ## Simple Example
 
@@ -28,7 +27,7 @@ Sending a notification email...
 Notification task completed!
 ```
 
-A realistic use case — chaining a side-effecting action after a main operation:
+A realistic use — running a side action right after a main operation finishes:
 
 ```java
 saveOrder(order)
@@ -38,6 +37,6 @@ saveOrder(order)
 
 ## Why It Matters
 
-`Mono.fromRunnable()` is a clean way to plug plain, non-reactive, "fire and complete"
-code (like logging or metrics) into a reactive chain, especially when combined with
-`.then()` to sequence it after another operation completes.
+`Mono.fromRunnable()` is a clean way to slot plain, non-reactive "just do this"
+code (like logging or metrics) into a reactive chain — especially useful with
+`.then()` to make sure it runs right after something else finishes.

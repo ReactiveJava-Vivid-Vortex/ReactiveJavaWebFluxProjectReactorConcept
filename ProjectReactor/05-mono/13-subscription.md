@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-Subscribing to a `Mono` is what actually **triggers** its execution and lets you
-react to its single value, empty completion, or error. `Mono.subscribe()` has several
-overloads depending on which signals you care about.
+Subscribing to a `Mono` is what actually kicks off its work and lets you react to
+its result — a value, an empty finish, or an error. `.subscribe()` comes in a
+few flavors depending on which of those you want to handle.
 
 ## Simple Example
 
@@ -31,8 +31,8 @@ mono.subscribe(
 );
 ```
 
-Every `.subscribe()` call returns a `Disposable`, which lets you cancel the
-subscription manually:
+Every `.subscribe()` call gives you back a `Disposable`, which lets you cancel it
+by hand:
 
 ```java
 Disposable subscription = mono.subscribe(v -> System.out.println(v));
@@ -41,8 +41,8 @@ subscription.dispose(); // cancels if still in progress
 
 ## Why It Matters
 
-In a Spring WebFlux application, you typically **never call `.subscribe()` yourself**
-— the framework subscribes to the `Mono`/`Flux` your controller returns, at the right
-time, and manages cancellation automatically if the client disconnects. Understanding
-manual subscription is still essential for writing standalone code, tests, and
-understanding what the framework does on your behalf.
+In a Spring WebFlux app, you basically never call `.subscribe()` yourself — the
+framework does it for you, at the right time, and even handles cancellation
+automatically if the client disconnects. Still, understanding how manual
+subscribing works is essential for standalone code and tests, and for
+understanding what the framework is quietly doing on your behalf.

@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-An "exception factory" is a small helper (a static method, or a dedicated class)
-that centralizes the creation of your custom exceptions — ensuring consistent
-messages and construction logic across your codebase, rather than duplicating
-`new SomeException(...)` calls with slightly different message formats everywhere.
+An "exception factory" is a small helper — a static method or a dedicated
+class — that centralizes how your custom exceptions get built, so the
+messages and construction stay consistent everywhere, instead of copying
+slightly different `new SomeException(...)` calls throughout your code.
 
 ## Simple Example
 
@@ -38,7 +38,8 @@ public Mono<ProductDto> getProduct(String id) {
 
 ## Why It Matters
 
-An exception factory prevents inconsistent error messages scattered across a
-codebase (e.g., "Product not found" vs "product doesn't exist" vs "No such
-product") and makes it easy to update messaging/logic for a given error type in one
-place, rather than hunting down every `new SomeException(...)` call site.
+An exception factory keeps you from ending up with mismatched error
+messages scattered around ("Product not found" vs "product doesn't exist"
+vs "No such product"), and makes it easy to update the wording or logic
+for a given error in one place, instead of hunting down every
+`new SomeException(...)` call.

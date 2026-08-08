@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-A `POST` request via `WebClient` sends data to a remote service to create a new
-resource — you supply the request body (either a plain object or a `Mono`/`Flux`
-for a reactive body), and get the response back as a `Mono`.
+A POST request through `WebClient` sends data to another service to
+create something new — you supply the request body (a plain object, or a
+`Mono`/`Flux` for a reactive body), and get the response back as a `Mono`.
 
 ## Simple Example
 
@@ -19,8 +19,8 @@ public Mono<UserDto> createUser(CreateUserRequest request) {
 }
 ```
 
-Using a reactive `Mono` request body instead (useful when the body itself comes from
-an upstream async source):
+Using a reactive `Mono` request body instead (handy when the body itself
+comes from an upstream async source):
 
 ```java
 public Mono<UserDto> createUserFromUpstream(Mono<CreateUserRequest> requestMono) {
@@ -34,7 +34,7 @@ public Mono<UserDto> createUserFromUpstream(Mono<CreateUserRequest> requestMono)
 
 ## Why It Matters
 
-`WebClient`'s POST support integrates naturally with the rest of a reactive
-pipeline — you can pass an upstream `Mono` directly as the request body, letting the
-whole chain (from receiving your own request, to calling the downstream service)
-remain non-blocking end-to-end.
+`WebClient`'s POST support fits naturally into the rest of a reactive
+pipeline — you can pass an upstream `Mono` straight in as the request
+body, keeping the whole chain (from handling your own request, to calling
+a downstream service) non-blocking end-to-end.

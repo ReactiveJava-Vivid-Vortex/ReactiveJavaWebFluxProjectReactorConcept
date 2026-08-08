@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-**Multiplexing** is HTTP/2's ability to send multiple independent requests and
-responses over a **single TCP connection**, simultaneously, without them blocking
-each other. In HTTP/1.1, each connection could effectively only handle one request
-at a time (barring pipelining workarounds), so browsers had to open multiple parallel
-connections to load resources concurrently.
+Multiplexing is HTTP/2's trick of sending several independent requests and
+responses over one single TCP connection at the same time, without any of
+them blocking each other. In HTTP/1.1, a connection could really only
+handle one request at a time, so browsers had to open several separate
+connections just to load things in parallel.
 
 ## Simple Example
 
@@ -37,7 +37,8 @@ server:
 
 ## Why It Matters
 
-Multiplexing reduces connection overhead significantly — fewer TCP connections
-means less resource usage on both client and server, faster page loads (no more
-"waiting for a free connection slot"), and better overall network efficiency,
-especially valuable for API-heavy applications making many small concurrent calls.
+Multiplexing cuts down connection overhead a lot — fewer TCP connections
+means less resource use on both ends, faster page loads (no more "waiting
+for a free connection slot"), and better overall network efficiency,
+especially valuable for API-heavy apps making lots of small concurrent
+calls.

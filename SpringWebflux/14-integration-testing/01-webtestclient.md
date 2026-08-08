@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`WebTestClient` is Spring's dedicated testing tool for WebFlux applications — it
-lets you send real (or mocked) HTTP requests to your application and assert on the
-response, similar in spirit to `MockMvc` for traditional Spring MVC, but built for
-the reactive, non-blocking programming model.
+`WebTestClient` is Spring's dedicated tool for testing WebFlux apps — it
+lets you send real (or mocked) HTTP requests to your app and check the
+response, similar in spirit to `MockMvc` for traditional Spring MVC, but
+built for the reactive, non-blocking world.
 
 ## Simple Example
 
@@ -38,8 +38,8 @@ class ProductControllerTest {
 
 ## Why It Matters
 
-`WebTestClient` handles the reactive complexity for you — internally, it subscribes
-to your controller's `Mono`/`Flux` response and blocks in a controlled,
-test-appropriate way until the result is available, letting you write straightforward
-assertions without manually dealing with subscriptions or `StepVerifier` at the HTTP
-layer.
+`WebTestClient` handles the reactive plumbing for you — under the hood, it
+subscribes to your controller's `Mono`/`Flux` response and waits, in a
+controlled, test-friendly way, until the result is ready — so you get to
+write plain, straightforward assertions without manually dealing with
+subscriptions or `StepVerifier` at the HTTP layer.

@@ -2,13 +2,12 @@
 
 ## In Simple Terms
 
-A **cold publisher** re-runs its data-producing logic **from scratch, for every new
-subscriber**. Each subscriber gets its own independent, fresh copy of the sequence —
-like watching a movie on Netflix (video-on-demand): every viewer starts from the
-beginning, whenever they press play.
+A **cold publisher** starts its work **fresh, from zero, for every single
+subscriber.** Think Netflix — every viewer who presses play starts the movie from
+the very beginning, no matter when they joined.
 
-Most `Mono`/`Flux` sources you create (`Flux.just()`, `Flux.fromIterable()`,
-a database query, an HTTP call) are **cold** by default.
+Most of the things you create in Reactor — `Flux.just()`, `Flux.fromIterable()`,
+a database query, an HTTP call — are cold by default.
 
 ## Simple Example
 
@@ -22,20 +21,20 @@ try { Thread.sleep(2000); } catch (InterruptedException e) {}
 coldFlux.subscribe(time -> System.out.println("Subscriber 2: " + time));
 ```
 
-Output (timestamps differ — each subscriber triggers a fresh execution):
+Output (different timestamps — each subscriber triggered its own fresh run):
 ```
 Subscriber 1: 1732000000000
 Subscriber 2: 1732000002000
 ```
 
-Even though it's the *same* `coldFlux` object, subscribing twice re-executes the
-`System.currentTimeMillis()` call separately for each subscriber.
+It's the exact same `coldFlux` object both times, but subscribing twice runs
+`System.currentTimeMillis()` separately, once per subscriber.
 
 ## Why It Matters
 
-Cold publishers are the default and usually what you want — e.g., a database query
-should re-run per subscriber to get fresh data, not share one cached run. When you
-*do* want subscribers to share the same, single execution (like one live broadcast
-instead of one full replay per viewer), you convert a cold publisher into a **hot**
-one, using operators like `.share()` or `.publish()` (covered in the "Hot & Cold
-Publishers" section).
+Cold is the default, and it's usually what you want — a database query should
+fetch fresh data for each subscriber, not reuse one cached run. When you *do*
+want subscribers to share the exact same live run (like tuning into a broadcast
+instead of each getting their own replay), you turn a cold publisher into a
+**hot** one using `.share()` or `.publish()` — covered in the Hot & Cold
+Publishers topic.

@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`EventSource` is a built-in browser JavaScript API specifically designed to consume
-`text/event-stream` (SSE) endpoints — no external libraries needed. It automatically
-handles the connection, parses incoming events, and even automatically reconnects if
-the connection drops.
+`EventSource` is a browser JavaScript API built specifically for consuming
+`text/event-stream` (SSE) endpoints — no extra libraries needed. It
+handles the connection for you, parses incoming events, and even
+automatically reconnects if the connection drops.
 
 ## Simple Example
 
@@ -36,7 +36,8 @@ eventSource.onerror = (error) => {
 
 ## Why It Matters
 
-`EventSource`'s built-in reconnection logic and simple API make SSE an especially
-low-friction choice for browser-facing live updates — unlike WebSockets, which
-require a dedicated client library/protocol handling, SSE works with a native
-browser API in just a few lines of JavaScript.
+`EventSource`'s built-in reconnection and simple API make SSE a
+low-friction choice for pushing live updates to a browser — unlike
+WebSockets, which need their own client library and protocol handling, SSE
+works with a browser API that's already there, in just a few lines of
+JavaScript.

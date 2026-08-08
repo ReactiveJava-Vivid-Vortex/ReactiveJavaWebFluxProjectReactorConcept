@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-A PUT endpoint updates an existing resource. In WebFlux, this typically involves
-looking up the existing entity first (to confirm it exists), applying the updates,
-and saving — all composed reactively without ever blocking.
+A PUT endpoint updates an existing resource. In WebFlux, this usually means
+looking up the existing entity first (to confirm it exists), applying the
+changes, and saving — all done reactively, without ever blocking.
 
 ## Simple Example
 
@@ -25,13 +25,14 @@ public Mono<ResponseEntity<ProductDto>> updateProduct(
 }
 ```
 
-Notice the `.flatMap()` here — looking up the existing entity is itself an
-asynchronous operation (`findById()` returns a `Mono`), so we need `.flatMap()`
-(not `.map()`) to chain the subsequent asynchronous `save()` call.
+Notice the `.flatMap()` here — looking up the existing entity is itself
+async (`findById()` returns a `Mono`), so you need `.flatMap()` (not
+`.map()`) to chain the follow-up async `save()` call.
 
 ## Why It Matters
 
-Correctly returning `404 Not Found` when updating a non-existent resource (rather
-than silently creating one, or throwing an unhandled exception) is an important REST
-API convention — and reactively composing the "check existence, then update" flow
-with `.flatMap()` and `.defaultIfEmpty()` is the idiomatic WebFlux way to express it.
+Correctly returning `404 Not Found` when updating a resource that doesn't
+exist (instead of quietly creating one, or throwing an unhandled
+exception) is an important REST convention — and composing the "check it
+exists, then update" flow reactively with `.flatMap()` and
+`.defaultIfEmpty()` is the natural WebFlux way to write it.

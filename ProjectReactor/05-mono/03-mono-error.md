@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`Mono.error(throwable)` creates a `Mono` that, once subscribed, immediately signals
-failure via `onError(throwable)` — no value is ever emitted. It's the reactive
-equivalent of `throw new SomeException()`, but wrapped as a value you can return from
-a method instead of literally throwing.
+`Mono.error(throwable)` builds a `Mono` that, the moment someone subscribes,
+immediately says "this failed" — no value is ever given out. It's basically
+`throw new SomeException()`, but as a value you can return from a method instead
+of literally throwing.
 
 ## Simple Example
 
@@ -19,7 +19,7 @@ mono.subscribe(
 // Output: Error: User ID cannot be null
 ```
 
-Common usage — returning an error conditionally from a service method:
+Common pattern — returning an error conditionally from a service method:
 
 ```java
 public Mono<User> getUser(String id) {
@@ -30,14 +30,13 @@ public Mono<User> getUser(String id) {
 }
 ```
 
-**Important gotcha:** `Mono.error(new RuntimeException(...))` still constructs the
-exception object eagerly (even before subscription). If constructing the exception
-is expensive, use `Mono.error(() -> new RuntimeException(...))` (the supplier
-overload) so it's only built lazily, per subscriber.
+**Watch out:** `Mono.error(new RuntimeException(...))` builds that exception
+object right away — even before anyone subscribes. If building the exception is
+expensive, use `Mono.error(() -> new RuntimeException(...))` (the supplier
+version) so it's only built when actually needed.
 
 ## Why It Matters
 
-Because `Mono.error()` is a *value* (not a thrown exception), it composes naturally
-with the rest of the reactive pipeline — you can `.subscribe()` and route it through
-`onErrorResume()`, `onErrorReturn()`, or `retry()`, without ever leaving the reactive
-flow or needing a synchronous try/catch block.
+Since `Mono.error()` is just a value, it fits naturally into the rest of your
+pipeline — you can chain `onErrorResume()`, `onErrorReturn()`, or `retry()` on
+top of it, without ever needing a regular try/catch block.

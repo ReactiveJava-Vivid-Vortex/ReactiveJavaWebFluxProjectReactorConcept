@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-Reactive pipelines in Project Reactor are **lazy** — building a `Mono` or `Flux` (with
-`.map()`, `.filter()`, etc.) does **not** run any code. It only builds a description
-of *what should happen*. The actual execution only starts once you call
-`.subscribe()` (directly, or indirectly via a framework like Spring WebFlux, which
-subscribes for you when handling an HTTP request).
+Reactive pipelines are **lazy** — writing `.map()`, `.filter()`, and so on
+doesn't actually run any of that code. It just builds a description of what
+*should* happen later. Nothing actually runs until `.subscribe()` gets called —
+either by you directly, or by a framework like Spring WebFlux handling an HTTP
+request.
 
 ## Simple Example
 
@@ -35,13 +35,14 @@ Supplier is running!
 Got value: Hello
 ```
 
-Notice "Supplier is running!" only prints **after** `.subscribe()` is called — not
-when `Mono.fromSupplier(...)` was defined.
+Notice "Supplier is running!" only shows up **after** `.subscribe()` — not when
+we defined `Mono.fromSupplier(...)`.
 
 ## Why It Matters
 
-This is one of the most common sources of confusion for beginners: **"why doesn't my
-reactive code do anything?"** — usually because `.subscribe()` was never called (or
-the framework never got a chance to subscribe, e.g., because the `Mono`/`Flux` return
-value was ignored). Understanding laziness also enables powerful patterns like
-`Mono.defer()`, which re-evaluates the supplier logic fresh for every subscriber.
+This is one of the biggest sources of "why isn't my code doing anything?!"
+confusion for beginners — it's almost always because `.subscribe()` was never
+called (or the framework never got the chance to, because the `Mono`/`Flux` was
+returned and ignored somewhere). Once laziness clicks, powerful tricks like
+`Mono.defer()` — which re-runs its logic fresh for every subscriber — start
+making sense too.

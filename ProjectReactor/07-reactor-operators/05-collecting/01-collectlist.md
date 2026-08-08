@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.collectList()` gathers all items from a `Flux` into a single `Mono<List<T>>`. It
-waits for the source to complete, then emits the whole collected list as one value.
-This is the reactive way of turning "many items over time" back into "one regular
-Java `List`."
+`.collectList()` waits for a `Flux` to finish, scoops up everything it
+produced along the way, and hands it all back as one regular Java `List`,
+wrapped in a `Mono`. It's how you turn "a bunch of items arriving over time"
+back into an ordinary list you already know how to work with.
 
 ## Simple Example
 
@@ -20,21 +20,21 @@ Output:
 Collected: [1, 2, 3, 4, 5]
 ```
 
-A common real-world use: returning a full list from a reactive repository as a single
-response.
+A common real-world use: returning a full list from a reactive repository as
+a single response.
 
 ```java
 Mono<List<Order>> allOrders = orderRepository.findAll().collectList();
 ```
 
-**Important:** `.collectList()` requires the source `Flux` to eventually complete —
-using it on an infinite stream (like `Flux.interval()`) will simply never emit,
-since it can't know the list is "final" until `onComplete()` fires. It also loads
-everything into memory at once, so it's not appropriate for very large or unbounded
-streams.
+**Good to know:** `.collectList()` needs the source `Flux` to actually
+finish before it can hand you anything — try it on something endless (like
+`Flux.interval()`) and it will just sit there forever, since it never gets
+the "that's everything" signal. It also has to hold every item in memory at
+once, so it's not a great fit for huge or unbounded streams.
 
 ## Why It Matters
 
-`.collectList()` is the natural bridge back from streaming to a regular collection —
-useful whenever a consumer genuinely needs the full data set at once (e.g., to sort
-it, or to serialize the whole thing as one JSON array).
+`.collectList()` is the natural bridge back from "streaming" to "a regular
+list" — useful whenever you genuinely need the whole set of data at once, to
+sort it or send it back as one JSON array, for example.

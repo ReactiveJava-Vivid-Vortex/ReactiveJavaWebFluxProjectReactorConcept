@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`Sinks` expose a small, focused **producer API** — the methods you call to actually
-push data into the reactive world manually. Understanding the exact contract of
-these methods (especially their `EmitResult` return values) is key to using sinks
-correctly and safely.
+`Sinks` give you a small, focused set of methods for actually pushing data
+into the reactive world by hand. Knowing exactly what these methods promise
+you — especially their `EmitResult` return values — is the key to using
+sinks correctly and safely.
 
 ## Key Methods
 
@@ -17,8 +17,9 @@ sink.tryEmitComplete();                            // signal successful completi
 sink.tryEmitError(new RuntimeException("failed")); // signal failure
 ```
 
-Each `tryEmitXxx()` call returns an `EmitResult` — instead of throwing an exception on
-failure, it returns a value you can inspect and react to:
+Each `tryEmitXxx()` call hands you back an `EmitResult` instead of throwing
+an exception on failure — a value you can check and decide what to do
+about:
 
 ```java
 Sinks.EmitResult result = sink.tryEmitNext(42);
@@ -33,8 +34,8 @@ if (result.isFailure()) {
 }
 ```
 
-For simpler cases where you're certain about single-threaded access, there's also a
-convenience method:
+For simpler cases where you know for sure only one thread is calling in,
+there's also a convenience method:
 
 ```java
 sink.emitNext(42, Sinks.EmitFailureHandler.FAIL_FAST); // throws on failure instead
@@ -42,8 +43,8 @@ sink.emitNext(42, Sinks.EmitFailureHandler.FAIL_FAST); // throws on failure inst
 
 ## Why It Matters
 
-Understanding the producer API's explicit, non-throwing `EmitResult` contract is what
-makes `Sinks` safer than the older `Processor` API (which could throw unpredictable
-exceptions on misuse). Always check (or explicitly handle) the `EmitResult` rather
-than ignoring it — silently ignoring a `FAIL_OVERFLOW` or `FAIL_TERMINATED` result can
-hide real bugs, like silently dropped events.
+This "hand back a result instead of throwing" contract is exactly what
+makes `Sinks` safer than the old `Processor` API, which could blow up with
+unpredictable exceptions if misused. Always check (or deliberately handle)
+the `EmitResult` you get back — quietly ignoring a `FAIL_OVERFLOW` or
+`FAIL_TERMINATED` can hide real bugs, like events silently going missing.

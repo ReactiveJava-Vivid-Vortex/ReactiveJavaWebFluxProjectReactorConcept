@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-"Producer speed" refers to how quickly a publisher can generate new items. When a
-producer is much faster than its consumer, backpressure exists specifically to
-prevent that speed mismatch from causing unbounded memory growth — the producer must
-be told, and must respect, how much the consumer can currently handle.
+"Producer speed" just means how fast a source can crank out new items. When
+a producer is way faster than the consumer, backpressure exists to stop
+that speed mismatch from piling up unbounded — the producer has to be told,
+and has to respect, how much the consumer can actually handle right now.
 
 ## Simple Example
 
@@ -28,13 +28,14 @@ fastProducer
     });
 ```
 
-Even though the source `Flux.range()` could produce a million items nearly
-instantly, the subscriber's controlled `request()` calls keep it in check — the
-source only produces items as fast as they're requested.
+Even though `Flux.range()` could pump out a million items almost instantly,
+the subscriber's careful `request()` calls keep it in check — the source
+only produces as much as has actually been asked for.
 
 ## Why It Matters
 
-A fast producer paired with a slow consumer, **without** backpressure, would cause
-unbounded buffering (and eventual `OutOfMemoryError`). Reactive Streams' demand model
-ensures producer speed is always tempered by actual consumer capacity — this is the
-central problem backpressure exists to solve.
+Pair a fast producer with a slow consumer and skip backpressure entirely,
+and you get unbounded buffering — eventually crashing with an
+`OutOfMemoryError`. The demand model in Reactive Streams makes sure
+producer speed always stays tied to what the consumer can genuinely handle
+— this is the whole problem backpressure exists to solve.

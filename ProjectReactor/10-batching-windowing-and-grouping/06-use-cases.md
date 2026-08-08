@@ -2,12 +2,12 @@
 
 ## In Simple Terms
 
-These operators aren't academic — they map directly onto very common data-engineering
-patterns, especially in streaming and Kafka-adjacent systems.
+These operators aren't just theory — they map straight onto very common
+data-engineering patterns, especially in streaming and Kafka-style systems.
 
 ## 1. Kafka Message Batching
 
-Instead of acknowledging/processing one Kafka message at a time, batch them for
+Instead of handling one Kafka message at a time, group them together for
 efficiency:
 
 ```java
@@ -56,7 +56,7 @@ eventFlux
 
 ## Why It Matters
 
-Batching, windowing, and grouping are the backbone of building efficient,
-high-throughput streaming systems — reducing the number of expensive downstream
-operations (database writes, network calls) while still processing data close to
-real time.
+Batching, windowing, and grouping are the backbone of building fast,
+high-volume streaming systems — cutting down the number of expensive
+downstream operations (database writes, network calls) while still keeping
+data processing close to real time.

@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-Debugging reactive pipelines can be tricky because nothing happens until someone
-subscribes, and the code doesn't execute top-to-bottom like normal imperative code.
-Project Reactor provides a built-in `.log()` operator that prints every signal
-(`onSubscribe`, `request`, `onNext`, `onComplete`, `onError`) flowing through that
-point in the pipeline — extremely useful for understanding what's actually happening.
+Reactive code can be confusing to debug, because nothing runs until someone
+subscribes, and it doesn't execute top-to-bottom the way normal code does.
+Project Reactor's `.log()` operator fixes this by printing out every single
+signal (`onSubscribe`, `request`, `onNext`, `onComplete`, `onError`) as it passes
+through that point in your pipeline — so you can actually see what's happening.
 
 ## Simple Example
 
@@ -17,7 +17,7 @@ Flux.just(1, 2, 3)
     .subscribe(System.out::println);
 ```
 
-Output (abbreviated):
+Output (shortened):
 ```
 [ INFO] onSubscribe(FluxArray.ArraySubscription)
 [ INFO] request(unbounded)
@@ -30,8 +30,8 @@ Output (abbreviated):
 6
 ```
 
-You can also give the log a name to distinguish multiple `.log()` calls in a longer
-pipeline:
+You can also name each `.log()` call if you have several in one pipeline, so you
+can tell them apart:
 
 ```java
 Flux.just(1, 2, 3)
@@ -43,8 +43,8 @@ Flux.just(1, 2, 3)
 
 ## Why It Matters
 
-`.log()` is often the fastest way to understand *why* your pipeline isn't behaving as
-expected — did it even get subscribed to? Did the request demand ever reach the
-source? Did an error happen before or after a particular operator? It's the reactive
-equivalent of sprinkling `System.out.println()` through imperative code, but built
-specifically to show Reactive Streams signals.
+`.log()` is usually the quickest way to figure out why a pipeline isn't doing
+what you expect. Did it even get subscribed to? Did the request for data actually
+reach the source? Did an error happen before or after a certain step? It's the
+reactive version of scattering `System.out.println()` everywhere — just built
+specifically for reactive signals.

@@ -2,13 +2,13 @@
 
 ## In Simple Terms
 
-Testing error scenarios is just as important as testing the happy path in reactive
-code — `StepVerifier` provides several ways to assert that a `Mono`/`Flux` fails in
-exactly the way you expect.
+Testing what happens when things go wrong matters just as much as testing
+the happy path. `StepVerifier` gives you several ways to check that a
+`Mono`/`Flux` fails exactly the way you expect it to.
 
 ## Simple Example
 
-Asserting the exact exception type:
+Checking the exact exception type:
 
 ```java
 @Test
@@ -21,7 +21,7 @@ void testErrorType() {
 }
 ```
 
-Asserting the exception type AND message:
+Checking the exception type *and* message:
 
 ```java
 @Test
@@ -34,7 +34,7 @@ void testErrorMessage() {
 }
 ```
 
-Asserting with a custom predicate on the error:
+Checking with a custom rule on the error:
 
 ```java
 @Test
@@ -50,7 +50,7 @@ void testErrorMatches() {
 }
 ```
 
-Testing that some values are emitted **before** the error occurs:
+Checking that some values come through *before* the error hits:
 
 ```java
 @Test
@@ -66,7 +66,8 @@ void testPartialSuccessBeforeError() {
 
 ## Why It Matters
 
-Explicit error testing ensures your error-handling logic (`onErrorResume`,
-`retryWhen`, custom exception mapping) is actually verified by tests, not just
-assumed to work — a common gap where "happy path" tests pass, but production
-failures reveal untested error-handling bugs.
+Testing errors explicitly makes sure your error-handling logic
+(`onErrorResume`, `retryWhen`, custom exception mapping) is actually
+proven to work, not just assumed to. This is a common gap — happy-path
+tests pass fine, and then production traffic reveals error-handling bugs
+that nobody ever checked for.

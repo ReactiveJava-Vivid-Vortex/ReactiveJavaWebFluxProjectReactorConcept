@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`onError(Throwable t)` is the signal a `Publisher` sends when **something went
-wrong** and the stream must terminate. Like `onComplete()`, it's a *terminal* signal
-— once called, no more `onNext()` or `onComplete()` will follow.
+`onError(throwable)` is the signal a publisher sends when **something broke** and
+the stream has to stop. Just like `onComplete()`, it's a one-time, final signal —
+once it fires, nothing else follows.
 
 ```java
 public interface Subscriber<T> {
@@ -26,14 +26,13 @@ Flux.just(1, 2, 0, 4)
 // Result: 10
 // Result: 5
 // Error occurred: / by zero
-// (note: "4" is never processed — the stream terminated at the error)
+// (note: "4" is never processed — the stream stopped right at the error)
 ```
 
 ## Why It Matters
 
-Unlike traditional try/catch, if you **don't** provide an `onError` handler in a
-reactive pipeline, the error doesn't just vanish — Reactor will throw an
-`UnsupportedOperatorException` warning you forgot to handle it (or, in some contexts,
-propagate it as an unhandled exception). This is why operators like `onErrorResume()`,
-`onErrorReturn()`, and providing an explicit error consumer in `subscribe()` are so
-important — they are your only chance to react to failures in a reactive pipeline.
+Unlike a normal try/catch, if you don't handle `onError` in a reactive pipeline,
+the error doesn't just quietly disappear — Reactor complains loudly about it. This
+is exactly why operators like `onErrorResume()`, `onErrorReturn()`, and just
+remembering to pass an error handler into `.subscribe()` matter so much — they're
+your only chance to catch and react to a failure.

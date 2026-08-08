@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-A **finite stream** is a `Flux` that eventually calls `onComplete()` on its own —
-it has a known, bounded number of items (even if that number is very large), unlike
-an infinite stream that runs forever unless externally stopped.
+A **finite stream** is a `Flux` that eventually finishes on its own — it has a
+known, limited number of items (even if that number is huge), unlike an infinite
+stream that keeps going unless something stops it from outside.
 
 ## Simple Example
 
@@ -18,8 +18,8 @@ finite.subscribe(
 );
 ```
 
-Contrast with `Flux.interval(...)`, which is **not** finite — it never calls
-`onComplete()` by itself, no matter how long you wait.
+Compare that with `Flux.interval(...)`, which is **not** finite — it never calls
+`onComplete()` on its own, no matter how long you wait.
 
 ```
 Flux.range(1, 5)          -> finite  (completes after 5 items)
@@ -29,7 +29,7 @@ Flux.interval(Duration)   -> infinite (never completes on its own)
 
 ## Why It Matters
 
-Whether a stream is finite or infinite matters for operators that need to know "the
-whole stream is done" — like `.collectList()`, `.count()`, or `.reduce()`. These
-operators would simply never emit a result on a truly infinite stream, because they
-have to wait for `onComplete()` before producing their aggregated output.
+Whether a stream is finite or infinite matters for operators that need the whole
+stream to finish before they can give you anything — like `.collectList()`,
+`.count()`, or `.reduce()`. Those would just sit and wait forever on a truly
+infinite `Flux`, since they can't produce a result until `onComplete()` fires.

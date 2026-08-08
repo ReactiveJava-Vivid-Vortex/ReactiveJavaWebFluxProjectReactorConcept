@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-"Thread switching" in a reactive pipeline means moving execution from one thread to
-another at a specific point, using `publishOn()` or `subscribeOn()`. Once you switch,
-every operator **downstream** of that point runs on the new thread, until another
-switch happens.
+"Thread switching" just means moving execution over to a different thread
+at some point in the pipeline, using `publishOn()` or `subscribeOn()`. Once
+you switch, everything *after* that point runs on the new thread, like a
+relay race handing the baton to a new runner — until another switch happens
+further down.
 
 ## Simple Example
 
@@ -23,17 +24,18 @@ Before switch: main
 After switch: boundedElastic-1
 ```
 
-Everything after `.publishOn(...)` in the chain now executes on a `boundedElastic`
-worker thread instead of `main`.
+Everything after `.publishOn(...)` now runs on a `boundedElastic` worker
+thread instead of `main`.
 
 ## Why It Matters
 
-Deliberate thread switching is essential for:
-1. Moving a blocking call off of a limited event-loop thread (e.g., onto
+Deliberately switching threads matters for a few reasons:
+1. Getting a blocking call off a limited thread (moving it onto
    `boundedElastic()`).
-2. Moving CPU-intensive work onto a `parallel()` scheduler to use multiple cores.
-3. Returning execution to a specific thread afterward if needed (e.g., a UI thread in
-   a desktop app).
+2. Putting CPU-heavy work on a `parallel()` scheduler so it can use multiple
+   cores.
+3. Coming back to a specific thread afterward if you need to (like a UI
+   thread in a desktop app).
 
-Without understanding thread switching, it's easy to accidentally leave blocking code
-running on threads meant only for fast, non-blocking work.
+Without understanding this, it's easy to accidentally leave blocking code
+running on threads that were only ever meant for fast, non-blocking work.

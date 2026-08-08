@@ -2,11 +2,12 @@
 
 ## In Simple Terms
 
-A custom validator is your own class/logic that checks incoming data against
-business rules that go beyond simple annotations (like `@NotNull`) — e.g., "this
-email must not already exist," or "the discount code must be currently active." In a
-reactive pipeline, custom validation often needs to be asynchronous itself (e.g.,
-checking a database), so it's expressed as a `Mono`-returning method.
+A custom validator is your own logic for checking incoming data against
+rules that go beyond a simple annotation like `@NotNull` — things like
+"this email can't already be taken," or "the discount code has to be
+currently active." In a reactive app, custom validation often needs to be
+async itself (checking a database, say), so it's written as a
+`Mono`-returning method.
 
 ## Simple Example
 
@@ -42,7 +43,7 @@ public Mono<ProductDto> createProduct(ProductDto dto) {
 
 ## Why It Matters
 
-Custom validators let you express business rules that simple declarative annotations
-can't express — especially rules requiring a database lookup or external check —
-while keeping validation logic fully reactive and non-blocking, consistent with the
-rest of your WebFlux pipeline.
+Custom validators let you express rules that simple annotations just
+can't — especially ones needing a database check or an external lookup —
+while keeping validation itself fully reactive and non-blocking, in step
+with the rest of your WebFlux pipeline.

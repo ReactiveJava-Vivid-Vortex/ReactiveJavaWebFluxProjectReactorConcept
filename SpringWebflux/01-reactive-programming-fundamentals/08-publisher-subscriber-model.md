@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-The Publisher/Subscriber model is the foundational pattern underlying all of Spring
-WebFlux: a **Publisher** (like `Mono`/`Flux`) produces data over time, and a
-**Subscriber** consumes it, reacting to new values, errors, or completion. WebFlux
-controllers, `WebClient`, and R2DBC repositories all speak this same publisher-based
-language throughout the entire request lifecycle.
+The publisher/subscriber pattern is the foundation everything in Spring
+WebFlux sits on: a Publisher (like `Mono`/`Flux`) produces data over time,
+and a Subscriber consumes it, reacting to new values, errors, or
+completion. WebFlux controllers, `WebClient`, and R2DBC repositories all
+speak this same publisher-based language throughout the entire request.
 
 ## Simple Example
 
@@ -26,15 +26,16 @@ public class UserController {
 }
 ```
 
-You never call `.subscribe()` yourself in a controller — Spring WebFlux's internal
-machinery subscribes to the `Mono`/`Flux` you return, at the right time, and streams
-the resulting data back to the HTTP client as it becomes available.
+You never call `.subscribe()` yourself inside a controller — Spring
+WebFlux's internal machinery subscribes to whatever `Mono`/`Flux` you
+return, at the right moment, and streams the data back to the HTTP client
+as it becomes available.
 
 ## The Three Signals Every Publisher Speaks
 
-Whatever the `Publisher` is — a `Mono<User>` from a repository, a `Flux<Order>`
-streamed over SSE, a `WebClient` call to another service — it can only ever
-communicate using **three signal types**:
+Whatever the Publisher actually is — a `Mono<User>` from a repository, a
+`Flux<Order>` streamed over SSE, a `WebClient` call to another service —
+it can only ever say three things:
 
 - **`onNext(item)`** — "here's a value" (0+ times).
 - **`onComplete()`** — "finished successfully" (terminal, at most once).
@@ -50,15 +51,15 @@ userRepository.findById(id).subscribe(
 ```
 
 Spring WebFlux itself is built entirely on top of this signal grammar: a
-`404 Not Found` for an empty `Mono` and a `500` for an unhandled `onError` are
-just the framework's default reactions to which terminal signal your controller's
-`Mono`/`Flux` ended with. See [[the-three-signal-types]] in the Project Reactor
-notes for the full breakdown.
+`404 Not Found` for an empty `Mono` and a `500` for an unhandled error are
+just the framework's default reaction to which terminal signal your
+controller's `Mono`/`Flux` ended with. See [[the-three-signal-types]] in
+the Project Reactor notes for the full breakdown.
 
 ## Why It Matters
 
-Understanding that "everything is a Publisher" in WebFlux — requests, responses,
-database calls, external API calls — is the key mental model shift from traditional
-Spring MVC. Once you see the whole request pipeline as a chain of publishers and
-subscribers, WebFlux's behavior (laziness, backpressure, non-blocking flow) becomes
-much more intuitive.
+Realizing that "everything is a Publisher" in WebFlux — requests,
+responses, database calls, external API calls — is the key mental shift
+from traditional Spring MVC. Once you see the whole request as a chain of
+publishers and subscribers, WebFlux's behavior (laziness, backpressure,
+non-blocking flow) starts making a lot more sense.

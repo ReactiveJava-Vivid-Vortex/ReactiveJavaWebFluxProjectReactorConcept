@@ -2,10 +2,9 @@
 
 ## In Simple Terms
 
-A `Subscription` is the **handshake object** created when a `Subscriber` subscribes to
-a `Publisher`. It's the "remote control" the subscriber uses to control the flow of
-data — asking for more items (`request(n)`) or stopping the stream entirely
-(`cancel()`).
+A `Subscription` is like a **remote control** handed to the subscriber the moment
+it subscribes. With it, the subscriber can ask for more items (`request(n)`) or
+tell the publisher to stop entirely (`cancel()`).
 
 ```java
 public interface Subscription {
@@ -16,8 +15,8 @@ public interface Subscription {
 
 ## Simple Example
 
-Think of a subscription like ordering food in installments at a restaurant, one plate
-at a time:
+Think of it like ordering food in courses at a restaurant, instead of getting
+everything dumped on the table at once:
 
 ```java
 public void onSubscribe(Subscription subscription) {
@@ -29,13 +28,13 @@ public void onSubscribe(Subscription subscription) {
 }
 ```
 
-The publisher is **not allowed** to send more items than have been requested. If the
-subscriber only calls `request(2)`, the publisher must send at most 2 `onNext()`
-signals until more are requested.
+The publisher is **not allowed** to send more than what's been asked for. If the
+subscriber only calls `request(2)`, the publisher can send at most 2 items before
+it has to wait for another request.
 
 ## Why It Matters
 
-The `Subscription` is what makes **backpressure** possible — the whole point of the
-Reactive Streams spec. Without it, a fast publisher could flood a slow subscriber
-with more data than it can handle, causing memory overload. With it, the consumer
-stays in control of the pace.
+The `Subscription` is what makes backpressure possible in the first place. Without
+it, a fast publisher could flood a slow subscriber with more data than it can
+handle, and memory would blow up. With it, the subscriber always stays in control
+of the pace.

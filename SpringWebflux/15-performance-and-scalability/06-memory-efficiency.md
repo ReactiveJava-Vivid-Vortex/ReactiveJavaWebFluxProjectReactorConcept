@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-WebFlux applications can achieve significantly better memory efficiency than
-traditional blocking servers under high concurrency — both because far fewer
-threads are needed (each thread's stack consumes real memory, see
-[[ram-and-memory-model]] in the ProjectReactor notes), and because streaming
-avoids fully buffering large datasets in memory.
+WebFlux apps can be a lot more memory-efficient than traditional blocking
+servers under heavy concurrency — both because they need far fewer
+threads (each thread's stack eats real memory, see
+[[ram-and-memory-model]] in the Project Reactor notes), and because
+streaming avoids fully loading big datasets into memory.
 
 ## Simple Example
 
@@ -22,13 +22,14 @@ Spring WebFlux (event-loop):
   ~8-16 MB for thread stacks total -- negligible by comparison
 ```
 
-Combined with streaming (avoiding `.collectList()` on huge datasets, see
-[[memory-efficient-processing]]), a WebFlux application's memory footprint stays far
-more predictable and bounded, even as concurrent load and dataset sizes grow.
+Combine that with streaming (avoiding `.collectList()` on huge datasets,
+see [[memory-efficient-processing]]), and a WebFlux app's memory footprint
+stays far more predictable and bounded, even as traffic and dataset sizes
+grow.
 
 ## Why It Matters
 
-Better memory efficiency directly translates to real infrastructure cost savings —
-handling the same traffic with less RAM per server instance, or handling more
-traffic with the same hardware — a concrete, measurable business benefit of
-adopting the reactive model for the right (I/O-heavy, high-concurrency) workloads.
+Better memory efficiency translates directly into real infrastructure
+savings — handling the same traffic with less RAM per server, or more
+traffic with the same hardware — a concrete, measurable payoff of going
+reactive for the right (I/O-heavy, high-concurrency) workloads.

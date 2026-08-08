@@ -2,14 +2,14 @@
 
 ## In Simple Terms
 
-"Rate limiting" in a reactive context means deliberately controlling **how fast**
-items flow through a pipeline — often to respect an external constraint, like a
-third-party API's requests-per-second limit, rather than a technical inability to
-keep up.
+Rate limiting means deliberately slowing down how fast items move through a
+pipeline — often not because your app can't keep up, but because something
+outside your control (like a third-party API's requests-per-second cap)
+demands it.
 
 ## Simple Example
 
-Using `.delayElements()` to space out emissions:
+Using `.delayElements()` to space things out:
 
 ```java
 Flux.range(1, 10)
@@ -17,8 +17,8 @@ Flux.range(1, 10)
     .subscribe(n -> System.out.println("Calling API with: " + n));
 ```
 
-Using `.limitRate(n)` to control how many items are requested from the source at a
-time (useful for large or expensive-to-produce sources):
+Using `.limitRate(n)` to pull from the source in smaller chunks, instead of
+all at once (handy for huge or expensive sources):
 
 ```java
 Flux.range(1, 1_000_000)
@@ -26,8 +26,8 @@ Flux.range(1, 1_000_000)
     .subscribe(n -> processItem(n));
 ```
 
-Combining rate limiting with concurrency control (e.g., only 5 concurrent outgoing
-calls at a time):
+Combining rate limiting with a cap on how many things run at once (say,
+only 5 outgoing calls in flight at a time):
 
 ```java
 Flux.fromIterable(userIds)
@@ -37,8 +37,8 @@ Flux.fromIterable(userIds)
 
 ## Why It Matters
 
-Rate limiting is essential when your reactive pipeline interacts with external
-systems that impose their own limits (API quotas, database connection pools) —
-without it, a reactive pipeline could technically produce/consume data faster than
-the outside world can safely handle, leading to `429 Too Many Requests` errors or
-overwhelmed downstream systems.
+Rate limiting matters whenever your pipeline talks to something with its
+own limits — API quotas, a database's connection pool. Without it, your
+reactive code could technically fire off requests faster than the outside
+world can safely handle, leading to `429 Too Many Requests` errors or
+knocking over a downstream system.

@@ -2,11 +2,10 @@
 
 ## In Simple Terms
 
-Error signaling is how a publisher communicates that something went wrong, via a
-single `onError(Throwable)` call. This is the reactive equivalent of throwing an
-exception — except instead of unwinding the call stack synchronously, the error
-travels downstream as a normal signal through the pipeline, and can be intercepted
-and handled by operators along the way.
+Error signaling is simply how a publisher says "something went wrong" — by
+calling `onError(throwable)`. It's the reactive version of throwing an exception,
+except the error travels down the pipeline like a normal signal, and any operator
+along the way can catch and react to it.
 
 ## Simple Example
 
@@ -30,13 +29,13 @@ Value: 5
 Caught error: Cannot process zero!
 ```
 
-Notice `4` is never processed — once `onError` fires, the stream is terminated; there
-is no going back to processing more items.
+Notice `4` never gets processed — once `onError` fires, the stream is over.
+There's no going back to finish the rest.
 
 ## Why It Matters
 
-Because errors are just another kind of signal in the pipeline, you can intercept and
-react to them mid-stream using operators like `onErrorResume()` or `onErrorReturn()`
-— something a plain `try/catch` around asynchronous code cannot easily do. This is a
-core reason reactive error handling feels different (and, once learned, more
-powerful) than traditional exception handling.
+Because an error is just another signal flowing through the pipeline, you can
+catch and react to it mid-stream with operators like `onErrorResume()` or
+`onErrorReturn()` — something a regular try/catch around async code can't easily
+do. This is the biggest reason reactive error handling feels different from
+traditional exception handling, and once you get used to it, more useful too.

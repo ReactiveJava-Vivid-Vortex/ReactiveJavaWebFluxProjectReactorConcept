@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`Flux.mergeDelayError(concurrency, source1, source2, ...)` is like `merge()`, but if
-any source errors, the error is **delayed** until all other sources have completed
-(successfully or not) — so a failure in one source doesn't cut off the results still
-arriving from the others.
+`Flux.mergeDelayError()` behaves like `merge()`, except if one of the
+sources fails, the failure gets held back until every other source has had
+a chance to finish, one way or another — so a problem in one source doesn't
+cut off results that are still coming in fine from the rest.
 
 ## Simple Example
 
@@ -29,13 +29,14 @@ Got: C
 Error at the end: Service down
 ```
 
-With plain `.merge()`, the error from `failing` would immediately terminate the
-whole stream, likely **before** `ok` had a chance to emit all its items.
+With plain `.merge()`, the failure from `failing` would immediately shut
+down the whole stream — probably before `ok` even had a chance to emit all
+its items.
 
 ## Why It Matters
 
-`.mergeDelayError()` is important when combining results from multiple independent,
-unreliable sources (e.g., aggregating data from several microservices) where one
-service failing shouldn't prevent you from still getting the successful results from
-the others — you find out about the failure only after everything else has had its
-chance to complete.
+`.mergeDelayError()` matters when you're combining results from several
+independent, unreliable sources — like pulling data from a handful of
+microservices — where one service having a bad day shouldn't stop you from
+still getting the good results from everyone else. You only find out about
+the failure after everything else finished.

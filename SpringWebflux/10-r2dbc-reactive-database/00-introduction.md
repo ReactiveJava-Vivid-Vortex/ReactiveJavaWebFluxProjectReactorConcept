@@ -1,52 +1,110 @@
-# R2DBC (Reactive Database) — Topic Overview
+# Q1. Why Can't I Just Use JPA/Hibernate in a WebFlux App?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of a One-Lane Bridge That Can't Be Widened)
 
-JDBC — the standard way Java talks to relational databases — is **fundamentally
-blocking**, no matter how you wrap it. That means JPA/Hibernate, which sits on top
-of JDBC, can never be truly non-blocking either. **R2DBC** (Reactive Relational
-Database Connectivity) is a completely different specification and set of drivers,
-built from the ground up around non-blocking I/O — the reactive counterpart to
-JDBC.
+JDBC — what JPA/Hibernate is built on — is a **one-lane bridge**: it was designed
+decades ago so that a thread crosses it and simply **waits** until it's fully
+across (the query finishes). No matter how cleverly you wrap it, you can't turn a
+one-lane bridge into a multi-lane highway after the fact — the blocking nature is
+baked into its foundation.
 
-The good news: if you already know Spring Data JPA, Spring Data R2DBC feels almost
-identical — you extend `ReactiveCrudRepository` instead of `CrudRepository`, and
-every method just returns `Mono`/`Flux` instead of a plain object or blocking
-`List`:
+```
+JDBC / JPA / Hibernate  =  fundamentally BLOCKING, no matter how you wrap it
+R2DBC                    =  a completely different bridge, built non-blocking from day one
+```
+
+**R2DBC** (Reactive Relational Database Connectivity) is that new, wider bridge —
+a separate specification and driver set, purpose-built for non-blocking database
+access.
+
+---
+
+## Q2. Does Spring Data R2DBC Feel Different from Spring Data JPA?
+
+**Barely.** If you know JPA, you already mostly know R2DBC:
 
 ```java
-public interface ProductRepository extends ReactiveCrudRepository<ProductEntity, String> {
-    Flux<ProductEntity> findByCategory(String category); // still works, just reactive
+// JPA
+public interface ProductRepository extends CrudRepository<ProductEntity, String> {
+    List<ProductEntity> findByCategory(String category); // BLOCKING
 }
 
+// R2DBC — same method-name convention, just reactive return types
+public interface ProductRepository extends ReactiveCrudRepository<ProductEntity, String> {
+    Flux<ProductEntity> findByCategory(String category); // NON-BLOCKING
+}
+```
+
+```java
 Mono<ProductEntity> product = productRepository.findById("P123");
 Flux<ProductEntity> allProducts = productRepository.findAll();
 ```
 
-For queries too complex for method-name conventions, `DatabaseClient` gives you a
-reactive escape hatch for raw, dynamic SQL — still returning `Mono`/`Flux`, still
-fully non-blocking.
+---
 
-**Why this matters so much:** using a blocking JPA repository inside an otherwise
-reactive WebFlux pipeline would silently reintroduce the exact problem WebFlux was
-meant to solve (a blocking call stalling a precious event-loop thread) — R2DBC keeps
-your data access layer non-blocking end to end.
+## Q3. What Do I Use for Complex, Dynamic SQL?
 
-## Quick Revision Cheat Sheet
+```java
+// Simple: @Query annotation
+@Query("SELECT * FROM products WHERE category = :category AND price < :maxPrice")
+Flux<ProductEntity> findAffordableInCategory(String category, double maxPrice);
 
-| # | Concept | One-Line Summary |
-|---|---|---|
-| 1 | **Reactive Repository** | `ReactiveCrudRepository<Entity, Id>` — Spring Data's reactive repository interface, Mono/Flux everywhere. |
-| 2 | **Reactive CRUD** | `save()`, `findById()`, `findAll()`, `deleteById()`, `count()` — all built in, all reactive. |
-| 3 | **R2DBC** | The reactive relational database spec/drivers — genuinely non-blocking, unlike JDBC. |
-| 4 | **Mono/Flux database operations** | Every DB call returns Mono (0-1) or Flux (0-N) — composes naturally with the rest of your reactive code. |
-| 5 | **Reactive SQL access** | `DatabaseClient` (or `@Query`) for complex/dynamic SQL beyond method-name conventions — still non-blocking. |
+// Complex/dynamic: DatabaseClient — still fully reactive
+public Flux<ProductEntity> searchProducts(String keyword, double minPrice) {
+    return databaseClient.sql("SELECT * FROM products WHERE name ILIKE :keyword AND price >= :minPrice")
+        .bind("keyword", "%" + keyword + "%")
+        .bind("minPrice", minPrice)
+        .map((row, meta) -> new ProductEntity(row.get("id", String.class), row.get("name", String.class), row.get("price", Double.class)))
+        .all();
+}
+```
 
-## How It All Fits Together
+---
+
+## Q4. What Actually Breaks If I Sneak JPA Into a WebFlux App?
+
+```java
+// This SILENTLY blocks an event-loop thread — even though the code "looks" reactive!
+@GetMapping("/products/{id}")
+public Mono<ProductDto> getProduct(@PathVariable String id) {
+    return Mono.fromCallable(() -> jpaRepository.findById(id)) // JPA call is BLOCKING
+        .map(ProductMapper::toDto);
+    // Missing .subscribeOn(Schedulers.boundedElastic()) -> freezes an event-loop thread!
+}
+```
+
+If you genuinely must use JPA (legacy system, no migration budget), you MUST
+isolate it with `.subscribeOn(Schedulers.boundedElastic())` — otherwise it
+silently undoes WebFlux's entire scalability benefit.
+
+---
+
+## Q5. Interview-Style Q&A
+
+### Is R2DBC a wrapper around JDBC?
+
+**No** — it's a completely separate specification/driver ecosystem, built
+non-blocking from the ground up. JDBC cannot be made truly non-blocking, no matter
+how it's wrapped.
+
+### Can I mix R2DBC and JPA in the same application?
+
+Technically yes, but any JPA call must be isolated on `boundedElastic()` — mixing
+them without that isolation reintroduces blocking-thread problems.
+
+### Does `ReactiveCrudRepository` support the same method-name query conventions as JPA's `CrudRepository`?
+
+**Yes** — `findByX`, `countByX`, etc. all work the same way, just returning
+`Mono`/`Flux` instead of plain values/collections.
+
+---
+
+## Q6. Summary
 
 ```
 JDBC (blocking, can't be fixed)  →  JPA/Hibernate (blocking, built on JDBC)
                                               ✗ NOT suitable for pure WebFlux pipelines
+                                                (unless isolated on boundedElastic())
 
 R2DBC (genuinely non-blocking)  →  Spring Data R2DBC
                                               │
@@ -55,9 +113,10 @@ R2DBC (genuinely non-blocking)  →  Spring Data R2DBC
                           DatabaseClient (complex/dynamic raw SQL, still reactive)
                                               │
                                      Mono / Flux results
-                          composes directly with Service/Controller layers
 ```
 
-Rule of thumb for this whole topic: **if your WebFlux app talks to a relational
-database, it should be through R2DBC, not JDBC/JPA** — otherwise you're only
-"half-reactive," with a blocking bottleneck hiding in your data layer.
+### One sentence to remember
+
+> **"JDBC is a one-lane bridge that can never be widened — if your WebFlux app
+> talks to a relational database, it needs R2DBC, a completely different,
+> genuinely non-blocking bridge."**

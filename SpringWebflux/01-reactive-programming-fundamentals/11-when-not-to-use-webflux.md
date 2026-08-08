@@ -2,29 +2,31 @@
 
 ## In Simple Terms
 
-WebFlux is a powerful tool, but it's not automatically the right choice for every
-project. Here's when to prefer traditional Spring MVC instead.
+WebFlux is powerful, but it's not automatically the right pick for every
+project. Here's when you're better off sticking with traditional Spring
+MVC.
 
 ## When to Avoid WebFlux
 
-1. **Your team lacks reactive programming experience.** Debugging reactive stack
-   traces, understanding thread-switching behavior, and writing correct
-   `StepVerifier` tests all have a real learning curve. If your team isn't ready for
-   that investment, the complexity cost may outweigh the benefit.
+1. **Your team hasn't worked with reactive code before.** Reading reactive
+   stack traces, understanding thread-switching, and writing correct
+   `StepVerifier` tests all take real time to learn. If your team isn't
+   ready for that, the added complexity may not be worth it.
 
-2. **You rely on blocking libraries with no reactive equivalent.** If your data
-   access layer is JPA/Hibernate (blocking) and there's no near-term plan to migrate
-   to R2DBC, you'd end up wrapping every call with `subscribeOn(boundedElastic())`
-   — at that point, you gain little of WebFlux's actual scalability benefit while
-   still paying its complexity cost.
+2. **You depend on blocking libraries with no reactive equivalent.** If
+   your data layer is JPA/Hibernate (blocking) and you're not planning to
+   move to R2DBC anytime soon, you'd end up wrapping every call with
+   `subscribeOn(boundedElastic())` — at which point you barely get any of
+   WebFlux's real scalability benefit, while still paying for its extra
+   complexity.
 
-3. **Your workload is CPU-bound, not I/O-bound.** Reactive programming's main
-   advantage (efficient thread usage during I/O waits) doesn't help CPU-heavy
-   workloads like image processing or complex calculations.
+3. **Your workload is CPU-bound, not I/O-bound.** Reactive programming's
+   main advantage — using threads efficiently while waiting on I/O —
+   doesn't help CPU-heavy work like image processing or big calculations.
 
-4. **Your concurrency needs are low.** An internal admin tool used by a handful of
-   employees doesn't need WebFlux's scalability — the added complexity isn't worth
-   it.
+4. **Your concurrency needs are small.** An internal admin tool used by a
+   handful of employees doesn't need WebFlux's scalability — the extra
+   complexity just isn't worth it there.
 
 ## Simple Example
 
@@ -40,7 +42,7 @@ Decision Guide:
 
 ## Why It Matters
 
-Choosing WebFlux "because it's more scalable" without considering these factors
-often leads to a system that's more complex to build and maintain, without actually
-realizing the scalability benefits — because the underlying blocking dependencies
-undermine the whole point.
+Picking WebFlux just "because it's more scalable," without weighing these
+factors, often leads to a system that's harder to build and maintain
+without actually getting the scalability payoff — because blocking
+dependencies underneath undermine the whole point.

@@ -2,22 +2,22 @@
 
 ## In Simple Terms
 
-Project Reactor gives you many `Mono.xxx()` static factory methods to create a `Mono`
-from different kinds of sources. Knowing which one fits your situation is key to
-writing correct, efficient reactive code.
+Reactor gives you a bunch of `Mono.xxx()` methods to create a `Mono` from
+different starting points. Picking the right one for the job is the key skill
+here.
 
 ## Quick Reference
 
 | Factory Method            | Use When...                                             |
 |----------------------------|----------------------------------------------------------|
-| `Mono.just(value)`          | You already have a value in hand (non-null, eager)       |
-| `Mono.empty()`              | You want to represent "no value" successfully             |
-| `Mono.error(t)`             | You want to represent a failure                           |
-| `Mono.fromSupplier(fn)`     | Lazy, synchronous computation, no checked exceptions       |
-| `Mono.fromCallable(fn)`     | Lazy, synchronous computation that may throw checked exceptions |
-| `Mono.fromRunnable(fn)`     | A side-effecting action with no return value (`Mono<Void>`) |
-| `Mono.defer(fn)`            | You need to choose/build a whole new Mono per subscription  |
-| `Mono.create(sink -> ...)`  | Bridging a callback-based, non-reactive API                |
+| `Mono.just(value)`          | You already have a value in hand (non-null, runs right away)       |
+| `Mono.empty()`              | You want to say "no value, but no error either"             |
+| `Mono.error(t)`             | You want to say "this failed"                           |
+| `Mono.fromSupplier(fn)`     | Lazy, simple computation, no checked exceptions       |
+| `Mono.fromCallable(fn)`     | Lazy, simple computation that might throw a checked exception |
+| `Mono.fromRunnable(fn)`     | An action with no return value (`Mono<Void>`) |
+| `Mono.defer(fn)`            | You need to choose a whole new Mono, fresh, per subscription  |
+| `Mono.create(sink -> ...)`  | Bridging an old-style, callback-based API                |
 | `Mono.fromFuture(future)`   | Wrapping a `CompletableFuture`                              |
 | `Mono.justOrEmpty(value)`   | A value that might legitimately be `null`                  |
 
@@ -36,7 +36,7 @@ Mono<String> h = Mono.justOrEmpty(possiblyNullValue);
 
 ## Why It Matters
 
-Picking the *right* factory method avoids subtle bugs — like accidentally running
-expensive code eagerly with `Mono.just(expensiveCall())` instead of lazily with
-`Mono.fromSupplier(() -> expensiveCall())`. Knowing this table by heart saves a lot of
-debugging time later.
+Picking the wrong one causes real bugs — like accidentally running expensive
+code right away with `Mono.just(expensiveCall())` instead of lazily with
+`Mono.fromSupplier(() -> expensiveCall())`. Knowing this table well saves a lot
+of head-scratching later.

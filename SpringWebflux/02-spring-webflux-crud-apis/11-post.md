@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-A POST endpoint creates a new resource. In WebFlux, you accept a `@RequestBody`
-(either the DTO directly, or wrapped in a `Mono<Dto>` for even more reactive request
-handling), save it via the repository, and return the created resource — typically
-with a `201 Created` status.
+A POST endpoint creates a new resource. In WebFlux, you accept a
+`@RequestBody` (either the DTO directly, or wrapped in a `Mono<Dto>` for
+even more reactive request handling), save it through the repository, and
+return the newly created resource — usually with a `201 Created` status.
 
 ## Simple Example
 
@@ -20,8 +20,8 @@ public Mono<ResponseEntity<ProductDto>> createProduct(@RequestBody ProductDto dt
 }
 ```
 
-Using `Mono<ProductDto>` as the request body type instead, for a fully reactive
-request-to-response pipeline:
+Using `Mono<ProductDto>` as the request body type instead, for a fully
+reactive request-to-response pipeline:
 
 ```java
 @PostMapping("/products")
@@ -36,7 +36,7 @@ public Mono<ResponseEntity<ProductDto>> createProduct(@RequestBody Mono<ProductD
 
 ## Why It Matters
 
-Getting the response status right (`201 Created`, not the default `200 OK`) and
-returning the fully-saved entity (including any server-generated fields, like an
-auto-generated `id`) are the key details that make a POST endpoint behave correctly
-according to REST conventions.
+Getting the response status right (`201 Created`, not the default
+`200 OK`) and sending back the fully-saved resource (including anything the
+server generated itself, like an auto-generated `id`) are the key details
+that make a POST endpoint behave the way REST conventions expect.

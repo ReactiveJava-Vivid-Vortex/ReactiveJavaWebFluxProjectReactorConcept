@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-In the context of Spring WebFlux, a "reactive pipeline" refers to the entire chain of
-processing a single HTTP request goes through — from the incoming request, through
-your controller's `Mono`/`Flux`-returning method, through any repository/WebClient
-calls, all the way to the outgoing HTTP response — all connected as one continuous,
-non-blocking, asynchronous chain.
+In Spring WebFlux, a "reactive pipeline" is the entire journey a single
+HTTP request takes — from the incoming request, through your controller's
+`Mono`/`Flux`-returning method, through any repository or `WebClient`
+calls, all the way to the outgoing response — all wired together as one
+continuous, non-blocking chain.
 
 ## Simple Example
 
@@ -25,14 +25,16 @@ public class OrderController {
 }
 ```
 
-This entire method describes one continuous reactive pipeline: WebFlux subscribes to
-it when the HTTP request arrives, data flows through the database call, the
-downstream user service call, the combination logic, and finally to the HTTP
-response — with no thread ever blocked at any stage.
+This whole method describes one continuous pipeline: WebFlux subscribes to
+it the moment the HTTP request arrives, and data flows through the
+database call, the downstream user-service call, the combining logic, and
+finally out to the HTTP response — with no thread ever frozen at any point
+along the way.
 
 ## Why It Matters
 
-Thinking of your entire request-handling logic as "one reactive pipeline" (rather
-than a sequence of separate blocking steps) is the core mental shift needed to write
-idiomatic WebFlux code — every operator you chain (`flatMap`, `switchIfEmpty`,
-`doOnNext`) is a stage in that same, single, non-blocking pipeline.
+Thinking of your entire request-handling logic as "one pipeline" — rather
+than a series of separate blocking steps — is the core shift needed to
+write natural WebFlux code. Every operator you chain (`flatMap`,
+`switchIfEmpty`, `doOnNext`) is just one stage in that same, single,
+non-blocking pipeline.

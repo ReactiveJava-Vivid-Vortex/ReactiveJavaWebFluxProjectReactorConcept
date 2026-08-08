@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`WebClient` offers two main ways to supply a request body: `.bodyValue(obj)` for a
-value you already have, and `.body(publisher, Class)` for supplying the body
-reactively (as a `Mono`/`Flux`) — useful for streaming request bodies or when the
-body itself comes from an upstream asynchronous source.
+`WebClient` gives you two main ways to send a request body:
+`.bodyValue(obj)` for a value you already have in hand, and
+`.body(publisher, Class)` for supplying the body reactively (as a
+`Mono`/`Flux`) — useful for streaming request bodies or when the body
+itself comes from an upstream async source.
 
 ## Simple Example
 
@@ -39,8 +40,8 @@ webClient.post()
 
 ## Why It Matters
 
-Choosing the right body-supplying method keeps your `WebClient` calls fully
-non-blocking and composable — `.body(mono, Class)` in particular lets you chain an
-outgoing HTTP call directly onto an upstream asynchronous computation, without
-needing to `.block()` to get a plain value first (which would defeat the purpose of
-using WebClient).
+Picking the right body-supplying method keeps `WebClient` calls fully
+non-blocking and easy to compose — `.body(mono, Class)` in particular lets
+you chain an outgoing call directly onto an upstream async computation,
+without needing to `.block()` first to get a plain value (which would
+defeat the whole point of using `WebClient`).

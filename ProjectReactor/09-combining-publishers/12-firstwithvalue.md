@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-`Flux.firstWithValue(source1, source2, ...)` is similar to `firstWithSignal()`, but
-it specifically waits for the first source to emit an **actual value** (not just any
-signal). If a source errors or completes empty first, it's ignored in favor of
-whichever source produces a real value first (as long as at least one eventually
-does).
+`Flux.firstWithValue()` is like `firstWithSignal()`, but pickier — it
+specifically waits for the first source to hand back an actual value, not
+just any response. If a source errors out or finishes with nothing, it's
+skipped in favor of whichever source actually produces real data first (as
+long as one eventually does).
 
 ## Simple Example
 
@@ -23,8 +23,9 @@ Output:
 Got: Data from DB
 ```
 
-Even though `cache` "finished" first (with an empty result), `firstWithValue()`
-correctly waits for `database` since it's the one that actually produced a value.
+Even though `cache` technically "finished" first (with nothing to show),
+`firstWithValue()` correctly waits for `database` since that's the one that
+actually gave a real answer.
 
 ## firstWithSignal() vs firstWithValue()
 
@@ -35,6 +36,7 @@ correctly waits for `database` since it's the one that actually produced a value
 
 ## Why It Matters
 
-`.firstWithValue()` is the safer choice when racing sources that might legitimately
-return "nothing" (like a cache miss) — you don't want an empty cache result to "win"
-the race and short-circuit a database call that would have returned real data.
+`.firstWithValue()` is the safer pick when racing sources that might
+legitimately come back with "nothing" — like a cache miss. You don't want an
+empty cache result to "win" the race and short-circuit a database call that
+would have actually returned real data.

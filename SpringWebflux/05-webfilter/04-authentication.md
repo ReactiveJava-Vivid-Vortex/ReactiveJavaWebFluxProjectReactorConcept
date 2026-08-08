@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-Authentication answers the question "who is making this request?" A `WebFilter` is a
-natural place to implement custom authentication logic — extracting credentials
-(e.g., a bearer token) from the request, validating them, and attaching the
-authenticated identity to the exchange for later use by your controllers.
+Authentication answers "who's making this request?" A `WebFilter` is a
+natural place to put custom authentication logic — pulling credentials
+(like a bearer token) out of the request, checking they're valid, and
+attaching the identified user to the exchange so controllers can use it
+later.
 
 ## Simple Example
 
@@ -36,11 +37,12 @@ public class TokenAuthenticationFilter implements WebFilter {
 }
 ```
 
-(In real applications, Spring Security's reactive support is generally preferred over
-hand-rolled filters like this for anything beyond simple demos.)
+(In real projects, Spring Security's reactive support is usually the
+better choice over a hand-rolled filter like this, beyond simple demos.)
 
 ## Why It Matters
 
-Implementing authentication as a `WebFilter` ensures **every** endpoint is protected
-consistently, without needing to remember to add authentication checks manually in
-each controller method — a single, centralized gatekeeper for the entire application.
+Doing authentication as a `WebFilter` makes sure every endpoint is
+protected the same way, without needing to remember to add checks
+manually in each controller — one single, centralized gatekeeper for the
+whole app.

@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-"Functional routing" is the overall style of declaring your API's routes using
-`RouterFunction` composition, rather than scattering `@GetMapping`/`@PostMapping`
-annotations across controller classes. Routes are composed together using methods
-like `.and()`, `.andRoute()`, or nested `RouterFunctions.route()` calls.
+"Functional routing" is the overall style of declaring your API's routes
+by composing `RouterFunction`s, instead of scattering
+`@GetMapping`/`@PostMapping` annotations across controller classes. You
+compose routes together with methods like `.and()`, `.andRoute()`, or by
+nesting `RouterFunctions.route()` calls.
 
 ## Simple Example
 
@@ -42,7 +43,7 @@ RouterFunctions.route()
 
 ## Why It Matters
 
-Functional routing's composability makes it easy to organize large APIs into
-modular, independently-defined route groups (one per resource/feature), and combine
-them together explicitly — giving you a single, traceable source of truth for your
-entire application's routing table.
+Because functional routes compose so easily, it's simple to organize a
+large API into separate, independently-defined route groups (one per
+resource or feature) and combine them explicitly — giving you a single,
+traceable source of truth for how your whole app's routing works.

@@ -2,9 +2,10 @@
 
 ## In Simple Terms
 
-A `WebFilter` can validate required HTTP headers (like an API key, a client version
-header, or a content-type) **before** any request reaches a controller — rejecting
-malformed or missing headers early and consistently across your entire API.
+A `WebFilter` can check that required HTTP headers (an API key, a client
+version header, a content type) are present and correct before a request
+even reaches a controller — rejecting bad or missing headers early and
+consistently across your whole API.
 
 ## Simple Example
 
@@ -32,6 +33,7 @@ public class ApiKeyValidationFilter implements WebFilter {
 
 ## Why It Matters
 
-Validating required headers centrally, in a filter, ensures every endpoint enforces
-the same rules consistently — instead of each controller needing to remember to
-check for a header individually (and risking inconsistency if one is forgotten).
+Checking required headers in one central filter makes sure every endpoint
+enforces the same rules — instead of each controller having to remember
+to check for a header individually (and risking inconsistency if someone
+forgets).

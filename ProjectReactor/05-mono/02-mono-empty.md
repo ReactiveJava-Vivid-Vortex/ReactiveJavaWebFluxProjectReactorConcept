@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`Mono.empty()` creates a `Mono` that **completes successfully without ever emitting
-any value**. This represents "nothing to return, but not an error either" — like a
-database lookup that legitimately found no matching record.
+`Mono.empty()` finishes successfully **without ever handing out a value**. Think
+of it as "nothing to give you, but nothing went wrong either" — like searching a
+database and legitimately finding no match.
 
 ## Simple Example
 
@@ -19,7 +19,7 @@ empty.subscribe(
 // Output: Completed with no value
 ```
 
-A common real-world use: representing "user not found" without throwing an error:
+A common real use — saying "user not found" without treating it as an error:
 
 ```java
 public Mono<User> findUser(String id) {
@@ -30,7 +30,7 @@ public Mono<User> findUser(String id) {
 }
 ```
 
-Callers can then handle the empty case explicitly with `.switchIfEmpty(...)`:
+Whoever calls this can decide what "empty" should mean to them:
 
 ```java
 findUser("123")
@@ -40,7 +40,6 @@ findUser("123")
 
 ## Why It Matters
 
-Distinguishing "empty" from "error" is important semantically — an empty result
-usually isn't a failure, just an absence of data. Reactive code that conflates the
-two (e.g., always throwing an exception instead of returning `Mono.empty()`) makes
-composition and error handling unnecessarily awkward.
+Keeping "empty" and "error" as two separate ideas matters — an empty result
+usually isn't a failure, just a lack of data. Code that treats every "not found"
+as an exception ends up harder to read and harder to compose cleanly.

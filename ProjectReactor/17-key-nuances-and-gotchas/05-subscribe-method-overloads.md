@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`.subscribe()` is heavily overloaded, and picking the right overload determines how
-much control you have — and how easy it is to accidentally swallow an error
-silently. From least to most control:
+`.subscribe()` comes in several flavors, and which one you pick determines
+how much control you get — and how easy it is to accidentally let an error
+slip by unnoticed. From least to most control:
 
 ```java
 mono.subscribe();
@@ -49,10 +49,11 @@ risky.subscribe(
 
 ## Why It Matters
 
-In a Spring WebFlux application, you rarely call `.subscribe()` yourself — the
-framework does it for you when handling a request, and its own error handling
-(`@ControllerAdvice`, default error responses) takes over. But in standalone code,
-scheduled tasks, or event listeners where **you** call `.subscribe()` directly,
-always supply at least an error consumer — otherwise failures are silently logged
-by Reactor internally instead of being handled by your own application logic,
-which can make bugs very hard to notice.
+In a Spring WebFlux app, you rarely call `.subscribe()` yourself — the
+framework does it for you when handling a request, and its own error
+handling (`@ControllerAdvice`, default error responses) takes it from
+there. But in standalone code, scheduled tasks, or event listeners where
+*you* call `.subscribe()` directly, always give it at least an error
+handler — otherwise failures just get quietly logged by Reactor internally
+instead of being handled by your own logic, which can make bugs very easy
+to miss.

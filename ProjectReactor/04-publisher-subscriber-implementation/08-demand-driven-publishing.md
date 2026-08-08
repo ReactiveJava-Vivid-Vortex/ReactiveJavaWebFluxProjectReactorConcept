@@ -2,11 +2,9 @@
 
 ## In Simple Terms
 
-"Demand-driven publishing" means a publisher only produces items **when there is
-demand for them** (i.e., only in response to `request(n)`), rather than eagerly
-generating everything upfront regardless of whether anyone is ready to consume it.
-This is the opposite of, say, eagerly filling a `List` and handing it over all at
-once.
+"Demand-driven publishing" means a publisher only makes an item when there's
+actual demand for it — that is, only in response to `request(n)`. It never
+eagerly generates a bunch of stuff upfront, hoping someone will want it later.
 
 ## Simple Example
 
@@ -21,8 +19,8 @@ demandDriven
     .subscribe(value -> System.out.println("Got: " + value));
 ```
 
-Output shows "Generating a value..." only printing **3 times** — exactly matching the
-demand from `.take(3)`, never more:
+Notice "Generating a value..." prints **exactly 3 times** — matching the demand
+from `.take(3)`, no more, no less:
 
 ```
 Generating a value...
@@ -35,8 +33,7 @@ Got: 89
 
 ## Why It Matters
 
-Demand-driven publishing is what makes reactive streams memory-safe when working with
-huge or infinite data sources (e.g., reading a massive file, or an endless sensor
-feed). Because production only happens in response to demand, you never build up an
-unbounded backlog of unconsumed items in memory — the producer naturally paces itself
-to match the consumer.
+This is what keeps reactive streams safe with huge or endless sources — like a
+massive file or a never-ending sensor feed. Since new items are only made when
+there's demand for them, you never end up with a pile of unused data building up
+in memory. The source naturally slows down to match whatever's consuming it.

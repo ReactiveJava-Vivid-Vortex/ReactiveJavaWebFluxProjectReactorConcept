@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-`.share()` converts a cold publisher into a hot one by having all subscribers share
-a **single underlying subscription** to the source. The source starts executing when
-the *first* subscriber arrives, and stops (unsubscribes from the source) when the
-*last* subscriber leaves — new subscribers joining later only see items emitted
-*after* they subscribed.
+`.share()` turns a cold publisher into a hot one by having everyone
+subscribed piggyback on a single, shared connection to the source. The
+source kicks off when the first subscriber shows up, and shuts down once
+the last one leaves — anyone who joins later only sees what happens *after*
+they showed up, like walking into a live radio broadcast partway through.
 
 ## Simple Example
 
@@ -31,13 +31,13 @@ Subscriber A: 3
 Subscriber B: 3
 ```
 
-Without `.share()`, each `.subscribe()` call would trigger an entirely separate,
-independent `Flux.interval()` execution — a completely different ticking clock for
-each subscriber.
+Without `.share()`, every `.subscribe()` call would kick off a totally
+separate `Flux.interval()` — its own independent clock ticking just for
+that one subscriber.
 
 ## Why It Matters
 
-`.share()` is the simplest way to make an expensive or naturally "live" source (like
-a WebSocket connection, or a sensor feed) shared across multiple consumers, instead of
-each consumer accidentally triggering its own separate, redundant execution of the
-same underlying resource.
+`.share()` is the easiest way to have several consumers share one
+expensive or naturally "live" source — a WebSocket connection, a sensor
+feed — instead of each consumer accidentally spinning up its own redundant
+copy of the same underlying work.

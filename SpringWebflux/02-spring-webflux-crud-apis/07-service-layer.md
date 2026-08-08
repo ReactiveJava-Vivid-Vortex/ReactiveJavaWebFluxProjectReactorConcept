@@ -2,12 +2,12 @@
 
 ## In Simple Terms
 
-The service layer contains your application's **business logic** — validation,
-orchestration of multiple repository/external calls, and entity-to-DTO
-transformation — sitting between the controller (HTTP concerns) and the repository
-(data access concerns). In reactive applications, service methods also return
-`Mono`/`Flux`, composing the repository layer's reactive results with additional
-logic.
+The service layer is where your business logic lives — validation,
+coordinating multiple repository or external calls, converting entities to
+DTOs — sitting between the controller (HTTP stuff) and the repository
+(data access). In reactive apps, service methods also return
+`Mono`/`Flux`, building on top of the repository's reactive results with
+extra logic.
 
 ## Simple Example
 
@@ -39,8 +39,8 @@ public class ProductService {
 
 ## Why It Matters
 
-Keeping business logic in a dedicated service layer (rather than directly in
-controllers) keeps controllers thin and focused purely on HTTP concerns
-(request/response mapping), while the service layer remains independently testable
-and reusable — the same layering principle from traditional Spring applications,
-just expressed reactively.
+Keeping business logic in its own service layer (instead of stuffing it
+into controllers) keeps controllers thin and focused purely on HTTP
+concerns, while the service layer stays independently testable and
+reusable — the same layering idea from traditional Spring apps, just
+expressed reactively.

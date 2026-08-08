@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-The single most important performance rule in reactive programming: **never block a
-thread that's meant to be non-blocking** (event-loop threads, `Schedulers.parallel()`
-threads). Blocking even briefly on one of these threads can stall many unrelated
-concurrent requests sharing that same small thread pool.
+Here's the single most important performance rule in reactive programming:
+never let something blocking sit on a thread that's supposed to stay free —
+event-loop threads, `Schedulers.parallel()` threads. Even a brief block on
+one of these can stall a whole bunch of unrelated requests that were
+sharing that same small pool of threads.
 
 ## Simple Example
 
@@ -37,8 +38,8 @@ public Mono<String> bestExample() {
 
 ## Why It Matters
 
-A single accidental blocking call on a shared event-loop thread pool (which might
-have as few as 4-8 threads for the entire application) can silently degrade
-performance for **every** concurrent request being handled by that pool — not just
-the one that made the blocking call. This is the #1 real-world reactive performance
-bug.
+A single accidental blocking call sitting on a shared event-loop pool
+(which might only have 4-8 threads for the whole app) can quietly slow down
+*every* concurrent request going through that pool — not just the one that
+caused it. This is, in practice, the number one reactive performance bug
+people run into.

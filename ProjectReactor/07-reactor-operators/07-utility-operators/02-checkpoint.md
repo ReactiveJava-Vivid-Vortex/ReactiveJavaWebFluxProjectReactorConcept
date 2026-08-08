@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-`.checkpoint()` (optionally with a description string) adds a marker into a
-pipeline's stack trace so that, if an error occurs, Reactor can tell you which part
-of your reactive chain it came from. Normal Java stack traces for reactive code are
-often unhelpful (full of internal Reactor framework frames); `.checkpoint()` inserts
-a readable, meaningful reference point.
+`.checkpoint()` drops a labeled signpost into your pipeline so that, if
+something goes wrong later, Reactor can point back and say "the problem is
+near this signpost." Normal stack traces from reactive code tend to be a
+mess of internal framework noise — `.checkpoint()` gives you something
+readable to look at instead.
 
 ## Simple Example
 
@@ -20,19 +20,20 @@ Flux.just(1, 2, 0, 4)
     );
 ```
 
-When the `ArithmeticException` occurs, the resulting stack trace includes a line
-referencing `"division-step"`, making it much easier to pinpoint exactly which
-operator in a long chain caused the failure — instead of guessing from generic
-internal Reactor class names.
+When the divide-by-zero error happens, the stack trace now mentions
+`"division-step"` — making it much easier to spot exactly which part of a
+long chain caused the failure, instead of trying to decode generic internal
+Reactor class names.
 
-For even more detail (at a performance cost), use `.checkpoint("desc", true)` to
-capture the actual code location, or globally enable
-`Hooks.onOperatorDebug()` during development to get full assembly traces
-automatically (not recommended for production due to overhead).
+For even more detail (at some cost to performance), use
+`.checkpoint("desc", true)` to capture the exact code location, or turn on
+`Hooks.onOperatorDebug()` globally during development to get full traces
+automatically (best avoided in production — it's expensive).
 
 ## Why It Matters
 
-Debugging reactive pipelines can be notoriously hard because errors often surface far
-from where they originated, and default stack traces are cluttered with internal
-Reactor machinery. `.checkpoint()` is a lightweight, targeted way to make failures in
-long or complex pipelines much easier to trace back to their source.
+Reactive pipelines can be genuinely hard to debug, since errors often show
+up far away from where they actually started, and the default stack trace
+is cluttered with Reactor's internal plumbing. `.checkpoint()` is a small,
+targeted way to make failures in long or tangled pipelines much easier to
+trace back to their real source.

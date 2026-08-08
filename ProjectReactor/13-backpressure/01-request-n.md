@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`request(n)` is the core mechanism of backpressure — a subscriber calls it on its
-`Subscription` to tell the publisher exactly how many items it's ready to receive
-next. The publisher is contractually forbidden from sending more than the total
-amount requested.
+`request(n)` is how a subscriber tells the source "send me `n` more, and
+not a single item beyond that." It's the whole mechanism backpressure is
+built on — like telling a waiter "just bring two dishes for now," instead
+of letting the kitchen pile up plates faster than you can eat.
 
 ## Simple Example
 
@@ -27,12 +27,12 @@ Flux.range(1, 1000)
     });
 ```
 
-Without any explicit `request()` call, most convenience methods like
-`.subscribe(consumer)` automatically request `Long.MAX_VALUE` (effectively
-unbounded) on your behalf.
+If you never call `request()` yourself, most of the convenience methods
+like `.subscribe(consumer)` quietly ask for everything (`Long.MAX_VALUE`)
+on your behalf.
 
 ## Why It Matters
 
-`request(n)` is the mechanism that prevents a fast producer from overwhelming a slow
-consumer — it's the foundation that everything else in backpressure (strategies,
-rate limiting, buffering) builds on top of.
+`request(n)` is what stops a fast producer from flooding a slow consumer —
+it's the foundation everything else about backpressure (strategies, rate
+limiting, buffering) is built on top of.

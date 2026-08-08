@@ -2,12 +2,12 @@
 
 ## In Simple Terms
 
-**Thread affinity** refers to whether a piece of work is guaranteed (or expected) to
-keep running on the *same* thread throughout its execution, versus potentially
-hopping between different threads at different stages. In reactive pipelines, thread
-affinity is generally **not guaranteed** across asynchronous boundaries — code before
-and after an async operation (like a database call) may run on entirely different
-threads.
+"Thread affinity" is just whether a piece of work is guaranteed to keep
+running on the *same* thread the whole way through, or whether it might hop
+between different threads at different points. In reactive pipelines, don't
+count on staying on one thread — code before and after something
+asynchronous (like a database call) can easily end up running on completely
+different threads.
 
 ## Simple Example
 
@@ -28,16 +28,16 @@ Step 2 on: boundedElastic-1
 Step 3 on: parallel-1
 ```
 
-**Important gotcha:** things that rely on thread-local state (like some logging MDC
-contexts, or `ThreadLocal` variables) can silently "disappear" across these thread
-switches, because the new thread doesn't have the same `ThreadLocal` values as the
-old one. Reactor provides its own `Context` mechanism specifically to carry
-contextual data safely across these thread switches, since `ThreadLocal` doesn't work
-reliably in reactive pipelines.
+**Watch out for this:** anything relying on thread-local state (like some
+logging context variables, or plain old `ThreadLocal` values) can quietly
+"vanish" across these switches, because the new thread never had those
+values to begin with. Reactor's own `Context` mechanism exists specifically
+to carry that kind of data safely across thread switches, since
+`ThreadLocal` just doesn't hold up in reactive code.
 
 ## Why It Matters
 
-Understanding that reactive pipelines don't preserve thread affinity by default
-explains why naive use of `ThreadLocal` (e.g., for request-scoped logging context)
-often breaks in reactive code — and why Reactor's `Context` API exists as the
-correct, thread-affinity-safe alternative.
+Knowing that reactive pipelines don't keep you on the same thread explains
+why naive use of `ThreadLocal` (say, for tracking request info in logs)
+often silently breaks in reactive code — and why Reactor's `Context` API
+exists as the safe replacement.

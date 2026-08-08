@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-When aggregating data from multiple downstream services, sometimes one service
-fails while others succeed. Rather than failing the entire response, a well-designed
-reactive service can return a **partial response** — the data that's available,
-with a clear indication of what's missing.
+When you're gathering data from several downstream services, sometimes
+one of them fails while the others are fine. Instead of failing the whole
+response, a well-designed service can send back a partial response — the
+data that is available, with a clear sign of what's missing.
 
 ## Simple Example
 
@@ -34,13 +34,13 @@ public Mono<Dashboard> getDashboard(String userId) {
 }
 ```
 
-If the recommendation service is down, the dashboard still renders with the profile
-and order data — just with `recommendations` empty — rather than failing the entire
-request.
+If the recommendation service is down, the dashboard still shows up with
+the profile and order data — just with `recommendations` empty — instead
+of failing the whole request.
 
 ## Why It Matters
 
-Partial responses provide a much better user experience than an all-or-nothing
-approach: a dashboard missing one non-critical widget is far better than a completely
-blank error page, especially when the failing dependency is non-essential to the
-overall page.
+Partial responses give a much better experience than an all-or-nothing
+approach: a dashboard missing one non-critical widget beats a totally
+blank error page, especially when the failing piece isn't essential to the
+page as a whole.

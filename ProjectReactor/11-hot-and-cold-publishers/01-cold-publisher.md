@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-A **cold publisher** starts its data production **fresh, from the beginning, for
-every new subscriber**. Two subscribers never share the same "run" — each gets its
-own independent execution, like each viewer starting a video-on-demand movie from
-frame zero.
+A cold publisher starts fresh, from scratch, for every single subscriber —
+nobody shares a run with anybody else. It's like watching a movie on a
+streaming service: every viewer starts from frame one, no matter when they
+hit play.
 
 ## Simple Example
 
@@ -19,19 +19,21 @@ try { Thread.sleep(1000); } catch (Exception e) {}
 cold.subscribe(t -> System.out.println("Subscriber 2 got: " + t));
 ```
 
-Output (different timestamps — each subscription re-executed the source):
+Output (different timestamps — each subscription re-ran the source from
+scratch):
 ```
 Subscriber 1 got: 1732000000000
 Subscriber 2 got: 1732000001000
 ```
 
-Most sources you create directly (`Flux.just()`, `Flux.fromIterable()`, a database
-query, an HTTP call) are cold by default.
+Most sources you build yourself — `Flux.just()`, `Flux.fromIterable()`, a
+database query, an HTTP call — are cold by default.
 
 ## Why It Matters
 
-Cold is usually the **correct default** — e.g., a `Mono<User>` representing a
-database lookup should re-run per subscriber to fetch fresh data, not share one
-cached execution across unrelated callers. When you genuinely want subscribers to
-share a single, ongoing execution (like a live broadcast), you deliberately convert
-a cold publisher into a hot one using operators like `.share()` or `.publish()`.
+Cold is usually exactly what you want — a `Mono<User>` from a database
+lookup should run fresh for each subscriber and grab up-to-date data, not
+hand out one shared, possibly stale result to everyone who asks. When you
+genuinely want subscribers to share one ongoing run — like tuning into a
+live broadcast — you deliberately turn a cold publisher into a hot one
+using operators like `.share()` or `.publish()`.

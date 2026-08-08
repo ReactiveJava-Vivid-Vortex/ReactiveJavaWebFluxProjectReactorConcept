@@ -1,68 +1,160 @@
-# Publisher & Subscriber Implementation — Topic Overview
+# Q1. Why Build a Publisher and Subscriber by Hand?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of Taking Apart an Engine)
 
-This topic is a deliberate step backward from convenience: instead of using
-Reactor's ready-made `Mono`/`Flux`, you build a `Publisher` and `Subscriber`
-completely **by hand**, using only the raw Reactive Streams interfaces from the
-previous topic. It's like taking apart an engine to see every gear before driving
-the finished car.
+You've been *using* `Mono`/`Flux`. This topic asks you to *become* one — implement
+the raw Reactive Streams interfaces yourself, with no Reactor conveniences. It's
+like taking an engine apart to see every gear, even though you'll never build one
+from scratch again in real projects.
 
-Why bother? Because doing this once makes you deeply appreciate what Reactor is
-doing *for* you automatically: tracking outstanding demand, safely handling
-`cancel()`, emitting `onComplete()` at exactly the right moment, and doing it all
-correctly even under concurrent access. Writing your own `Subscription` — the object
-responsible for counting how many items have been requested and stopping exactly
-on cue — reveals just how much careful bookkeeping is involved.
+```
+Using Flux.range(1, 5)          -> one line, "just works"
+Hand-writing the same thing     -> reveals ALL the careful bookkeeping
+                                    Reactor is doing for you invisibly
+```
+
+Once you've done this once, you deeply appreciate what `Flux.range()`,
+`request(n)`, and `cancel()` are actually managing under the hood.
+
+---
+
+## Q2. What Does a Hand-Written Publisher Look Like?
 
 ```java
-class SimpleSubscription implements Subscription {
-    int index = 0;
-    public void request(long n) {
-        for (long i = 0; i < n && index < data.length; i++) {
-            subscriber.onNext(data[index++]);
-        }
-        if (index == data.length) subscriber.onComplete();
+public class RangePublisher implements Publisher<Integer> {
+    private final int start, count;
+
+    @Override
+    public void subscribe(Subscriber<? super Integer> subscriber) {
+        subscriber.onSubscribe(new Subscription() {
+            int current = start;
+            int remaining = count;
+            boolean cancelled = false;
+
+            public void request(long n) {
+                for (long i = 0; i < n && remaining > 0 && !cancelled; i++) {
+                    subscriber.onNext(current++);
+                    remaining--;
+                }
+                if (remaining == 0 && !cancelled) subscriber.onComplete();
+            }
+
+            public void cancel() { cancelled = true; }
+        });
     }
-    public void cancel() { /* stop emitting */ }
 }
 ```
 
-The key idea threading through every subtopic here is **demand-driven publishing**:
-a well-behaved publisher only ever produces an item in direct response to
-`request(n)` — never eagerly, never more than asked. That discipline is exactly what
-makes reactive streams memory-safe even with huge or infinite data sources.
+Notice how much manual state tracking is required: `current`, `remaining`,
+`cancelled` — all to correctly implement what `Flux.range(1, 5)` gives you in one
+line.
 
-## Quick Revision Cheat Sheet
+---
 
-| # | Concept | One-Line Summary |
-|---|---------|-------------------|
-| 1 | **Implementing a custom Publisher** | Hand-write `subscribe()` to hand the subscriber a `Subscription` that emits items only on `request(n)`. |
-| 2 | **Implementing a custom Subscriber** | Hand-write all four callbacks (`onSubscribe`, `onNext`, `onError`, `onComplete`), controlling your own request pace. |
-| 3 | **Subscription (custom)** | The trickiest part: safely track outstanding demand and stop cleanly on `cancel()`, even under concurrency. |
-| 4 | **Requesting elements** | Calling `request(n)` in controlled batches (not just `Long.MAX_VALUE`) to pace consumption deliberately. |
-| 5 | **Cancelling subscriptions** | Calling `cancel()` (or `.dispose()` on the higher-level API) to stop emissions and free resources early. |
-| 6 | **Completing streams** | A publisher calls `onComplete()` exactly once, only after successfully emitting everything it has. |
-| 7 | **Error signaling** | A publisher calls `onError(throwable)` exactly once to end the stream on failure — no further signals follow. |
-| 8 | **Demand-driven publishing** | The publisher only ever produces the next item in direct response to demand — never gets ahead of the consumer. |
+## Q3. What Does a Hand-Written Subscriber Look Like?
 
-## How It All Fits Together
+```java
+Subscriber<Integer> subscriber = new Subscriber<>() {
+    Subscription subscription;
 
-```
-Custom Publisher.subscribe(customSubscriber)
-        │
-        ▼
-Hand out a hand-rolled Subscription
-        │
-        ▼
-Subscriber calls request(n)  ──▶  Publisher emits AT MOST n onNext() calls
-        │
-        ▼
-Publisher ends with exactly one: onComplete()  OR  onError()
-        │
-   (subscriber may also cancel() early at any point)
+    public void onSubscribe(Subscription s) {
+        subscription = s;
+        s.request(2); // start by asking for just 2
+    }
+
+    public void onNext(Integer item) {
+        System.out.println("Received: " + item);
+        subscription.request(1); // ask for one more once processed
+    }
+
+    public void onError(Throwable t) { System.out.println("Error: " + t); }
+    public void onComplete() { System.out.println("Done!"); }
+};
 ```
 
-Everything you build here by hand is exactly what `Flux.range()`, `Flux.create()`,
-and Reactor's internal machinery do for you — correctly, safely, and without you
-needing to think about it — in every subsequent topic in this course.
+This subscriber controls its own pace explicitly — it never has more than ~2
+outstanding requested items at a time. That's backpressure, hand-implemented.
+
+---
+
+## Q4. What's the Trickiest Part? (The Subscription)
+
+The `Subscription` must correctly track demand **and** handle concurrent
+`request()`/`cancel()` calls safely. Getting this wrong — sending too many items,
+not stopping on `cancel()` — is a classic source of subtle reactive bugs. This is
+exactly why almost nobody hand-writes this in real projects.
+
+```java
+class SimpleSubscription implements Subscription {
+    volatile boolean cancelled = false;
+    int index = 0;
+
+    public void request(long n) {
+        if (cancelled) return;
+        for (long i = 0; i < n && index < data.length; i++) {
+            subscriber.onNext(data[index++]);
+        }
+        if (index == data.length && !cancelled) subscriber.onComplete();
+    }
+
+    public void cancel() { cancelled = true; }
+}
+```
+
+---
+
+## Q5. What Is "Demand-Driven Publishing"?
+
+A well-behaved publisher only ever produces an item **in direct response to
+`request(n)`** — never eagerly, never more than asked.
+
+```java
+Flux<Integer> demandDriven = Flux.generate(sink -> {
+    System.out.println("Generating a value..."); // only runs when there's demand
+    sink.next((int) (Math.random() * 100));
+});
+
+demandDriven.take(3).subscribe(v -> System.out.println("Got: " + v));
+```
+
+Output shows `"Generating a value..."` printing **exactly 3 times** — matching the
+demand from `.take(3)`, never more. This is what keeps reactive streams
+memory-safe even with huge or infinite sources.
+
+---
+
+## Q6. Interview-Style Q&A
+
+### Why does `Reactor` give you `BaseSubscriber<T>` instead of the raw `Subscriber` interface?
+
+Because implementing raw `Subscriber` correctly (especially the `Subscription`
+side) is genuinely hard to get right — `BaseSubscriber` gives sensible defaults
+while still letting you control demand manually when needed.
+
+### What happens if a Subscription's `request()` is called concurrently from two threads?
+
+A correct implementation must handle this safely (usually with atomic counters) —
+this is exactly the kind of subtlety that makes hand-rolling a `Subscription`
+risky in production code.
+
+### If a publisher ignores `cancel()`, what happens?
+
+It keeps emitting even though the subscriber walked away — a resource leak. A
+compliant publisher must stop promptly once `cancel()` is called.
+
+---
+
+## Q7. Summary
+
+| Concept | Key Takeaway |
+|---|---|
+| Custom Publisher | Implements `subscribe()`, hands out a `Subscription` obeying demand |
+| Custom Subscriber | Implements all 4 callbacks, controls its own request pace |
+| Subscription | The trickiest part — must track demand & handle `cancel()` correctly, even concurrently |
+| Demand-driven publishing | Never produce ahead of demand — this is what makes reactive memory-safe |
+
+### One sentence to remember
+
+> **"Everything you'd have to painstakingly hand-code here — demand tracking,
+> cancellation, correct signal ordering — is exactly what Flux.range(), Flux.create(),
+> and every Reactor operator already does for you, correctly, for free."**

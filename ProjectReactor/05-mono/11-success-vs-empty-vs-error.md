@@ -2,14 +2,14 @@
 
 ## In Simple Terms
 
-Every `Mono` settles into exactly one of three states, and it's important to treat
-each one differently in your code:
+Every `Mono` ends up in exactly one of three states — and it's worth treating
+each one differently in your code instead of lumping them together:
 
-| State   | Signal(s)                     | Meaning                                  |
+| State   | Signal(s)                     | What It Means                                  |
 |---------|--------------------------------|-------------------------------------------|
-| Success | `onNext(value)` + `onComplete()` | Operation succeeded, here's the result   |
-| Empty   | `onComplete()` only             | Operation succeeded, but there's no result (e.g. "not found") |
-| Error   | `onError(throwable)`            | Operation failed                          |
+| Success | `onNext(value)` + `onComplete()` | It worked, here's the result   |
+| Empty   | `onComplete()` only             | It worked, but there's nothing to give back (e.g. "not found") |
+| Error   | `onError(throwable)`            | It failed                          |
 
 ## Simple Example
 
@@ -38,8 +38,7 @@ findUser(userId)
 
 ## Why It Matters
 
-A common beginner mistake is to conflate "empty" with "error" (e.g., always throwing
-an exception for "not found" cases). Distinguishing them clearly lets callers use the
-right tool for each case — `switchIfEmpty()` for legitimate absence of data, and
-`onErrorResume()`/`onErrorReturn()` for actual failures — which keeps error handling
-logic focused and readable.
+A common beginner mistake is mixing up "empty" and "error" — like throwing an
+exception every time something isn't found. Keeping them separate lets you use
+the right tool for each case: `switchIfEmpty()` for a legitimate "nothing here,"
+and `onErrorResume()`/`onErrorReturn()` for actual failures.

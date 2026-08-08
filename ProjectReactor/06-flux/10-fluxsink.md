@@ -3,9 +3,9 @@
 ## In Simple Terms
 
 `FluxSink<T>` is the object you use inside `Flux.create()` or `Flux.push()` to
-manually emit items into the stream. Unlike `MonoSink` (which allows only one
-emission), `FluxSink` lets you call `sink.next(value)` **many times**, followed by
-either `sink.complete()` or `sink.error(throwable)` to end the stream.
+manually push items into a stream. Unlike `MonoSink` (which only lets you emit
+once), `FluxSink` lets you call `sink.next(value)` **as many times as you want**,
+then finish up with `sink.complete()` or `sink.error(throwable)`.
 
 ```java
 public interface FluxSink<T> {
@@ -29,7 +29,7 @@ Flux<Integer> flux = Flux.create(sink -> {
 flux.subscribe(value -> System.out.println("Got: " + value));
 ```
 
-You can also check downstream demand to avoid overproducing:
+You can also check how much demand is outstanding, to avoid producing too much:
 
 ```java
 Flux.create(sink -> {
@@ -41,8 +41,8 @@ Flux.create(sink -> {
 
 ## Why It Matters
 
-`FluxSink` is your manual control point for feeding external, push-based data (e.g.,
-messages from a queue, sensor readings, or WebSocket frames) into a reactive
-pipeline. Handling overflow correctly (via `OverflowStrategy.BUFFER`, `DROP`,
-`LATEST`, or `ERROR`) is critical — otherwise a fast producer can overwhelm a slow
-consumer and cause memory issues.
+`FluxSink` is your manual dial for feeding external, push-based data — queue
+messages, sensor readings, WebSocket frames — into a reactive pipeline. Handling
+overflow correctly (`BUFFER`, `DROP`, `LATEST`, or `ERROR`) matters a lot here —
+otherwise a fast producer can overwhelm a slow consumer and cause memory
+trouble.

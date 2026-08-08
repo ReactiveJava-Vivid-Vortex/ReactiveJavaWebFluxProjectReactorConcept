@@ -1,74 +1,185 @@
-# Mono — Topic Overview
+# Q1. What Is a Mono?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of a Vending Machine Slot)
 
-A `Mono<T>` is Reactor's type for representing **at most one asynchronous value** —
-think of it as a reactive version of `Optional<T>` or a `Future<T>`, but lazy and
-fully composable with the rest of the reactive world. A `Mono` can settle into
-exactly one of **three outcomes**, and nothing else:
+A `Mono<T>` is a slot in a vending machine that gives you **at most one item** —
+never two, sometimes zero (out of stock), sometimes it jams (error).
 
-1. **Success with a value** — `onNext(value)` then `onComplete()`.
-2. **Success with no value (empty)** — just `onComplete()`, like "not found."
-3. **Failure** — `onError(throwable)`.
+```
+Press the button (subscribe)
+        │
+   ┌────┴─────┬──────────────┐
+   ▼           ▼              ▼
+ Item drops  Nothing drops  Machine jams
+ (VALUE)     (EMPTY)        (ERROR)
+```
 
-These three outcomes aren't a special `Mono` rule — they're the universal Reactive
-Streams signal grammar (`onSubscribe onNext* (onError | onComplete)?`, see
-[[the-three-signal-types]] in the previous topic) with one extra constraint:
-`onNext` is capped at **at most once** instead of unlimited. Internalizing this one
-grammar is, honestly, 80% of understanding reactive programming — everything else
-is operators reacting to these same three signals.
+Those are the **only three things** that can ever happen with a `Mono` — there is
+no fourth outcome, and it's not a coincidence: it's the universal Reactive Streams
+signal grammar (`onSubscribe onNext* (onError | onComplete)?`) with `onNext`
+capped at *at most once* instead of unlimited.
 
-The biggest practical skill in this topic is choosing the right **factory method**
-to create a `Mono` for your situation — and the biggest trap is mixing up *eager*
-(`Mono.just()`) vs *lazy* (`Mono.fromSupplier()`, `Mono.fromCallable()`,
-`Mono.defer()`) creation:
+---
+
+## Q2. What Are the Three Outcomes, Concretely?
 
 ```java
-// EAGER — fetchFromDb() runs THE INSTANT this line executes, even with no subscriber!
+// Outcome 1: SUCCESS with a value
+Mono.just("hello").subscribe(
+    v -> System.out.println("Value: " + v),
+    e -> System.out.println("Error: " + e),
+    () -> System.out.println("Complete")
+);
+// Value: hello
+// Complete
+
+// Outcome 2: EMPTY (success, no value — like "not found")
+Mono.empty().subscribe(
+    v -> System.out.println("Value: " + v),
+    e -> System.out.println("Error: " + e),
+    () -> System.out.println("Complete")
+);
+// Complete   (no "Value:" line!)
+
+// Outcome 3: ERROR
+Mono.error(new RuntimeException("failed")).subscribe(
+    v -> System.out.println("Value: " + v),
+    e -> System.out.println("Error: " + e),
+    () -> System.out.println("Complete")
+);
+// Error: failed   (no "Complete" line!)
+```
+
+| Outcome | Signal(s) | Real-World Meaning |
+|---|---|---|
+| Success + value | `onNext` then `onComplete` | "Here's your result" |
+| Empty | `onComplete` only | "Valid lookup, nothing found" (not an error!) |
+| Error | `onError` only | "Something went wrong" |
+
+---
+
+## Q3. What Are the Factory Methods, and When Do I Use Each?
+
+| Factory | Use When... | Eager or Lazy? |
+|---|---|---|
+| `Mono.just(v)` | You already have a non-null value in hand | **Eager** |
+| `Mono.empty()` | You want to represent "no value," successfully | — |
+| `Mono.error(t)` | You want to represent a failure | — |
+| `Mono.fromSupplier(fn)` | Lazy sync computation, no checked exceptions | Lazy |
+| `Mono.fromCallable(fn)` | Lazy sync computation that MAY throw checked exceptions | Lazy |
+| `Mono.fromRunnable(fn)` | A side effect with no return value (`Mono<Void>`) | Lazy |
+| `Mono.defer(fn)` | Need a fresh, whole new Mono chosen per subscriber | Lazy |
+| `Mono.create(sink -> ..)` | Bridging a legacy callback-based API | Manual |
+
+**The biggest trap:** confusing eager `just()` with lazy `fromSupplier()`.
+
+```java
+// BAD: fetchFromDb() runs IMMEDIATELY, even with no subscriber!
 Mono<User> bad = Mono.just(fetchFromDb());
 
-// LAZY — fetchFromDb() only runs once someone actually subscribes
+// GOOD: fetchFromDb() only runs once someone subscribes
 Mono<User> good = Mono.fromSupplier(() -> fetchFromDb());
 ```
 
-Since a `Mono` can be empty, you'll constantly reach for `.switchIfEmpty()` or
-`.defaultIfEmpty()` to decide what "nothing found" should mean for your specific
-case — a fallback value, a different `Mono`, or an error.
+---
 
-## Quick Revision Cheat Sheet
+## Q4. What Is `MonoSink`, and When Do I Need `Mono.create()`?
 
-| # | Concept | One-Line Summary |
-|---|---------|-------------------|
-| 1 | **Mono.just()** | Wraps an already-known, non-null value — captured **eagerly**, at creation time. |
-| 2 | **Mono.empty()** | Completes successfully with no value — represents "nothing to return" without erroring. |
-| 3 | **Mono.error()** | Signals failure immediately on subscription — the reactive equivalent of `throw`. |
-| 4 | **Mono.fromSupplier()** | Lazily runs a `Supplier<T>` only on subscription; re-runs fresh per subscriber. |
-| 5 | **Mono.fromRunnable()** | Runs a side-effecting `Runnable` (no return value) then completes empty — `Mono<Void>`. |
-| 6 | **Mono.fromCallable()** | Like `fromSupplier()` but for code that may throw a checked exception. |
-| 7 | **Mono.defer()** | Lazily builds a **whole new Mono** per subscriber — use when the decision itself must be fresh. |
-| 8 | **Mono.create()** | Manual escape hatch (`MonoSink`) for bridging legacy callback-based APIs into a `Mono`. |
-| 9 | **MonoSink** | The "microphone" inside `Mono.create()` — call `success()`, `success(T)`, or `error()` exactly once. |
-| 10 | **Mono lifecycle** | Exactly 3 outcomes: value+complete, empty (complete only), or error — never a mix. |
-| 11 | **Success vs Empty vs Error** | Treat these as 3 distinct cases in your code — don't conflate "empty" with "error." |
-| 12 | **Lazy evaluation** | Nothing in a `Mono` chain runs until subscribed — the same laziness principle as topic 3, applied to `Mono`. |
-| 13 | **Subscription** | `.subscribe()` has overloads for value-only, value+error, or value+error+complete handling. |
-| 14 | **Logging** | `.log()` shows exactly which of the 3 outcomes occurred and when — great for debugging "why is my Mono empty?" |
-| 15 | **Factory methods** | The cheat-sheet-within-a-cheat-sheet: `just` (eager) vs `fromSupplier`/`fromCallable`/`defer` (lazy) vs `empty`/`error` vs `create` (bridging). |
+`MonoSink` is your manual "microphone" for bridging non-reactive, callback-based
+APIs into a `Mono`. Call exactly one of `success()`, `success(value)`, or `error()`
+— once.
 
-## How It All Fits Together
-
-```
-                     Mono<T> created (lazily, usually)
-                              │
-                    someone calls .subscribe()
-                              │
-              ┌───────────────┼───────────────┐
-              ▼               ▼               ▼
-        SUCCESS(value)      EMPTY           ERROR
-      onNext + onComplete  onComplete()   onError(throwable)
-              │               │               │
-      handled by .map()  .switchIfEmpty()  .onErrorResume()
+```java
+Mono<String> mono = Mono.create(sink -> {
+    legacyAsyncCall(new LegacyCallback() {
+        public void onSuccess(String result) { sink.success(result); }
+        public void onFailure(Throwable error) { sink.error(error); }
+    });
+});
 ```
 
-Master this one type well, and `Flux` (the next topic) will feel like "the same
-ideas, just 0-to-N instead of 0-to-1."
+Use this **sparingly** — only for genuinely non-reactive sources. Everything else
+should use one of the factory methods above.
+
+---
+
+## Q5. What Happens If the Mono Is Empty — How Do I Handle It?
+
+```java
+public Mono<User> findUser(String id) {
+    return database.findById(id); // returns Mono.empty() if not found
+}
+
+// Option A: default value
+findUser("x").defaultIfEmpty(User.GUEST).subscribe(System.out::println);
+
+// Option B: switch to a different (possibly async) Mono
+findUser("x").switchIfEmpty(backupDatabase.findById("x")).subscribe(System.out::println);
+
+// Option C: treat empty as an error
+findUser("x").switchIfEmpty(Mono.error(new UserNotFoundException("x"))).subscribe(...);
+```
+
+**Common beginner mistake:** treating "empty" and "error" as the same thing. They
+are not — empty is a *valid, successful* outcome; error is a *failure*.
+
+---
+
+## Q6. How Many Ways Can I `.subscribe()` to a Mono?
+
+```java
+mono.subscribe();                                    // fire-and-forget
+mono.subscribe(value -> handle(value));               // value only — errors silently logged by Reactor!
+mono.subscribe(value -> handle(value), err -> handleError(err));       // value + error (safe minimum)
+mono.subscribe(value -> handle(value), err -> handleError(err), () -> onDone()); // + completion
+```
+
+**Always supply an error consumer** unless you're absolutely sure the `Mono` can't
+fail — otherwise failures are silently logged by Reactor internally instead of
+being handled by your own application logic.
+
+---
+
+## Q7. Interview-Style Q&A
+
+### Can a Mono emit `onNext` twice?
+
+**No.** That would violate the contract — a `Mono` emits `onNext` at most once,
+ever.
+
+### Is `Mono.just(null)` valid?
+
+**No** — throws `NullPointerException` immediately, because Reactive Streams
+forbids `null` as a valid element. Use `Mono.justOrEmpty(possiblyNullValue)`
+instead.
+
+### Does `Mono.empty()` represent an error?
+
+**No.** It's a successful, valid outcome — "nothing found," not "something broke."
+
+### What's the difference between `Mono.fromSupplier()` and `Mono.fromCallable()`?
+
+`fromSupplier()` is for code that can't throw a checked exception;
+`fromCallable()` is for code that might (like file I/O) — both are equally lazy.
+
+---
+
+## Q8. Summary
+
+| Outcome | Signals | Handled By |
+|---|---|---|
+| Success (value) | `onNext` + `onComplete` | `.map()`, normal chaining |
+| Empty | `onComplete` only | `.switchIfEmpty()` / `.defaultIfEmpty()` |
+| Error | `onError` only | `.onErrorResume()` / `.onErrorReturn()` |
+
+| Concept | Key Takeaway |
+|---|---|
+| Mono | 0-or-1 async value — exactly 3 possible outcomes |
+| Eager vs Lazy | `just()` runs immediately; `fromSupplier`/`fromCallable`/`defer` run on subscription |
+| MonoSink | Manual bridge for legacy callback APIs — call success/error exactly once |
+| Empty ≠ Error | Treat them as distinct — "not found" isn't automatically a failure |
+
+### One sentence to remember
+
+> **"A Mono is a vending machine slot: press the button and you get exactly one
+> of three things — a snack, nothing, or a jam — never more, never a mixture."**

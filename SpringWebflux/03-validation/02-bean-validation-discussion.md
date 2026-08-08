@@ -2,12 +2,12 @@
 
 ## In Simple Terms
 
-**Bean Validation** (JSR 380, e.g., `@NotNull`, `@Size`, `@Min`) is the standard
-Java annotation-based validation approach, well-established in traditional Spring
-MVC. In Spring WebFlux, Bean Validation annotations still work on your DTOs, but
-there's an important nuance: automatic `@Valid` triggering doesn't always integrate
-as seamlessly with reactive types (`Mono<Dto>` request bodies) as it does with plain
-objects — this is a commonly discussed WebFlux gotcha.
+Bean Validation (`@NotNull`, `@Size`, `@Min`, and friends) is the standard
+annotation-based validation style you already know from traditional Spring
+MVC. In Spring WebFlux, those same annotations still work on your DTOs, but
+there's a catch worth knowing: automatic `@Valid` triggering doesn't always
+play nicely with reactive request bodies (`Mono<Dto>`) the way it does with
+plain objects — this trips people up a lot.
 
 ## Simple Example
 
@@ -18,7 +18,7 @@ public record ProductDto(
 ) {}
 ```
 
-Works cleanly with a plain (non-Mono) request body:
+Works cleanly with a plain (non-`Mono`) request body:
 
 ```java
 @PostMapping
@@ -28,13 +28,15 @@ public Mono<ProductDto> create(@Valid @RequestBody ProductDto dto) {
 }
 ```
 
-**Gotcha:** `@Valid` does **not** automatically apply when the request body itself is
-wrapped in `Mono<ProductDto>` — you'd need to manually validate inside the reactive
-chain in that case (e.g., using a `Validator` bean directly).
+**Watch out for this:** `@Valid` doesn't automatically kick in when the
+request body is wrapped in `Mono<ProductDto>` — in that case you'd need to
+validate manually inside the reactive chain (say, using a `Validator` bean
+directly).
 
 ## Why It Matters
 
-Understanding this nuance avoids a subtle, hard-to-notice bug: assuming
-`@Valid @RequestBody Mono<ProductDto>` validates automatically (it often does NOT,
-depending on Spring version and configuration), when in practice you may need
-explicit validation logic. Always verify validation actually triggers with a test.
+Knowing this nuance saves you from a subtle, easy-to-miss bug: assuming
+`@Valid @RequestBody Mono<ProductDto>` validates automatically (it often
+doesn't, depending on your Spring version and setup), when you actually
+need to validate explicitly. Always double-check with a test that
+validation is really firing.

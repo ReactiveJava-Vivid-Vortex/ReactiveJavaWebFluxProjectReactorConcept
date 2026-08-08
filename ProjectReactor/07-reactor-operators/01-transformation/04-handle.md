@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.handle((value, sink) -> ...)` is a flexible operator that combines the abilities of
-`map()` and `filter()` into one: for each item, you can choose to emit a transformed
-value (`sink.next(...)`), emit nothing (skip the item, like `filter`), or signal an
-error (`sink.error(...)`) — all in one place.
+`.handle()` is a Swiss-army-knife operator: for every item, you get to
+decide — keep it as-is, change it into something else, throw it away
+entirely, or raise an error — all in one spot. It's basically `.filter()`
+and `.map()` merged into a single decision point.
 
 ## Simple Example
 
@@ -13,9 +13,9 @@ error (`sink.error(...)`) — all in one place.
 Flux.just(1, 2, 3, 4, 5, 6)
     .handle((n, sink) -> {
         if (n % 2 == 0) {
-            sink.next(n * 10); // transform and emit
+            sink.next(n * 10); // keep it, transformed
         }
-        // odd numbers are simply skipped (no sink.next() call)
+        // odd numbers: do nothing, so they just vanish
     })
     .subscribe(value -> System.out.println("Got: " + value));
 ```
@@ -27,12 +27,13 @@ Got: 40
 Got: 60
 ```
 
-This is equivalent to `.filter(n -> n % 2 == 0).map(n -> n * 10)`, but done in a
-single pass with one operator.
+This does the exact same job as `.filter(n -> n % 2 == 0).map(n -> n * 10)`,
+just packed into one operator instead of two.
 
 ## Why It Matters
 
-`.handle()` is useful when filter-and-map logic is tightly coupled (e.g., you need to
-inspect the value to decide both whether to keep it *and* how to transform it), or
-when you want to signal a custom error partway through processing based on a
-specific item's value — all without chaining multiple separate operators.
+Reach for `.handle()` when deciding "should I keep this?" and "how should I
+change it?" are really the same decision based on the same check — it saves
+you from chaining separate `.filter()` and `.map()` calls. It's also handy
+when you want to raise a custom error partway through, based on something
+about a specific item.

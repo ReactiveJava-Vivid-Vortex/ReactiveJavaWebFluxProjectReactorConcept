@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-Combining reactive repositories, NDJSON, and backpressure allows a WebFlux endpoint
-to stream extremely large datasets (millions of rows) to a client while keeping
-server memory usage roughly constant throughout — as opposed to loading the entire
-result set into a `List` first.
+Combine reactive repositories, NDJSON, and backpressure, and a WebFlux
+endpoint can stream absolutely huge datasets (millions of rows) to a
+client while keeping server memory roughly steady the whole time — instead
+of loading the entire result set into a `List` first.
 
 ## Simple Example
 
@@ -18,16 +18,17 @@ public Flux<ProductDto> exportAllProducts() {
 }
 ```
 
-Because the R2DBC repository itself returns a `Flux` (not a pre-materialized
-`List`), rows are fetched from the database and streamed to the client incrementally
-— the server never holds all 1,000,000+ rows in memory simultaneously.
+Because the R2DBC repository itself hands back a `Flux` (not a
+pre-loaded `List`), rows get pulled from the database and streamed to the
+client incrementally — the server never holds all 1,000,000+ rows in
+memory at once.
 
-For the reverse direction (uploading millions of records), the same principle
-applies using a `Flux<ProductDto>` request body (see [[client-streaming]]).
+The same idea applies in reverse for uploading millions of records, using
+a `Flux<ProductDto>` request body (see [[client-streaming]]).
 
 ## Why It Matters
 
-This pattern — reactive repository + streaming media type — is what makes it
-practical to export/import extremely large datasets through a standard HTTP API,
-without needing specialized batch-file-transfer infrastructure or risking
-`OutOfMemoryError` on either the server or client.
+This combo — reactive repository plus a streaming media type — is what
+makes it realistic to export or import huge datasets over a plain HTTP
+API, without needing special batch-transfer infrastructure or risking an
+`OutOfMemoryError` on either end.

@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.switchIfEmpty(fallback)` is the standard way to convert an "empty" result (like a
-`findById()` that finds nothing) into an explicit error, or into an alternate
-`Mono` — a very common pattern for implementing "not found" behavior in reactive
-service methods.
+`.switchIfEmpty()` is the standard way to turn "nothing came back" (like a
+`findById()` that found nothing) into a proper error, or into some
+alternate result — a very common pattern for implementing "not found"
+behavior.
 
 ## Simple Example
 
@@ -17,7 +17,7 @@ public Mono<ProductDto> getProduct(String id) {
 }
 ```
 
-Alternatively, falling back to a default value instead of an error:
+Or falling back to a default value instead of an error:
 
 ```java
 public Mono<ProductDto> getProductOrDefault(String id) {
@@ -29,7 +29,7 @@ public Mono<ProductDto> getProductOrDefault(String id) {
 
 ## Why It Matters
 
-`.switchIfEmpty()` is the idiomatic way to turn "nothing found" into a well-defined
-outcome — either a specific, meaningful error (handled centrally via
-`@ControllerAdvice`) or a sensible default — rather than letting an empty `Mono`
-silently produce an ambiguous, empty HTTP response.
+`.switchIfEmpty()` is the natural way to turn "nothing found" into a
+clearly defined outcome — either a meaningful error (handled centrally via
+`@ControllerAdvice`) or a sensible default — instead of letting an empty
+`Mono` quietly produce a vague, empty response.

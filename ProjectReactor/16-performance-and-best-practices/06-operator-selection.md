@@ -2,13 +2,14 @@
 
 ## In Simple Terms
 
-Choosing the *right* operator for a given task isn't just about correctness — it also
-has real performance implications. A few common examples of operator choices that
-matter:
+Picking the *right* operator for the job isn't just about getting the
+right answer — it also affects performance. Here are a few common choices
+that actually matter.
 
 ## Simple Example
 
-**map() vs flatMap()** — don't use `flatMap()` for synchronous transformations:
+**map() vs flatMap()** — don't reach for `flatMap()` for plain, synchronous
+changes:
 
 ```java
 // Unnecessary overhead: flatMap() is for ASYNC transformations
@@ -18,8 +19,8 @@ flux.flatMap(item -> Mono.just(transform(item)));
 flux.map(item -> transform(item));
 ```
 
-**flatMap() concurrency control** — unbounded concurrency can overwhelm downstream
-systems:
+**flatMap() concurrency control** — letting concurrency run wild can
+overwhelm whatever's downstream:
 
 ```java
 // Potentially unbounded concurrent calls - risky against a rate-limited API
@@ -29,8 +30,8 @@ flux.flatMap(item -> callExternalApi(item));
 flux.flatMap(item -> callExternalApi(item), 10); // max 10 concurrent calls
 ```
 
-**concatMap() vs flatMap()** — use `concatMap()` when strict ordering matters (at
-the cost of concurrency):
+**concatMap() vs flatMap()** — reach for `concatMap()` when strict order
+matters (you trade away concurrency to get it):
 
 ```java
 flux.concatMap(item -> processInOrder(item)); // sequential, ordered
@@ -39,8 +40,10 @@ flux.flatMap(item -> processInOrder(item));   // concurrent, unordered
 
 ## Why It Matters
 
-Picking the wrong operator can silently hurt performance (unnecessary
-async-wrapping overhead), correctness (unordered output when order was assumed), or
-stability (unbounded concurrency overwhelming a downstream dependency). Being
-deliberate about operator choice — not just picking whichever "seems to work" — is a
-hallmark of production-quality reactive code.
+Picking the wrong operator can quietly hurt performance (extra
+async-wrapping overhead for no reason), correctness (results coming back
+out of order when you assumed they wouldn't), or stability (unbounded
+concurrency overwhelming something downstream). Being deliberate about
+which operator you reach for — not just whatever happens to compile — is
+what separates production-quality reactive code from code that just seems
+to work.

@@ -2,17 +2,17 @@
 
 ## In Simple Terms
 
-A CPU core can only run **one instruction stream at a time**. But your computer runs
-dozens of programs "at once" (browser, IDE, music player...). How? The operating
-system rapidly switches the CPU between different threads, giving each one a small
-slice of time (a few milliseconds). This is called **CPU scheduling**.
+A CPU core can only do **one thing at a time**. Yet your laptop somehow runs a
+browser, an IDE, and music player all "at once." How? The operating system
+constantly flips the CPU between different threads, giving each one a tiny sliver
+of time — just a few milliseconds.
 
-It feels simultaneous to us because the switching happens so fast, but at any given
-instant, a single core is doing exactly one thing.
+It *feels* like everything runs together because the switching is so fast. But at
+any single instant, one CPU core is only ever doing one thing.
 
 ## Simple Example
 
-Imagine a CPU core as a single cashier at a store, and threads as customers in line:
+Think of a CPU core as one cashier, and threads as customers in line:
 
 ```
 Time slice 1: Cashier serves Thread-A for 10ms
@@ -22,13 +22,14 @@ Time slice 4: Cashier serves Thread-A again for 10ms
 ...
 ```
 
-The OS scheduler decides the order and duration of these slices, based on priority,
-fairness, and whether a thread is waiting on something (like disk or network).
+The operating system decides the order and how long each slice lasts — based on
+priority, fairness, and whether a thread is just sitting there waiting on
+something (like a disk or the network).
 
 ## Why It Matters for Reactive Programming
 
-If a thread is **blocked** (e.g., waiting for a database response), it is still
-"holding a seat" even though it's doing no useful work — the scheduler still has to
-manage it, and no other work can use that thread meanwhile. Reactive programming tries
-to make sure threads are **never idle-waiting**; they should always be scheduled to do
-actual work, and be released back to the pool the instant they'd otherwise block.
+If a thread is stuck waiting (say, for a database to answer), it's still "holding
+a spot in line" — even though it's doing nothing. The scheduler still has to track
+it, and nobody else can use it in the meantime. Reactive programming tries to make
+sure a thread is never just standing there waiting — it should always be doing
+real work, or freed up immediately to help someone else.

@@ -2,10 +2,9 @@
 
 ## In Simple Terms
 
-`Flux.interval(duration)` creates a `Flux<Long>` that emits an incrementing counter
-(`0`, `1`, `2`, ...) at a fixed time interval, **forever** (it never completes on its
-own). It's commonly used to simulate periodic events, like a heartbeat, polling
-mechanism, or ticking clock.
+`Flux.interval(duration)` creates a `Flux<Long>` that counts up (`0`, `1`, `2`,
+...) on a fixed schedule, **forever** — it never finishes on its own. It's often
+used to simulate a heartbeat, a polling loop, or a ticking clock.
 
 ## Simple Example
 
@@ -24,7 +23,7 @@ Tick: 3
 Tick: 4
 ```
 
-A realistic use case — powering a Server-Sent Events endpoint with periodic updates:
+A real-world use — powering a live-updating endpoint:
 
 ```java
 @GetMapping(value = "/live-clock", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -34,12 +33,12 @@ public Flux<String> liveClock() {
 }
 ```
 
-**Important:** `Flux.interval()` runs by default on a parallel `Scheduler`, not the
-calling thread — so tests using it typically need `StepVerifier.withVirtualTime()` to
-avoid actually waiting in real time.
+**Heads up:** `Flux.interval()` runs on a background scheduler by default, not
+the thread that subscribed — so tests using it usually need
+`StepVerifier.withVirtualTime()` to avoid literally waiting in real time.
 
 ## Why It Matters
 
-`Flux.interval()` is the go-to building block for any periodic/polling behavior in a
-reactive application — heartbeats, live dashboards, scheduled health checks — all
-without needing a separate `Timer` or `ScheduledExecutorService`.
+`Flux.interval()` is the standard building block for anything periodic in a
+reactive app — heartbeats, live dashboards, health checks — without needing a
+separate `Timer` or `ScheduledExecutorService`.

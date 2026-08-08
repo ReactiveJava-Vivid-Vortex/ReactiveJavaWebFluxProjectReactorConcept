@@ -2,14 +2,14 @@
 
 ## In Simple Terms
 
-A `Mono`/`Flux` is **immutable**. Calling an operator like `.map()` or `.filter()`
-does **not** modify the original object — it returns a **brand-new**
-`Mono`/`Flux` wrapping your original one. If you don't capture (or chain onto) that
-return value, your transformation simply never happens, and nothing tells you it
-was ignored.
+A `Mono`/`Flux` never changes once it's built. Calling something like
+`.map()` or `.filter()` doesn't modify the original — it hands you back a
+*brand-new* `Mono`/`Flux` that wraps the old one. If you don't grab that
+new result (or chain straight onto it), your transformation just... doesn't
+happen. Nothing warns you it got skipped.
 
-This is, by a wide margin, the most common "why isn't my reactive code doing
-anything?!" bug for beginners coming from imperative Java.
+This is, by far, the most common "why isn't my reactive code doing
+anything?!" trap for people coming from regular imperative Java.
 
 ## Simple Example
 
@@ -33,8 +33,8 @@ scaled.subscribe(n -> System.out.println("Got: " + n));
 // Output: Got: 100, Got: 200, Got: 300   ← correct!
 ```
 
-In practice you almost always avoid this bug naturally by chaining everything in
-one fluent expression:
+In practice, you sidestep this bug naturally just by chaining everything
+together in one fluent line:
 
 ```java
 Flux.just(1, 2, 3)
@@ -45,8 +45,9 @@ Flux.just(1, 2, 3)
 
 ## Why It Matters
 
-Because Reactor types are immutable, a `Mono`/`Flux` is completely safe to store,
-pass around, and reuse — nobody can accidentally corrupt it by calling an operator
-on it. The tradeoff is this specific beginner trap: **an operator call that isn't
-assigned or chained is a silent no-op**, not a compile error and not a runtime
-exception. Always chain, or always reassign.
+Because Reactor types never change once built, a `Mono`/`Flux` is
+completely safe to store, pass around, and reuse — nobody can accidentally
+mess it up by calling an operator on it. The catch is this specific
+beginner trap: **an operator call you don't assign or chain is a silent
+no-op** — not a compile error, not a runtime exception, just... nothing.
+Always chain, or always reassign.

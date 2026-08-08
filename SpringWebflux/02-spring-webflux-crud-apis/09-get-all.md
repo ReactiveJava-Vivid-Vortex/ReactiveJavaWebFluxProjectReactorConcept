@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-A "GET All" endpoint returns the full collection of a resource — implemented in
-WebFlux by returning a `Flux<T>` (or `Flux<Dto>`) from `repository.findAll()`,
-optionally mapped, filtered, or paginated.
+A "GET All" endpoint hands back the full collection of a resource —
+implemented in WebFlux by returning a `Flux<T>` (or `Flux<Dto>`) from
+`repository.findAll()`, optionally mapped, filtered, or paginated first.
 
 ## Simple Example
 
@@ -32,6 +32,6 @@ public Flux<ProductDto> getAllProducts(
 
 ## Why It Matters
 
-"GET All" is usually the first CRUD endpoint written for any resource, and it
-establishes the pattern (`Flux` return type, entity-to-DTO mapping) that the rest of
-your reactive CRUD endpoints will follow.
+"GET All" is usually the first CRUD endpoint you write for any resource,
+and it sets the pattern (`Flux` return type, entity-to-DTO mapping) that
+the rest of your reactive CRUD endpoints will follow.

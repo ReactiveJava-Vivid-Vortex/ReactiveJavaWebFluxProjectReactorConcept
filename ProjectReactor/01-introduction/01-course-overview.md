@@ -2,33 +2,35 @@
 
 ## In Simple Terms
 
-This section is the map for the whole course. Before writing a single line of reactive
-code, we need to understand **why** reactive programming exists at all. That means
-stepping back from Java syntax and looking at things closer to the metal: how a CPU
-runs your code, how the operating system juggles many programs at once, and what
-"waiting" actually costs a program.
+This section is the map for everything that follows. Before we touch any reactive
+code, we need to answer one question: **why does reactive programming even exist?**
 
-Once those fundamentals are clear, everything Project Reactor does — `Mono`, `Flux`,
-schedulers, backpressure — will feel like a natural answer to a real problem, instead
-of new syntax to memorize.
+To answer that, we have to step back from Java for a moment and look at how a
+computer actually works — how a CPU runs your code, how the operating system
+juggles many programs at once, and what "waiting" really costs.
+
+Once that clicks, everything else in this course — `Mono`, `Flux`, schedulers,
+backpressure — stops feeling like new syntax to memorize. It starts feeling like
+the obvious answer to a real, physical problem.
 
 ## The Roadmap
 
-1. How a computer actually executes your code (processes, threads, CPU scheduling).
-2. Why some operations "block" and why that is expensive.
-3. Synchronous vs asynchronous programming.
-4. Blocking vs non-blocking I/O, and the various I/O models.
-5. Finally: why reactive programming was invented, and when it helps.
+1. How a computer runs your code (processes, threads, CPU scheduling).
+2. Why "waiting" is expensive.
+3. Synchronous vs asynchronous code.
+4. Blocking vs non-blocking I/O.
+5. Why reactive programming was invented, and when it actually helps.
 
 ## Simple Example
 
-Think of a restaurant:
+Picture a restaurant with one waiter.
 
-- A **blocking/synchronous** waiter takes an order, walks it to the kitchen, and then
-  just **stands there** waiting until the food is ready before serving the next table.
-- A **non-blocking/reactive** waiter takes an order, hands it to the kitchen, and
-  immediately goes to take the next table's order. When food becomes ready (an event),
-  the waiter is notified and delivers it.
+- A **blocking** waiter takes an order, walks it to the kitchen, and then just
+  **stands there** waiting for the food — ignoring every other table until it's
+  ready.
+- A **non-blocking** waiter takes an order, drops it at the kitchen, and
+  immediately goes to take the next table's order. When food is ready, the
+  kitchen rings a bell and the waiter delivers it.
 
-The second waiter serves far more tables with the same number of people. That single
-idea — don't wait, get notified instead — is the seed of everything in this course.
+Same one waiter. The second one serves far more tables. That's the whole idea
+behind this course: **don't wait around — get notified instead.**

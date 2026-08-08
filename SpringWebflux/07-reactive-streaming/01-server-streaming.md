@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-"Server streaming" means a WebFlux endpoint sends its response **incrementally**, as
-data becomes available, rather than waiting for the entire result set to be ready
-before sending anything. This is achieved by returning a `Flux<T>` with a streaming
-media type (like NDJSON or SSE) instead of the default JSON array format.
+"Server streaming" means a WebFlux endpoint sends its response bit by
+bit, as data becomes ready, instead of waiting for the whole result set
+before sending anything. You do this by returning a `Flux<T>` with a
+streaming media type (like NDJSON or SSE) instead of the default JSON
+array.
 
 ## Simple Example
 
@@ -17,9 +18,10 @@ public Flux<ProductDto> streamProducts() {
 }
 ```
 
-With `APPLICATION_NDJSON_VALUE`, each `ProductDto` is written to the HTTP response as
-a separate line of JSON, as soon as it's available from the database — the client can
-start processing results immediately, rather than waiting for the entire dataset.
+With `APPLICATION_NDJSON_VALUE`, each `ProductDto` gets written to the
+response as its own line of JSON, the moment it's ready from the database
+— the client can start working with results right away, instead of
+waiting for everything.
 
 Compare with the default (non-streaming) JSON array behavior:
 
@@ -33,7 +35,7 @@ public Flux<ProductDto> getAllProducts() {
 
 ## Why It Matters
 
-Server streaming is essential for large datasets, slow-to-produce results, or
-real-time feeds — it reduces time-to-first-byte dramatically and lets clients begin
-processing data as it arrives, rather than waiting for a potentially very large,
-fully-buffered response.
+Server streaming matters a lot for big datasets, slow-to-produce results,
+or real-time feeds — it dramatically cuts down time-to-first-byte and lets
+clients start processing data as it arrives, instead of waiting on a
+potentially huge, fully-buffered response.

@@ -2,17 +2,17 @@
 
 ## In Simple Terms
 
-A **process** is a running program with its own private memory space — like a separate
-apartment. Your browser is a process, your IDE is a process. Processes don't share
-memory with each other directly; they are isolated.
+A **process** is a running program with its own private slice of memory — think of
+it like an apartment. Your browser is one apartment, your IDE is another. They
+can't just walk into each other's kitchen and grab a variable.
 
-A **thread** is a unit of execution *inside* a process — like a person living in that
-apartment. A single process (apartment) can have many threads (people) working at the
-same time, and they all share the same memory (the apartment's furniture, fridge,
-etc.).
+A **thread** is a worker living inside that apartment. One apartment (process) can
+have several workers (threads) doing things at the same time, and they all share
+the same furniture and fridge (memory).
 
-Because threads share memory, they can communicate easily, but they can also
-interfere with each other (race conditions) if not coordinated carefully.
+Because threads share memory, they can pass information to each other easily. But
+that also means two threads can bump into each other and cause bugs if they're not
+careful — that's called a race condition.
 
 ## Simple Example
 
@@ -30,15 +30,14 @@ public class ProcessVsThreadDemo {
 }
 ```
 
-Both `main` and `worker` run inside the **same JVM process** and share the same heap
-memory — that's why a variable created in one thread can be seen by another (if
-shared correctly). If instead you ran two separate Java programs (`java App1` and
-`java App2`), those would be two different **processes**, each with its own memory,
-unable to see each other's variables directly.
+Both `main` and `worker` live in the same apartment (JVM process) and share the
+same fridge (heap memory) — that's why one thread can see a variable another
+thread created. If you instead ran two separate `java` commands, those would be
+two completely separate apartments, unable to see each other's stuff at all.
 
 ## Why It Matters for Reactive Programming
 
-Reactive programming is fundamentally about using a **small number of threads**
-efficiently, instead of creating a new thread per task (which is expensive). Understanding
-that threads are the actual "workers" executing your reactive pipeline is the first
-building block.
+Reactive programming is really about getting a **small number of workers** to do
+a lot of work efficiently, instead of hiring a brand-new worker for every single
+task (which costs time and memory). Threads are the actual workers running your
+reactive code — everything else in this course builds on that idea.

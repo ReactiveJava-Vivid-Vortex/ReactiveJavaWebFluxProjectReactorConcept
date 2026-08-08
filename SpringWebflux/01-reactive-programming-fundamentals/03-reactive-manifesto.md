@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-The **Reactive Manifesto** (reactivemanifesto.org) is a document describing the four
-core traits a well-designed reactive system should have. Spring WebFlux and Project
-Reactor are built with these principles in mind:
+The Reactive Manifesto (reactivemanifesto.org) lays out four traits a
+well-built reactive system should have. Spring WebFlux and Project Reactor
+are both designed with these in mind:
 
 ```
         Responsive
@@ -15,16 +15,15 @@ Resilient <-+-> Elastic
      Message Driven (the foundation)
 ```
 
-- **Responsive**: the system responds in a timely manner, even under load.
-- **Resilient**: the system stays responsive even when parts of it fail.
-- **Elastic**: the system stays responsive under varying load, scaling up or down as
-  needed.
-- **Message Driven**: components communicate via asynchronous messages/events, which
-  is what enables the other three traits.
+- **Responsive**: answers in a timely way, even when things get busy.
+- **Resilient**: keeps working even when some part of it breaks.
+- **Elastic**: handles more or less load by scaling up or down as needed.
+- **Message Driven**: parts of the system talk to each other through
+  async messages/events, which is what makes the other three possible.
 
 ## Simple Example
 
-A reactive microservice architecture embodying these traits:
+A reactive microservice putting all four traits into practice:
 
 ```java
 public Mono<Dashboard> getDashboard(String userId) {
@@ -39,8 +38,9 @@ public Mono<Dashboard> getDashboard(String userId) {
 
 ## Why It Matters
 
-The Reactive Manifesto isn't just marketing language — it's a practical checklist.
-When evaluating whether a system is "truly reactive," ask: does it respond quickly
-under load? Does it degrade gracefully on failure? Does it scale elastically? Is its
-internal communication asynchronous and message-driven? Spring WebFlux gives you the
-tools to build systems that check all four boxes.
+The Reactive Manifesto isn't just buzzwords — it's a practical checklist.
+When you're wondering if a system is "truly reactive," ask: does it
+respond quickly under load? Does it degrade gracefully when something
+fails? Does it scale up and down smoothly? Does it talk internally through
+async messages? Spring WebFlux gives you what you need to check all four
+boxes.

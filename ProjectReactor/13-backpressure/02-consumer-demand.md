@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-"Consumer demand" is the running total of items a subscriber has requested but not
-yet received — essentially, the consumer's own stated capacity to keep up. A
-well-behaved reactive consumer only requests as much as it can genuinely process in a
-reasonable time, replenishing demand as it finishes work.
+"Consumer demand" is just the running count of items a subscriber has asked
+for but not yet gotten — basically, how much work the consumer says it can
+currently handle. A well-behaved consumer only asks for as much as it can
+genuinely keep up with, topping up its request as it finishes each batch.
 
 ## Simple Example
 
@@ -25,12 +25,12 @@ Flux.range(1, 100)
     });
 ```
 
-This subscriber never has more than 1 outstanding item of demand at a time —
-matching its own processing speed exactly.
+This subscriber never has more than 1 item outstanding at a time — always
+asking for just as much as it can actually chew.
 
 ## Why It Matters
 
-Understanding consumer demand explains why some reactive pipelines "pull" data at a
-controlled pace instead of being flooded — the subscriber is in the driver's seat,
-declaring its own capacity, rather than the producer deciding unilaterally how fast
-to push.
+Understanding consumer demand explains why some pipelines pull data at a
+steady, controlled pace instead of getting flooded — the consumer is in the
+driver's seat here, declaring its own capacity, rather than the producer
+deciding unilaterally how fast to push things at it.

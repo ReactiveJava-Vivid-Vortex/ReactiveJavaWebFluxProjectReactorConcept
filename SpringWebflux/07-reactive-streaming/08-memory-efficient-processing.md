@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-"Memory-efficient processing" refers to designing your reactive pipelines so that
-memory usage stays roughly **constant**, regardless of how large the underlying
-dataset is — achieved by streaming data through the pipeline incrementally instead
-of collecting it all into memory-resident structures (`List`, `Map`) at any point.
+"Memory-efficient processing" is about designing your pipelines so memory
+use stays roughly flat no matter how big the underlying data is —
+achieved by streaming data through the pipeline bit by bit instead of
+gathering it all into memory-heavy structures (`List`, `Map`) at any
+point.
 
 ## Simple Example
 
@@ -21,7 +22,8 @@ public Mono<BigDecimal> calculateTotalRevenue() {
 }
 ```
 
-Memory-efficient — processes one order at a time, never holding the full list:
+Memory-efficient — handles one order at a time, never holding the full
+list:
 
 ```java
 public Mono<BigDecimal> calculateTotalRevenue() {
@@ -31,13 +33,14 @@ public Mono<BigDecimal> calculateTotalRevenue() {
 }
 ```
 
-Both produce the same result, but the second version never holds more than one
-order's data (plus a running total) in memory at once — critical for datasets too
-large to comfortably fit in memory as a `List`.
+Both give you the same answer, but the second version never holds more
+than one order's data (plus a running total) in memory at a time —
+critical for datasets too big to comfortably fit in memory as a `List`.
 
 ## Why It Matters
 
-Being deliberate about avoiding unnecessary `.collectList()`/`.collectMap()` calls
-(or bounding them with `.buffer()` when some batching is genuinely needed) is what
-allows reactive pipelines to process datasets far larger than available memory —
-one of the most practically valuable benefits of the streaming model.
+Being deliberate about avoiding unnecessary `.collectList()`/`.collectMap()`
+calls (or putting explicit bounds on them with `.buffer()` when some
+batching is genuinely needed) is what lets reactive pipelines handle
+datasets far bigger than available memory — one of the most practically
+useful benefits of the streaming approach.

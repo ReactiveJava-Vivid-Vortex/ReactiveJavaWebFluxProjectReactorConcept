@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.subscribeOn(scheduler)` controls which thread the **subscription itself** (and the
-original source's emission) happens on — regardless of where `.subscribeOn()` is
-placed in the chain, it affects the **entire pipeline from the very beginning**. This
-is different from `.publishOn()`, which only affects everything after its position.
+`.subscribeOn()` controls which thread the whole thing *starts* on — no
+matter where you put it in the chain, it reaches all the way back to the
+very beginning and affects the entire pipeline. That's the key difference
+from `.publishOn()`, which only affects what comes after it.
 
 ## Simple Example
 
@@ -32,7 +32,8 @@ map running on: boundedElastic-1
 | `.subscribeOn()`   | The whole chain, from the very source, regardless of where it's placed |
 | `.publishOn()`     | Only what comes AFTER it in the chain               |
 
-Even placing `.subscribeOn()` at the end of a chain affects the source at the start:
+Even putting `.subscribeOn()` at the very end still reaches back and
+affects the source at the start:
 
 ```java
 Mono.fromCallable(() -> "data")
@@ -43,7 +44,8 @@ Mono.fromCallable(() -> "data")
 
 ## Why It Matters
 
-`.subscribeOn()` is the right tool when the **source itself** is blocking (e.g., a
-blocking JDBC call, file read) and needs to run on an appropriate scheduler from the
-very start — only one `.subscribeOn()` per chain has any effect (the first one
-encountered wins), unlike `.publishOn()` which can be used multiple times.
+`.subscribeOn()` is the tool for when the *source itself* is blocking (a
+blocking database call, reading a file) and needs to start life on the
+right kind of thread from the very first moment. Only one `.subscribeOn()`
+per chain actually does anything — the first one Reactor sees wins — unlike
+`.publishOn()`, which you can use as many times as you like.

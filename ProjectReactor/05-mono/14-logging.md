@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-Just like with `Flux`, you can attach `.log()` to a `Mono` pipeline to see exactly
-what signals fire and when — extremely useful for understanding subscription timing,
-whether a value was emitted, or if/when an error occurred.
+Just like with `Flux`, you can stick `.log()` onto a `Mono` pipeline to see
+exactly what's happening — great for figuring out subscription timing, whether a
+value actually came through, and if/when an error happened.
 
 ## Simple Example
 
@@ -15,7 +15,7 @@ Mono.just("Hello")
     .subscribe();
 ```
 
-Output (abbreviated):
+Output (shortened):
 ```
 [ INFO] onSubscribe([Fuseable] Operators.ScalarSubscription)
 [ INFO] request(unbounded)
@@ -23,7 +23,7 @@ Output (abbreviated):
 [ INFO] onComplete()
 ```
 
-You can compare an empty `Mono`'s log output to see the difference:
+Compare that to an empty `Mono`'s log output:
 
 ```java
 Mono.empty().log().subscribe();
@@ -37,7 +37,7 @@ Output:
 
 ## Why It Matters
 
-When debugging why a `Mono` seems to "not emit anything," `.log()` immediately tells
-you whether it's because the `Mono` completed empty, errored out, or was never even
-subscribed to in the first place — saving a lot of guesswork compared to sprinkling
-manual print statements.
+When you're trying to figure out why a `Mono` doesn't seem to be giving you
+anything, `.log()` tells you right away whether it finished empty, errored out,
+or was never even subscribed to — much faster than guessing with print
+statements.

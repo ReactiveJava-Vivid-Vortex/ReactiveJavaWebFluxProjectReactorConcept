@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`Schedulers.parallel()` provides a **fixed-size** thread pool, sized to match the
-number of available CPU cores. It's designed for **CPU-bound, non-blocking** work —
-computations that keep the CPU busy (like hashing, sorting, or number crunching) —
-not for I/O or blocking calls.
+`Schedulers.parallel()` gives you a small, fixed set of threads — one per
+CPU core, roughly. It's built for work that keeps the CPU genuinely busy,
+like number crunching or hashing, not for waiting on a network call or a
+disk read.
 
 ## Simple Example
 
@@ -19,8 +19,8 @@ Flux.range(1, 4)
     .subscribe(result -> System.out.println("Result: " + result));
 ```
 
-Combined with `.parallel()` (the Flux operator, not the Scheduler) and `.runOn()` for
-true multi-core parallel processing:
+Combined with the `.parallel()` operator (a different thing from the
+`Scheduler` of the same name) and `.runOn()`, for true multi-core work:
 
 ```java
 Flux.range(1, 1000)
@@ -33,8 +33,8 @@ Flux.range(1, 1000)
 
 ## Why It Matters
 
-Using `Schedulers.parallel()` for CPU-heavy work lets you actually use multiple CPU
-cores concurrently — something the default single-threaded execution model won't do
-for you automatically. **Never** run blocking calls (I/O, `Thread.sleep()`, blocking
-JDBC) on this scheduler — its small, fixed thread count means a single blocking call
-can stall a disproportionate share of your CPU-bound workload.
+Using `Schedulers.parallel()` for CPU-heavy work lets you actually spread it
+across multiple cores at once — something the default single-threaded
+behavior won't give you for free. Never put a blocking call here — the
+thread count is small and fixed, so a single stuck thread can hold back a
+disproportionate chunk of your whole CPU-bound workload.

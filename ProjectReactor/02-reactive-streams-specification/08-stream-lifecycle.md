@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-Every reactive stream follows a predictable lifecycle, defined by the Reactive
-Streams specification. Understanding this sequence tells you exactly what signals
-can happen, and in what order:
+Every reactive stream follows the same predictable script from start to finish.
+Once you know the script, you always know exactly what can happen and in what
+order:
 
 ```
 1. subscribe()     -> Subscriber asks to receive data from a Publisher
@@ -16,8 +16,9 @@ can happen, and in what order:
    onError(t)      -> Publisher signals a failure
 ```
 
-**Key rule:** after `onComplete()` or `onError()`, **no further signals** are sent.
-The stream is finished — either successfully or with a failure, never both.
+**The one rule to remember:** once `onComplete()` or `onError()` happens,
+**nothing else follows.** The stream is over — either it worked, or it failed,
+but never both.
 
 ## Simple Example
 
@@ -36,12 +37,12 @@ Flux.just("a", "b", "c")
 // onComplete!
 ```
 
-If an error occurred instead, you'd see `onNext` calls (zero or more), then a single
-`onError` call, and **no** `onComplete()` afterward.
+If something had failed instead, you'd see some `onNext` calls (maybe zero, maybe
+a few), then one `onError` call — and no `onComplete()` after that.
 
 ## Why It Matters
 
-Knowing this strict lifecycle helps you reason about your pipelines: you can rely on
-the fact that once a stream errors or completes, nothing more will come through. This
-is critical when writing cleanup logic (`doFinally()`) or tests (`StepVerifier`),
-since you always know exactly how a stream is allowed to end.
+Knowing this script by heart makes reasoning about your code much easier — once a
+stream errors or finishes, you know for certain nothing more is coming. That's
+exactly why cleanup logic (`doFinally()`) and tests (`StepVerifier`) can rely on
+it so confidently.

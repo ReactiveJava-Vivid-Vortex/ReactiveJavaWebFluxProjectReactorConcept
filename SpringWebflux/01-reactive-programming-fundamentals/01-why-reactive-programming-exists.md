@@ -2,15 +2,17 @@
 
 ## In Simple Terms
 
-Reactive programming exists to solve a specific, real problem: **traditional
-blocking web servers waste threads while waiting on slow I/O** (databases, external
-APIs). Each blocking request ties up a whole thread for its entire duration, even
-though the thread does nothing useful during the wait — just holding memory and
-being tracked by the OS scheduler.
+Reactive programming exists to fix a very real, everyday problem:
+traditional web servers waste threads while waiting on slow things
+(databases, other services). Every blocking request ties up an entire
+thread for its whole duration, even though that thread does absolutely
+nothing useful while it waits — it just sits there, taking up memory,
+being tracked by the OS.
 
 ## Simple Example
 
-Traditional Spring MVC (blocking) — one thread per request, frozen during I/O wait:
+Traditional Spring MVC (blocking) — one thread per request, frozen while
+waiting:
 
 ```java
 @GetMapping("/users/{id}")
@@ -19,23 +21,26 @@ public User getUser(@PathVariable String id) {
 }
 ```
 
-If the database takes 100ms to respond and you have 10,000 concurrent requests, you'd
-need up to 10,000 threads just to keep all requests "waiting" simultaneously — a huge
-memory cost for a lot of doing-nothing.
+If the database takes 100ms to answer and you've got 10,000 requests
+coming in at once, you'd need up to 10,000 threads just to keep everyone
+"waiting" at the same time — a huge amount of memory spent on threads doing
+nothing.
 
-Spring WebFlux (reactive) — the thread is released immediately during the wait:
+Spring WebFlux (reactive) — the thread gets freed up right away instead of
+waiting:
 
 ```java
 @GetMapping("/users/{id}")
-public Mono<User> getUser(@PathVariable String id) {
-    return userRepository.findById(id); // returns immediately, no thread blocked
+public Mono<User> getUser(@PathVariable String id) { // returns immediately, no thread blocked
+    return userRepository.findById(id);
 }
 ```
 
 ## Why It Matters
 
-With WebFlux, the same 10,000 concurrent requests can be handled by a small, fixed
-pool of event-loop threads (often just 4-16), because no thread is ever frozen
-waiting — it's freed the instant it would otherwise block, and reused for other
-incoming work. This is the entire motivation behind reactive programming's existence:
-dramatically better resource efficiency under high, I/O-heavy concurrency.
+With WebFlux, those same 10,000 requests can be handled by a small, fixed
+group of threads (often just 4-16), because no thread ever sits frozen
+waiting — it gets freed the moment it would otherwise block, and reused for
+whatever else needs doing. That's the whole reason reactive programming
+exists: much better use of resources when you've got a lot of concurrent,
+I/O-heavy work going on.

@@ -1,13 +1,11 @@
-# Integration Testing — Topic Overview
+# Q1. How Do I Test a WebFlux Endpoint End-to-End?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of a Mystery Shopper vs Inspecting Kitchen Equipment)
 
-Unit tests check one class in isolation with mocked dependencies. **Integration
-tests** verify that your controller, service, repository, and (ideally) a real
-database all work correctly *together*. For WebFlux, the essential tool for this is
-`WebTestClient` — Spring's reactive-aware equivalent of `MockMvc` — which sends real
-HTTP requests to your running application and lets you assert on the response with
-clean, readable syntax:
+A unit test is like inspecting the oven in isolation — does it heat correctly?
+An integration test is a **mystery shopper**: walk in the front door, order food,
+and check what actually comes out — verifying the controller, service,
+repository, and (ideally) a real database all work together correctly.
 
 ```java
 @Autowired
@@ -24,14 +22,16 @@ void getProduct_returnsProduct() {
 }
 ```
 
-`WebTestClient` handles the reactive complexity internally — subscribing to your
-controller's `Mono`/`Flux` and blocking in a test-appropriate, controlled way — so
-you don't need to manually manage subscriptions in your test code.
+`WebTestClient` handles all the reactive complexity internally — subscribing to
+your controller's `Mono`/`Flux` and blocking in a test-appropriate, controlled way
+— you never manage subscriptions manually.
 
-The one nuance beyond typical Spring MVC testing is verifying **streaming**
-responses (NDJSON, SSE): `WebTestClient` returns a `FluxExchangeResult`, and you
-combine it with `StepVerifier` to assert on the streamed body itself, since a
-streaming endpoint's response is a `Flux`, not a single object.
+---
+
+## Q2. How Do I Test a Streaming (NDJSON/SSE) Endpoint?
+
+A streaming endpoint's response IS a `Flux`, not one object — so you need
+`StepVerifier` on top of `WebTestClient` for the actual body assertions:
 
 ```java
 FluxExchangeResult<ProductDto> result = webTestClient.get()
@@ -41,15 +41,54 @@ FluxExchangeResult<ProductDto> result = webTestClient.get()
 StepVerifier.create(result.getResponseBody()).expectNextCount(3).verifyComplete();
 ```
 
-## Quick Revision Cheat Sheet
+---
 
-| # | Concept | One-Line Summary |
-|---|---|---|
-| 1 | **WebTestClient** | Spring's dedicated WebFlux test client — send real HTTP requests, assert on status/body cleanly. |
-| 2 | **Integration Tests** | Verify controller + service + repository (+ real/containerized DB) work together, not just one class in isolation. |
-| 3 | **Reactive endpoint testing** | For streaming (NDJSON/SSE) endpoints, combine `WebTestClient.returnResult()` + `StepVerifier` to assert the streamed body. |
+## Q3. How Do I Test Against a Real Database Instead of Mocks?
 
-## How It All Fits Together
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
+@Testcontainers
+class ProductIntegrationTest {
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
+
+    @DynamicPropertySource
+    static void configureR2dbc(DynamicPropertyRegistry registry) {
+        registry.add("spring.r2dbc.url", () ->
+            "r2dbc:postgresql://" + postgres.getHost() + ":" + postgres.getFirstMappedPort() + "/test");
+    }
+    // ... test methods
+}
+```
+
+This catches issues mocked unit tests miss entirely: incorrect SQL, serialization
+mismatches, misconfigured routes.
+
+---
+
+## Q4. Interview-Style Q&A
+
+### Does `WebTestClient` require a running server?
+
+It can work either way — bound to a running server (`RANDOM_PORT`) for true
+integration tests, or bound directly to your `RouterFunction`/controllers in
+isolation for faster, more focused tests.
+
+### Why can't I just call `.block()` on the controller's returned Mono and assert normally?
+
+You *could* in principle for a plain unit test of a service method, but for
+testing the full HTTP layer (status codes, headers, serialization), `WebTestClient`
+is purpose-built and far more expressive.
+
+### How do I assert a streaming endpoint never completes (e.g., an SSE feed)?
+
+Use `StepVerifier` with `.thenCancel()` instead of `.verifyComplete()` — waiting
+for completion on a genuinely infinite stream would hang the test forever.
+
+---
+
+## Q5. Summary
 
 ```
 Test sends request  ──▶  webTestClient.get()/.post()/...
@@ -65,7 +104,8 @@ Test sends request  ──▶  webTestClient.get()/.post()/...
 └───────────────────────┴──────────────────────────────┘
 ```
 
-Treat `WebTestClient` + `StepVerifier` as a matched pair: the former drives the HTTP
-layer, the latter asserts on any reactive stream buried inside the response —
-together they give you full confidence in both the contract and the actual
-streaming behavior of your endpoints.
+### One sentence to remember
+
+> **"WebTestClient is a mystery shopper for your API — it drives the HTTP
+> layer end-to-end, and StepVerifier steps in whenever the response itself is
+> a stream, not a single object."**

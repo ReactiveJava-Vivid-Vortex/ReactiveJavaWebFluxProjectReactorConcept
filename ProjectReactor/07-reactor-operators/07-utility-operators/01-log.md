@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`.log()` is a diagnostic operator that prints (via SLF4J, at INFO level by default)
-every Reactive Streams signal passing through this point in the pipeline —
-`onSubscribe`, `request`, `onNext`, `onComplete`, `onError`. It's the most useful
-tool for understanding what's actually happening inside a reactive pipeline.
+`.log()` prints out everything happening at this point in the pipeline —
+when someone subscribed, how many items were asked for, every item that
+went by, and how the stream ended. It's like putting a security camera with
+a running commentary at one spot in your pipeline, so you can actually see
+what's going on instead of guessing.
 
 ## Simple Example
 
@@ -26,7 +27,8 @@ Output (abbreviated):
 [ INFO] onComplete()
 ```
 
-You can name multiple `.log()` calls in the same pipeline to tell them apart:
+You can label multiple `.log()` calls in the same pipeline so you can tell
+which one is which:
 
 ```java
 Flux.range(1, 3)
@@ -38,7 +40,8 @@ Flux.range(1, 3)
 
 ## Why It Matters
 
-`.log()` is often the fastest way to diagnose a reactive pipeline that isn't behaving
-as expected: Did it get subscribed to? How much was requested? Did an error occur
-before or after a specific operator? It's the reactive-world equivalent of
-strategically placed `System.out.println()` calls, but far more informative.
+`.log()` is often the quickest way to figure out why a reactive pipeline
+isn't doing what you expect: Did anything even subscribe? How much was
+requested? Did the error happen before or after a certain step? It's the
+reactive world's version of scattering `System.out.println()` everywhere —
+except far more informative and much less messy.

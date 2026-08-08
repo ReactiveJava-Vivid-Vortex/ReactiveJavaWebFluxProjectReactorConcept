@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`Flux.fromIterable(iterable)` creates a `Flux` that emits each element of an existing
-`Iterable` (like a `List`, `Set`, etc.), one at a time, in order. This is the most
-common way to turn regular Java collections into a reactive stream.
+`Flux.fromIterable(iterable)` takes an existing `List`, `Set`, or any
+`Iterable`, and sends out each element, one at a time. It's the go-to way to
+turn a normal Java collection into a reactive stream.
 
 ## Simple Example
 
@@ -23,20 +23,20 @@ Name: BOB
 Name: CHARLIE
 ```
 
-A very common real-world pattern: converting a database result (already fetched as a
-`List`) into a `Flux` for further reactive processing:
+A common pattern — turning an already-fetched list into a `Flux` for further
+processing:
 
 ```java
 List<Order> orders = orderRepository.findAllBlocking(); // hypothetical blocking call
 Flux<Order> orderFlux = Flux.fromIterable(orders);
 ```
 
-(Note: in real reactive code, you'd typically get a `Flux<Order>` directly from a
-reactive repository, rather than fetching a blocking `List` first.)
+(In real reactive code, you'd usually get a `Flux<Order>` directly from a
+reactive repository, rather than fetching a plain `List` first.)
 
 ## Why It Matters
 
-`Flux.fromIterable()` is the standard bridge between "regular Java collections" and
-"reactive streams" — extremely useful when you have data already in memory (e.g.,
-static configuration, a small in-memory cache) that you want to process using
-Reactor's operators.
+`Flux.fromIterable()` is the standard bridge between "a regular Java collection"
+and "a reactive stream" — handy any time you have data already sitting in
+memory (static config, a small cache) that you want to run through Reactor's
+operators.

@@ -2,9 +2,10 @@
 
 ## In Simple Terms
 
-`ServerResponse` is the functional model's way of building an HTTP response — status
-code, headers, and body — using a fluent builder API, instead of returning a plain
-object (or `ResponseEntity`) from an annotated controller method.
+`ServerResponse` is how you build an HTTP response in the functional
+model — status code, headers, body — using a fluent builder, instead of
+returning a plain object (or `ResponseEntity`) from an annotated controller
+method.
 
 ## Simple Example
 
@@ -34,7 +35,8 @@ ServerResponse.ok()
 
 ## Why It Matters
 
-`ServerResponse`'s builder API gives you the same fine-grained control over the HTTP
-response (status, headers, content type, streaming body) as `ResponseEntity` does in
-the annotation-based model — just expressed through explicit method chaining rather
-than annotations, fitting naturally with the functional routing style.
+`ServerResponse`'s builder gives you the same fine-grained control over the
+HTTP response (status, headers, content type, streaming body) that
+`ResponseEntity` gives you in the annotation-based world — just written as
+explicit method chaining, which fits naturally with the functional routing
+style.

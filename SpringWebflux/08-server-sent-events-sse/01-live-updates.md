@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-"Live updates" refers to pushing new information to a connected client as soon as
-it happens, without the client needing to repeatedly ask ("poll") for it. Server-Sent
-Events (SSE) is one of the simplest ways to implement live updates in a WebFlux
-application — the server keeps a connection open and pushes new data whenever it's
-available.
+"Live updates" means pushing new information to a connected client the
+moment it happens, instead of the client having to keep asking ("polling")
+for it. Server-Sent Events (SSE) is one of the easiest ways to do live
+updates in WebFlux — the server just keeps the connection open and pushes
+new data whenever there's something to send.
 
 ## Simple Example
 
@@ -17,13 +17,14 @@ public Flux<StockPrice> streamPrice(@PathVariable String symbol) {
 }
 ```
 
-A browser connecting to this endpoint receives a new event automatically every time
-the price changes — no repeated polling requests (`GET /stock-price/AAPL` every
-second) needed.
+A browser connected to this endpoint automatically gets a new event every
+time the price changes — no repeated `GET /stock-price/AAPL` requests every
+second needed.
 
 ## Why It Matters
 
-Live updates via SSE are far more efficient than client-side polling: polling wastes
-resources sending repeated requests even when nothing has changed, whereas SSE only
-sends data when there's actually something new to report — while still using plain
-HTTP, no special infrastructure (like WebSockets) required.
+Live updates through SSE are much more efficient than the client polling
+over and over: polling wastes resources sending requests even when nothing
+changed, while SSE only sends data when there's actually something new —
+and it does all this over plain HTTP, no special infrastructure (like
+WebSockets) required.

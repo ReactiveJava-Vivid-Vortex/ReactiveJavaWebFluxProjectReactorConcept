@@ -2,36 +2,36 @@
 
 ## In Simple Terms
 
-**Non-blocking I/O** means: when your thread asks for data, it does **not** wait. It
-either gets told "no data yet, come back later" immediately, or it registers interest
-in that I/O source and moves on to do other work. When the data finally becomes
-available, the thread (or a different one) is notified and processes it.
+**Non-blocking I/O** means: when your thread asks for data, it does **not** just
+sit there. It either gets told "not ready yet, I'll let you know," or it moves on
+right away and gets notified later when the data finally shows up.
 
-This lets a **single thread** effectively juggle thousands of in-flight I/O
-operations, because it's never frozen waiting on any one of them.
+This means **one single thread** can juggle thousands of ongoing requests at
+once, because it's never frozen waiting on any one of them.
 
 ## Simple Example
 
 ```java
-// Conceptual illustration (real NIO code is more verbose)
+// Conceptual illustration (real NIO code looks more verbose)
 Channel channel = openNonBlockingChannel("example.com", 80);
 
 channel.onDataAvailable(data -> {
-    // This runs LATER, only when data has actually arrived
+    // This runs LATER, only once data has actually arrived
     System.out.println("Got data: " + data);
 });
 
 System.out.println("Registered interest, moving on immediately!");
-// This thread is now free to service other channels/requests
+// This thread is free to go help with other requests now
 ```
 
-Under the hood, the OS gives you a mechanism (like `epoll` on Linux, or `kqueue` on
-macOS) that lets one thread ask: "of these 10,000 sockets I'm watching, which ones
-have new data right now?" — instead of checking (or blocking on) each one individually.
+Under the hood, the operating system gives you a trick (called `epoll` on Linux,
+`kqueue` on macOS) where one thread can ask: "of these 10,000 open connections,
+which ones actually have new data right now?" — instead of checking (or freezing
+on) each one individually.
 
 ## Why It Matters for Reactive Programming
 
-Non-blocking I/O is the *technical mechanism* that makes reactive programming
-possible at scale. Project Reactor and Spring WebFlux are built on top of non-blocking
-I/O (via Netty), which is why a WebFlux app can serve tens of thousands of concurrent
-connections using only a handful of threads.
+Non-blocking I/O is the actual engine that makes reactive programming work at
+scale. Project Reactor and Spring WebFlux run on top of it (via Netty), which is
+why a WebFlux app can handle tens of thousands of connections using just a
+handful of threads.

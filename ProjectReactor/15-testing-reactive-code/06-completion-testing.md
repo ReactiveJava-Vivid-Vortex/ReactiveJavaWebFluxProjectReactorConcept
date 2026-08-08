@@ -2,13 +2,14 @@
 
 ## In Simple Terms
 
-Verifying how a stream **ends** — successfully (`onComplete`), with an error
-(`onError`), or via cancellation — is just as important as verifying its emitted
-values. `StepVerifier` provides distinct terminal assertions for each case.
+Checking *how* a stream ends — cleanly, with an error, or by being
+cancelled — matters just as much as checking what values it produced along
+the way. `StepVerifier` gives you a separate assertion for each of those
+endings.
 
 ## Simple Example
 
-Verifying successful completion:
+Checking a clean finish:
 
 ```java
 @Test
@@ -21,8 +22,8 @@ void testCompletion() {
 }
 ```
 
-Verifying the stream does NOT complete within a time budget (e.g., testing an
-infinite stream is correctly bounded elsewhere):
+Checking that a stream deliberately does *not* finish within a time budget
+(useful for confirming an infinite stream really is unbounded elsewhere):
 
 ```java
 @Test
@@ -37,7 +38,7 @@ void testTimeout() {
 }
 ```
 
-Verifying cancellation behavior:
+Checking cancellation behavior:
 
 ```java
 @Test
@@ -53,7 +54,7 @@ void testCancellation() {
 
 ## Why It Matters
 
-Explicitly asserting *how* a stream terminates catches subtle bugs — like a pipeline
-that should complete but instead hangs indefinitely, or one that's supposed to
-error but silently completes instead — issues that a test only checking emitted
-values (and ignoring the terminal signal) would completely miss.
+Explicitly checking how a stream ends catches subtle bugs that a test only
+looking at emitted values would completely miss — like a pipeline that
+should finish but instead hangs forever, or one that's supposed to error
+out but silently completes as if nothing went wrong.

@@ -2,9 +2,10 @@
 
 ## In Simple Terms
 
-`.groupBy(keySelector)` splits a `Flux` into multiple sub-streams (`GroupedFlux`),
-one per distinct key — similar to SQL's `GROUP BY`. Each `GroupedFlux` carries its
-key (accessible via `.key()`) and contains only the items belonging to that group.
+`.groupBy()` sorts a stream into separate sub-streams based on a key you
+give it — much like SQL's `GROUP BY`, or sorting mail into different
+mailboxes by recipient. Each sub-stream (a `GroupedFlux`) knows its own key
+and only contains the items that belong to that group.
 
 ## Simple Example
 
@@ -36,13 +37,13 @@ orderFlux
     .subscribe(System.out::println);
 ```
 
-**Important gotcha:** each `GroupedFlux` must be subscribed to (usually via
-`.flatMap()`) — if you ignore a group without consuming it, its buffered items can
-build up in memory, since nothing is requesting/draining them.
+**Watch out for this:** every `GroupedFlux` needs to actually be subscribed
+to (usually through `.flatMap()`) — if you ignore a group without draining
+it, its items just pile up in memory, since nothing is asking for them.
 
 ## Why It Matters
 
-`.groupBy()` is essential for stream-partitioning use cases — e.g., grouping Kafka
-messages by customer ID for per-customer processing, or splitting a log stream by
-severity level for different downstream handling — all done reactively, without
-manually maintaining a `Map<Key, List<T>>`.
+`.groupBy()` is essential for splitting up a stream by category — grouping
+Kafka messages by customer for per-customer handling, or splitting a log
+stream by severity level for different processing — all done reactively,
+without you having to hand-manage a `Map<Key, List<T>>` yourself.

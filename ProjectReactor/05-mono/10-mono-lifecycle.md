@@ -2,8 +2,9 @@
 
 ## In Simple Terms
 
-A `Mono<T>` represents **0 or 1** asynchronous value. Its lifecycle follows the same
-Reactive Streams signals as any publisher, but constrained to at most one item:
+A `Mono<T>` represents **0 or 1** value that will arrive eventually. It follows
+the same signal rules as any publisher, just with a tighter limit — at most one
+item, ever:
 
 ```
 onSubscribe()
@@ -16,7 +17,8 @@ onSubscribe()
   -> onError(throwable) [instead of onNext + onComplete]
 ```
 
-There are exactly **three possible outcomes** for any `Mono`:
+There are exactly **three possible outcomes** for any `Mono` — nothing else can
+happen:
 
 1. **Success with a value**: `onNext(value)` then `onComplete()`.
 2. **Success with no value (empty)**: just `onComplete()`, no `onNext()`.
@@ -53,13 +55,10 @@ Mono.error(new RuntimeException("failed")).subscribe(
 
 ## Why It Matters
 
-Knowing there are exactly these three, mutually-exclusive outcomes makes writing
-`StepVerifier` tests and reasoning about `Mono`-returning methods much simpler — you
-always know a `Mono` will settle into exactly one of these three states, never a
-mixture.
+Knowing there are exactly these three outcomes — and never a mix of them —
+makes writing `StepVerifier` tests and reasoning about `Mono`-returning methods
+much easier.
 
-**This isn't a Mono-specific rule** — it's the universal Reactive Streams signal
-grammar (`onSubscribe onNext* (onError | onComplete)?`) applied with one extra
-constraint: `onNext` is capped at *at most once*. A `Flux` allows unlimited
-`onNext` calls; a `Mono` allows 0 or 1. Same three signals, same terminal rules,
-just a different cap. See [[the-three-signal-types]] for the full picture.
+**This isn't just a Mono thing** — it's the same universal rule every reactive
+stream follows, just with `onNext` capped at one instead of unlimited. See
+[[the-three-signal-types]] for the full picture.

@@ -2,11 +2,12 @@
 
 ## In Simple Terms
 
-Custom exceptions are your own exception classes representing specific,
-meaningful failure conditions in your domain (e.g., `ProductNotFoundException`,
-`InsufficientStockException`) — rather than relying on generic exceptions like
-`RuntimeException`. They make error handling in your reactive pipelines (and in
-`@ControllerAdvice`) far more precise and readable.
+Custom exceptions are your own exception classes for specific, meaningful
+failures in your app — `ProductNotFoundException`,
+`InsufficientStockException` — instead of leaning on generic ones like
+`RuntimeException`. They make error handling (both `onErrorResume()` calls
+and centralized `@ControllerAdvice` handlers) much clearer and more
+precise.
 
 ## Simple Example
 
@@ -44,7 +45,7 @@ public Mono<ProductDto> getProduct(String id) {
 
 ## Why It Matters
 
-Custom exceptions give your error-handling code (both `onErrorResume()` calls and
-centralized `@ControllerAdvice` handlers) something specific and meaningful to match
-against — instead of parsing generic exception messages, you can branch on exact
-exception types, each mapped to the correct HTTP status and error response.
+Custom exceptions give your error-handling code something specific and
+meaningful to check against — instead of parsing generic error messages,
+you can branch on exact exception types, each mapped to the right HTTP
+status and response.

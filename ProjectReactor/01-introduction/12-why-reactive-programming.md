@@ -2,43 +2,44 @@
 
 ## In Simple Terms
 
-Reactive programming exists to solve one specific problem: **traditional blocking,
-thread-per-request applications don't scale well when there is a lot of waiting on
-I/O** (databases, external APIs, file systems). Every waiting thread costs memory and
-adds scheduling overhead, even though it's doing zero useful work.
+Reactive programming exists to fix one specific problem: **regular
+one-thread-per-request apps don't scale well when there's a lot of waiting on
+slow things** — databases, other services, files. Every thread that's just
+sitting around waiting still costs memory and management overhead, even though
+it's doing zero real work.
 
-Reactive programming flips the model: instead of a thread pulling data and waiting,
-your code **declares a pipeline** of what should happen when data becomes available,
-errors occur, or the stream completes — and the underlying engine (Project Reactor)
-drives that pipeline using a small, efficient set of threads, only doing work when
+Reactive programming flips this around. Instead of a thread grabbing data and
+waiting for it, your code describes a **pipeline**: what should happen when data
+shows up, when something fails, or when it's all done. Project Reactor then runs
+that pipeline using a small, efficient group of threads — only doing work when
 there's actually something to do.
 
 ## Simple Example
 
-Blocking approach (each request ties up a thread for the full duration):
+The old way — each request holds its thread hostage the whole time:
 
 ```java
 @GetMapping("/user/{id}")
 public User getUser(@PathVariable String id) {
-    return userRepository.findById(id); // thread blocks until the DB responds
+    return userRepository.findById(id); // thread waits here until the DB replies
 }
 ```
 
-Reactive approach (thread is released immediately; work resumes on data arrival):
+The reactive way — the thread is freed up right away:
 
 ```java
 @GetMapping("/user/{id}")
 public Mono<User> getUser(@PathVariable String id) {
-    return userRepository.findById(id); // returns immediately; no thread is blocked
+    return userRepository.findById(id); // returns instantly; no thread sits waiting
 }
 ```
 
-In the reactive version, while waiting for the database, the thread that started the
-request is free to handle other incoming requests. When the DB responds, whichever
-available thread is free continues the pipeline.
+In the reactive version, while the database is working, that thread goes and
+helps another request. Whenever the database answers, any free thread picks the
+work back up.
 
 ## Why It Matters
 
-With reactive programming, a small server (say, 8 threads) can comfortably serve tens
-of thousands of concurrent slow I/O-bound requests — something that would require
-tens of thousands of threads (and gigabytes of extra RAM) in the blocking model.
+With reactive programming, a small server — even just 8 threads — can comfortably
+handle tens of thousands of slow, concurrent requests. Doing the same thing the
+old way would need tens of thousands of threads and gigabytes of extra memory.

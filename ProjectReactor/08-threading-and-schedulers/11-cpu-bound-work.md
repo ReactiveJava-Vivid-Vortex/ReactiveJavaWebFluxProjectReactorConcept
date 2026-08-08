@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-**CPU-bound** work is any computation that keeps the processor busy the entire time
-— math-heavy calculations, encryption/hashing, image resizing, sorting large
-datasets. Unlike I/O, there's no "waiting" involved; the CPU is doing real work
-continuously.
+CPU-bound work is anything that keeps the processor genuinely busy the
+whole time — heavy math, encryption, hashing, resizing images, sorting big
+piles of data. There's no waiting involved here — unlike I/O, the CPU is
+actually grinding away nonstop.
 
 ## Simple Example
 
@@ -29,9 +29,10 @@ Flux.range(1, 8)
 
 ## Why It Matters
 
-Reactive programming's main benefit (avoiding wasted threads while waiting on I/O)
-does **not** apply to CPU-bound work — a CPU-heavy task takes the same amount of
-processor time whether written reactively or synchronously. For CPU-bound work, the
-goal instead is to correctly parallelize across available cores using
-`Schedulers.parallel()`, without over-subscribing more threads than there are actual
-cores to run them on.
+Reactive programming's biggest superpower — not wasting threads while
+they're waiting on something — doesn't really apply here. A CPU-heavy task
+takes the same amount of processor time whether you write it reactively or
+the plain old way. For CPU-bound work, the goal instead is just spreading
+it correctly across the cores you actually have, using
+`Schedulers.parallel()`, without piling on more threads than there are
+cores to run them.

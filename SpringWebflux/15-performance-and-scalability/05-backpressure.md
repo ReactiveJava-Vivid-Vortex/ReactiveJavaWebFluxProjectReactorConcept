@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-In the context of WebFlux performance, backpressure ensures that streaming
-endpoints (large downloads, NDJSON exports) never overwhelm slow clients or
-overload server memory — the underlying Reactive Streams machinery (Netty +
-Project Reactor) automatically paces data production to match what the client can
-actually consume.
+For WebFlux performance, backpressure makes sure streaming endpoints
+(large downloads, NDJSON exports) never overwhelm a slow client or flood
+server memory — the underlying Reactive Streams machinery (Netty + Project
+Reactor) automatically paces how fast data gets produced to match what the
+client can actually handle.
 
 ## Simple Example
 
@@ -21,15 +21,15 @@ public Flux<ProductDto> exportProducts() {
 }
 ```
 
-You rarely need to configure backpressure explicitly for typical WebFlux endpoints
-— it's handled transparently by the underlying Reactive Streams implementation, as
-long as your entire pipeline (repository, mapping, response writing) stays reactive
-and doesn't introduce an unbounded buffering point (like an accidental
-`.collectList()` on a huge stream).
+You rarely have to configure backpressure yourself for typical WebFlux
+endpoints — it's handled transparently by the underlying Reactive Streams
+setup, as long as your whole pipeline (repository, mapping, response
+writing) stays reactive and doesn't sneak in an unbounded buffering point
+(like an accidental `.collectList()` on a huge stream).
 
 ## Why It Matters
 
-Backpressure is what allows WebFlux to safely stream very large or slow-to-produce
-datasets to clients with varying network speeds, without risking server memory
-exhaustion — a performance and reliability guarantee that a naive
-"buffer everything, then send" approach could never provide at scale.
+Backpressure is what lets WebFlux safely stream very large or
+slow-to-produce datasets to clients with all kinds of network speeds,
+without risking server memory running out — a guarantee a naive "buffer
+everything, then send" approach could never give you at scale.

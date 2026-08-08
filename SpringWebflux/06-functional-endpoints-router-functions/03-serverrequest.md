@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`ServerRequest` represents the incoming HTTP request in the functional WebFlux
-model — giving you access to path variables, query parameters, headers, and the
-request body, all through explicit method calls rather than annotation-driven
-injection (`@PathVariable`, `@RequestParam`, etc.).
+`ServerRequest` represents the incoming HTTP request in the functional
+WebFlux model — giving you access to path variables, query parameters,
+headers, and the request body, all through direct method calls instead of
+annotation-driven injection (`@PathVariable`, `@RequestParam`, etc.).
 
 ## Simple Example
 
@@ -24,7 +24,7 @@ public Mono<ServerResponse> handleRequest(ServerRequest request) {
 
 ## Why It Matters
 
-`ServerRequest`'s explicit, method-call-based access to request data (rather than
-annotation injection) makes handler functions straightforward to unit test — you can
-construct a mock `ServerRequest` directly in a test and call your handler method with
-it, without needing a full Spring MVC test context.
+Getting request data through direct method calls (instead of annotation
+injection) makes handler functions easy to unit test — you can build a mock
+`ServerRequest` right in a test and call your handler with it, without
+needing a full Spring MVC test context.

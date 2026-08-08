@@ -2,15 +2,15 @@
 
 ## In Simple Terms
 
-"Scalability" is a system's ability to handle increasing load (more users, more
-requests) without a proportional increase in resources (CPU, memory, threads).
-Reactive programming primarily improves **vertical scalability** — squeezing more
-concurrent capacity out of the same hardware — by minimizing wasted threads during
-I/O waits.
+"Scalability" is how well a system handles more load — more users, more
+requests — without needing a proportional pile of extra resources (CPU,
+memory, threads). Reactive programming mostly helps by squeezing more
+capacity out of the same hardware, by wasting far fewer threads while
+waiting on slow I/O.
 
 ## Simple Example
 
-Rough illustrative comparison for an I/O-heavy workload:
+Rough, illustrative comparison for an I/O-heavy workload:
 
 ```
 Blocking (thread-per-request):
@@ -24,8 +24,8 @@ Reactive (non-blocking):
 
 ## Why It Matters
 
-Scalability gains from reactive programming are most dramatic for **I/O-bound,
-high-concurrency** workloads (many slow external calls, lots of simultaneous
-clients) — that's precisely the profile of most modern microservices and public
-APIs, which is why reactive frameworks like Spring WebFlux have become popular for
-exactly these kinds of systems.
+The scalability gains from reactive programming really show up in
+I/O-heavy, high-concurrency workloads — lots of slow external calls, lots
+of clients connected at once. That's exactly the shape of most modern
+microservices and public APIs, which is why frameworks like Spring WebFlux
+took off for these kinds of systems in the first place.

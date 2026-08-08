@@ -2,8 +2,8 @@
 
 ## In Simple Terms
 
-Testing a `Mono` with `StepVerifier` follows the same three possible outcomes a
-`Mono` can have: a value, empty, or an error — your test asserts which one occurred.
+Testing a `Mono` with `StepVerifier` just means checking which of its three
+possible outcomes actually happened: a value, nothing at all, or an error.
 
 ## Simple Example
 
@@ -50,7 +50,7 @@ void testMonoError() {
 
 ## Why It Matters
 
-Explicitly testing all three possible `Mono` outcomes (value, empty, error) ensures
-your service methods behave correctly in every scenario — not just the "happy path"
-— catching regressions where, say, an empty case accidentally starts throwing an
-exception, or vice versa.
+Testing all three possible outcomes — not just the happy path — makes sure
+your service methods behave correctly no matter what happens. It's how you
+catch bugs like an empty case that accidentally starts throwing an
+exception, or the other way around.

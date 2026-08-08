@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-A `PUT` request via `WebClient` updates an existing remote resource, following the
-same fluent API pattern as GET/POST, just with a different HTTP method and typically
-a request body containing the updated data.
+A PUT request through `WebClient` updates a resource on another service,
+following the same fluent style as GET/POST — just a different HTTP
+method, usually with a body containing the updated data.
 
 ## Simple Example
 
@@ -19,7 +19,7 @@ public Mono<UserDto> updateUser(String id, UpdateUserRequest request) {
 }
 ```
 
-Handling a potential `404 Not Found` from the remote service explicitly:
+Handling a possible `404 Not Found` from the other service explicitly:
 
 ```java
 public Mono<UserDto> updateUser(String id, UpdateUserRequest request) {
@@ -36,7 +36,7 @@ public Mono<UserDto> updateUser(String id, UpdateUserRequest request) {
 
 ## Why It Matters
 
-Consistent use of `WebClient`'s fluent API across all HTTP methods (GET, POST, PUT,
-DELETE) keeps your inter-service communication code uniform and predictable — the
-same patterns for building the request, handling errors, and extracting the response
-body apply regardless of which HTTP verb you're using.
+Using `WebClient`'s fluent style consistently across GET, POST, PUT, and
+DELETE keeps your inter-service calls uniform and predictable — the same
+patterns for building a request, handling errors, and pulling out the
+response apply no matter which HTTP verb you're using.

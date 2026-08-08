@@ -2,13 +2,13 @@
 
 ## In Simple Terms
 
-**Blocking I/O**: when your code asks for data (a database row, a file, a network
-response), the calling thread **freezes** until the data is ready — it can do
-nothing else in the meantime.
+**Blocking I/O**: your code asks for some data (a database row, a file, a
+network response), and the thread that asked just freezes right there until
+the data shows up — it can't do anything else in the meantime.
 
-**Non-blocking I/O**: the calling thread asks for data and immediately moves on to
-other work. When the data becomes available, it's delivered via a callback/event,
-without the thread ever having to sit idle waiting.
+**Non-blocking I/O**: the thread asks for data and immediately moves on to
+other work. When the data's finally ready, it gets handed over through a
+callback or event — the thread never had to just sit there waiting.
 
 ## Simple Example
 
@@ -21,14 +21,15 @@ User user = jdbcTemplate.queryForObject(sql, User.class); // FREEZES here
 Mono<User> userMono = r2dbcTemplate.selectOne(query, User.class); // no freeze
 ```
 
-Analogy: a blocking waiter takes an order and stands at the kitchen window until food
-is ready before serving anyone else. A non-blocking waiter takes the order, moves on
-to other tables immediately, and comes back to deliver food only once it's actually
-ready (having been notified).
+Think of it like two waiters: a blocking waiter takes an order and stands
+at the kitchen window until the food's ready before serving anyone else. A
+non-blocking waiter takes the order, immediately moves on to other tables,
+and only comes back to deliver the food once it's actually ready (someone
+lets them know).
 
 ## Why It Matters
 
-Spring WebFlux is built entirely around non-blocking I/O (via Netty). This is what
-allows it to handle a huge number of concurrent connections using only a small
-number of threads — every thread is always doing productive work, never frozen
-waiting on a specific piece of I/O to complete.
+Spring WebFlux is built entirely around non-blocking I/O (through Netty).
+That's exactly what lets it handle a huge number of connections at once
+using only a handful of threads — every thread stays busy doing real work,
+never frozen waiting on one specific piece of I/O.

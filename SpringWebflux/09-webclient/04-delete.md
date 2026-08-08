@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-A `DELETE` request via `WebClient` removes a resource on a remote service. Since
-there's usually no meaningful response body, the result is typically a
-`Mono<Void>`.
+A DELETE request through `WebClient` removes a resource on another
+service. Since there's usually nothing meaningful to send back, the result
+is typically a `Mono<Void>`.
 
 ## Simple Example
 
@@ -17,7 +17,7 @@ public Mono<Void> deleteUser(String id) {
 }
 ```
 
-Handling the response status explicitly, without needing a body:
+Checking the response status explicitly, without needing a body:
 
 ```java
 public Mono<Void> deleteUser(String id) {
@@ -31,7 +31,7 @@ public Mono<Void> deleteUser(String id) {
 
 ## Why It Matters
 
-Correctly modeling a DELETE call's result as `Mono<Void>` (rather than trying to
-parse a body that doesn't exist) keeps your service layer's method signatures
-accurate and prevents runtime errors from attempting to deserialize an empty
-response body.
+Correctly treating a DELETE call's result as `Mono<Void>` (instead of
+trying to parse a body that doesn't exist) keeps your service method
+signatures accurate and avoids runtime errors from trying to deserialize
+an empty response.

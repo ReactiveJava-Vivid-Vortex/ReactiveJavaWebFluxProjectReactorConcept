@@ -2,9 +2,10 @@
 
 ## In Simple Terms
 
-Beyond simple request/response calls, microservices can stream data to each other
-continuously — one service producing a `Flux` that another consumes in real time,
-using WebClient to consume an NDJSON or SSE stream from an upstream service.
+Beyond simple request/response calls, microservices can stream data to
+each other continuously — one service producing a `Flux` that another
+consumes in real time, using `WebClient` to read an NDJSON or SSE stream
+from an upstream service.
 
 ## Simple Example
 
@@ -17,7 +18,7 @@ public Flux<InventoryUpdate> streamInventoryUpdates() {
 }
 ```
 
-Consumer service — consuming that stream reactively via WebClient:
+Consumer service — reading that stream reactively via `WebClient`:
 
 ```java
 public Flux<InventoryUpdate> subscribeToInventoryUpdates() {
@@ -31,13 +32,13 @@ public Flux<InventoryUpdate> subscribeToInventoryUpdates() {
 }
 ```
 
-This lets one service maintain an up-to-date local view of another service's state,
-continuously, without needing to poll repeatedly.
+This lets one service keep an always-up-to-date local view of another
+service's state, continuously, without repeatedly polling for it.
 
 ## Why It Matters
 
-Streaming between microservices (rather than repeated request/response polling)
-reduces latency for propagating changes and cuts down on unnecessary network
-traffic — an increasingly common pattern for keeping distributed caches, search
-indexes, or read-replicas synchronized with a source-of-truth service in near
-real time.
+Streaming between microservices (rather than polling with repeated
+request/response calls) cuts latency for propagating changes and reduces
+unnecessary network traffic — an increasingly common way to keep
+distributed caches, search indexes, or read-replicas in sync with a
+source-of-truth service close to real time.

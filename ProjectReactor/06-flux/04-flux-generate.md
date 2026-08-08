@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-`Flux.generate()` lets you programmatically produce items **one at a time,
-synchronously**, in direct response to demand. You're given a `SynchronousSink` and
-must call `sink.next(value)` at most once per invocation (or `sink.complete()` /
-`sink.error()` to end the stream). It's ideal for generating sequences based on
-some internal state (like a counter, or the previous value).
+`Flux.generate()` lets you produce items **one at a time**, only when there's
+demand for the next one. You get a `SynchronousSink` and call `sink.next(value)`
+once per call (or `sink.complete()`/`sink.error()` to end things). It's great for
+sequences that depend on some running state, like a counter or the previous
+value.
 
 ## Simple Example
 
@@ -26,14 +26,13 @@ fibonacci.take(8).subscribe(n -> System.out.print(n + " "));
 // Output: 0 1 1 2 3 5 8 13
 ```
 
-Notice `.take(8)` is required — `Flux.generate()` can produce infinitely, so you must
-limit it explicitly (or call `sink.complete()` yourself inside the generator function
-when done).
+Note the `.take(8)` — without it, `Flux.generate()` could keep going forever, so
+you have to limit it yourself (or call `sink.complete()` inside the generator
+once you're done).
 
 ## Why It Matters
 
-`Flux.generate()` is inherently **demand-aware** — it only computes the next value
-when there's demand for it, making it naturally backpressure-friendly, unlike
-manually looping and pushing values with `Flux.create()`. It's the right tool when
-your data source is a simple, single-threaded, stateful computation (like a
-mathematical sequence or a step-by-step algorithm).
+`Flux.generate()` naturally respects demand — it only computes the next value
+when something's actually asking for it, so it's automatically safe from
+backpressure problems, unlike manually pushing values with `Flux.create()`. Use
+it whenever your source is a simple, one-thread-at-a-time, stateful sequence.

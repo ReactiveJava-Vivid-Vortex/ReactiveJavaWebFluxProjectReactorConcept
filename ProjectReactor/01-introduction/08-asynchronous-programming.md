@@ -2,12 +2,13 @@
 
 ## In Simple Terms
 
-**Asynchronous** code kicks off an operation and **does not wait** for it to finish.
-Instead, it moves on immediately, and the result (or error) is delivered later —
-usually via a callback, a `Future`, or (in reactive programming) a stream of events.
+**Asynchronous** code starts a task and then **doesn't wait around** for it. It
+just moves on, and whenever the result (or an error) is ready, it gets delivered
+later — usually through a callback, a `Future`, or, in reactive code, a stream of
+events.
 
-The key shift in thinking: "call me back when you're done" instead of "I'll wait
-right here until you're done."
+The mental shift is: instead of "I'll wait right here until you're done," it
+becomes "call me back whenever you're done."
 
 ## Simple Example
 
@@ -17,7 +18,7 @@ public class AsyncDemo {
         System.out.println("Step 1: Requesting user...");
 
         fetchUserAsync(userId, user -> {
-            // this callback runs LATER, whenever the data is ready
+            // this runs LATER, whenever the data actually shows up
             System.out.println("Got user: " + user.getName());
         });
 
@@ -26,12 +27,13 @@ public class AsyncDemo {
 }
 ```
 
-Notice "Step 2" prints **before** the user is fetched — the main thread never stopped
-to wait. It's free to do other work while the fetch happens in the background.
+Notice "Step 2" prints **before** the user has even been fetched — the main
+thread never stopped to wait. It's free to keep working while the fetch happens
+in the background.
 
 ## Why It Matters for Reactive Programming
 
-Asynchronous programming is the foundation reactive programming builds on. But plain
-async callbacks get messy fast when you need to chain many steps ("callback hell").
-Project Reactor's `Mono`/`Flux` give you a clean, composable way to write
-asynchronous, non-blocking pipelines without nesting callbacks endlessly.
+Asynchronous programming is the foundation everything else here is built on. But
+plain callbacks get messy fast once you chain several steps together (people call
+this "callback hell"). `Mono`/`Flux` in Project Reactor give you a clean way to
+write async, non-blocking code without nesting callback after callback.

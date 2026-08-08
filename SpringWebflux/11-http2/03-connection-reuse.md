@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-"Connection reuse" means using the same established TCP connection for multiple
-requests/responses over time, instead of opening a new connection for every single
-request. HTTP/2's multiplexing takes this further than HTTP/1.1's "keep-alive" —
-allowing many *concurrent* requests over one reused connection, not just sequential
-ones.
+"Connection reuse" means using the same already-open TCP connection for
+several requests over time, instead of opening a fresh one every time.
+HTTP/2's multiplexing takes this a step further than HTTP/1.1's
+"keep-alive" — it lets many requests run over one reused connection *at
+the same time*, not just one after another.
 
 ## Simple Example
 
@@ -20,8 +20,8 @@ HTTP/2 (concurrent reuse via multiplexing):
   Request A, Request B sent together -> Response A, Response B interleaved
 ```
 
-Configuring `WebClient` to reuse connections efficiently via connection pooling
-(covered in depth in [[http-connection-pooling]]):
+Setting up `WebClient` to reuse connections efficiently through connection
+pooling (covered in depth in [[http-connection-pooling]]):
 
 ```java
 ConnectionProvider provider = ConnectionProvider.builder("custom")
@@ -35,8 +35,8 @@ WebClient webClient = WebClient.builder()
 
 ## Why It Matters
 
-Efficient connection reuse (especially combined with HTTP/2 multiplexing)
-dramatically reduces the overhead of establishing new TCP/TLS connections
-(handshakes are relatively expensive) — critical for high-throughput
-service-to-service communication where the same downstream services are called
-repeatedly.
+Reusing connections efficiently — especially combined with HTTP/2's
+multiplexing — cuts down a lot of the cost of opening new TCP/TLS
+connections (handshakes aren't cheap) — important for high-throughput
+service-to-service calls where you're repeatedly hitting the same
+downstream services.

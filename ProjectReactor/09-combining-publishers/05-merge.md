@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`Flux.merge(source1, source2, ...)` combines multiple publishers **concurrently** —
-it subscribes to all sources at once, and emits items from whichever source produces
-them first. Unlike `concat()`, the order of items **interleaves** based on timing,
-not on source order.
+`Flux.merge()` starts several streams at the same time and just lets
+whichever one produces something first come through first — order isn't
+guaranteed, it's whoever's fastest. Think of merging lanes on a highway:
+cars go through in whatever order they actually arrive, not necessarily the
+order they entered.
 
 ## Simple Example
 
@@ -35,6 +36,6 @@ Got: B2
 
 ## Why It Matters
 
-`.merge()` is ideal when you have multiple independent sources (e.g., calling several
-downstream microservices) and you don't care about the order results arrive in —
-just that you get them all as fast as possible, combining whichever finishes first.
+`.merge()` is great when you've got several independent sources — like
+calling a handful of microservices — and you don't care what order the
+results show up in, you just want everything back as fast as possible.

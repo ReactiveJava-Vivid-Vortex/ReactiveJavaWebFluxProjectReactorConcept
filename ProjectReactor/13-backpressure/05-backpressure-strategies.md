@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-Beyond raw overflow strategies on `Flux.create()`, Project Reactor provides dedicated
-operators to apply backpressure-related behavior directly within a pipeline, letting
-you decide how to react when a downstream consumer can't keep up.
+Beyond the raw overflow strategies you set on `Flux.create()`, Reactor also
+gives you dedicated operators you can drop right into a pipeline to decide
+what happens when a consumer just can't keep up.
 
 ## Simple Example
 
@@ -41,7 +41,8 @@ Flux.range(1, 1000)
 
 ## Why It Matters
 
-Picking the right backpressure strategy is a real architectural decision tied to your
-data's semantics — losing a stale sensor reading is fine, but silently dropping a
-financial transaction is not. Reactor gives you explicit tools to make that trade-off
-deliberately, rather than by accident.
+Picking the right strategy is a real design call tied to what your data
+actually means — losing a stale sensor reading is no big deal, but silently
+dropping a financial transaction absolutely is. Reactor gives you clear
+tools to make that trade-off on purpose, instead of it happening to you by
+accident.

@@ -2,11 +2,10 @@
 
 ## In Simple Terms
 
-`Flux.push()` is very similar to `Flux.create()` — it gives you a `FluxSink` to
-manually emit items — but it's designed for the case where **only a single producer
-thread** will ever call `sink.next()` at a time (not multiple concurrent threads).
-Because it doesn't need to handle multi-threaded producer synchronization, it can be
-slightly more efficient than `Flux.create()` in that specific scenario.
+`Flux.push()` is basically `Flux.create()`'s sibling — it also gives you a
+`FluxSink` to push items into — but it assumes **only one thread** will ever call
+`sink.next()` at a time. Since it doesn't need to guard against multiple threads
+stepping on each other, it can be a bit more efficient in that specific case.
 
 ## Simple Example
 
@@ -34,8 +33,7 @@ flux.subscribe(value -> System.out.println("Got: " + value));
 
 ## Why It Matters
 
-Choosing `push()` over `create()` when you genuinely have a single-threaded producer
-avoids unnecessary internal synchronization overhead. If you're unsure whether
-multiple threads could call the sink concurrently, it's safer to default to
-`Flux.create()`, since using `push()` incorrectly with multiple threads can lead to
-subtle, hard-to-reproduce bugs.
+Picking `push()` when you truly only have one producer thread avoids some
+unnecessary internal overhead. If you're not sure whether multiple threads might
+call the sink at once, play it safe and use `Flux.create()` instead — using
+`push()` incorrectly with multiple threads leads to subtle, annoying bugs.

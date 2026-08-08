@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-"Requesting elements" refers to the subscriber-side action of calling
-`subscription.request(n)` to say how many items it's ready to receive next. This is
-the core mechanic subscribers use to pace their own consumption, and it can happen
-multiple times throughout the life of a subscription (not just once at the start).
+"Requesting elements" just means the subscriber calling
+`subscription.request(n)` to say "I'm ready for `n` more." This is how a
+subscriber controls its own pace, and it can happen many times over the life of a
+subscription — not just once at the start.
 
 ## Simple Example
 
@@ -29,8 +29,8 @@ Flux.range(1, 10)
     });
 ```
 
-Output shows the subscriber pulling data in controlled batches of 3, rather than all
-10 items being pushed at once:
+Notice this pulls data in controlled batches of 3, instead of getting all 10
+items pushed at once:
 
 ```
 Requesting first batch of 3
@@ -47,7 +47,7 @@ Requesting next batch of 3
 
 ## Why It Matters
 
-Requesting elements in controlled batches (instead of `Long.MAX_VALUE` all at once)
-is how you build **flow-controlled** consumers — useful when downstream processing
-(e.g., writing to a database, or calling a rate-limited API) is slower than the
-upstream can produce data.
+Requesting data in small, controlled batches — instead of just asking for
+`Long.MAX_VALUE` up front — is how you build a consumer that paces itself. This
+matters when whatever comes next (writing to a database, calling a rate-limited
+API) is slower than the source can produce data.

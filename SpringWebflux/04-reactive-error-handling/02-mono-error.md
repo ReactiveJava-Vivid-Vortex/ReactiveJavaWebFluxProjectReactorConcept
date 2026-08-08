@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`Mono.error(exception)` is how you signal a failure from within a reactive service
-method — the reactive equivalent of `throw`, but expressed as a returned value
-instead of an actual thrown exception, so it composes naturally with the rest of the
-chain.
+`Mono.error(exception)` is how you signal a failure from inside a reactive
+service method — the reactive version of `throw`, just expressed as a
+returned value instead of an actual thrown exception, so it fits naturally
+into the rest of the chain.
 
 ## Simple Example
 
@@ -21,13 +21,15 @@ public Mono<ProductDto> getProduct(String id) {
 }
 ```
 
-The error propagates all the way to whoever eventually subscribes — in a WebFlux
-app, that's the framework itself, which routes it to your `@ControllerAdvice` (or
-default error handling) to produce the appropriate HTTP response.
+The error travels all the way to whoever eventually subscribes — in a
+WebFlux app, that's the framework itself, which routes it to your
+`@ControllerAdvice` (or the default error handling) to build the right
+HTTP response.
 
 ## Why It Matters
 
-Using `Mono.error()` (rather than literally `throw`-ing inside a lambda, which can
-sometimes behave unexpectedly in reactive contexts depending on where it happens) is
-the idiomatic, reliable way to signal a failure from within a reactive method,
-ensuring it's properly captured as part of the `Mono`'s error channel.
+Using `Mono.error()` (rather than literally `throw`-ing inside a lambda,
+which can behave in surprising ways depending on where it happens in a
+reactive chain) is the reliable, idiomatic way to signal a failure from
+inside a reactive method, making sure it's properly captured as part of the
+`Mono`'s error channel.

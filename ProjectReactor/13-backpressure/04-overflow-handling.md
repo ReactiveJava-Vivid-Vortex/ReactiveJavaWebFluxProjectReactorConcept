@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-"Overflow" happens when a producer emits items faster than the consumer has
-requested, and there's nowhere safe to put the excess. Reactive Streams sources
-(especially manually created ones like `Flux.create()`) need an explicit
-**overflow strategy** to decide what to do in that situation.
+"Overflow" happens when a producer sends out more than the consumer asked
+for, and there's nowhere safe to put the excess — like a mailbox getting
+more letters than it can hold. Sources you build by hand (especially
+`Flux.create()`) need an explicit overflow strategy to decide what happens
+when that occurs.
 
 ## Simple Example
 
@@ -41,8 +42,9 @@ Available `OverflowStrategy` options:
 
 ## Why It Matters
 
-Choosing the right overflow strategy is a real design decision: `BUFFER` is safest
-for correctness but risks memory issues if truly unbounded; `LATEST`/`DROP` trade
-completeness for bounded memory (ideal for live data like sensor readings where only
-the newest value matters); `ERROR` surfaces the mismatch loudly instead of silently
-dropping data.
+Picking the right overflow strategy is a genuine design decision:
+`BUFFER` is the safest choice for correctness, but risks memory trouble if
+truly unbounded; `LATEST`/`DROP` trade completeness for keeping memory
+bounded (great for live data like sensor readings where only the newest
+value actually matters); `ERROR` makes the mismatch loud and obvious
+instead of quietly dropping data.

@@ -2,11 +2,10 @@
 
 ## In Simple Terms
 
-"Entity mapping" is the process of converting between your database `Entity`
-(annotated for R2DBC/persistence) and your API-facing `DTO`, in both directions —
-`Entity -> DTO` for responses, and `DTO -> Entity` for incoming create/update
-requests. In reactive code, this mapping happens inside `.map()` calls within your
-reactive pipeline.
+"Entity mapping" is just converting between your database `Entity` and
+your API-facing `DTO`, in both directions — `Entity -> DTO` for responses,
+and `DTO -> Entity` for incoming create/update requests. In reactive code,
+this conversion happens inside `.map()` calls right in your pipeline.
 
 ## Simple Example
 
@@ -46,7 +45,7 @@ public Mono<ProductDto> create(@RequestBody ProductDto dto) {
 
 ## Why It Matters
 
-Keeping entity-to-DTO mapping explicit and centralized (e.g., in a dedicated
-`Mapper` class) avoids scattering ad-hoc conversion logic throughout your
-controllers and services — making it easier to keep your API contract stable even as
-your internal entity structure evolves.
+Keeping entity-to-DTO conversion explicit and in one place (like a
+dedicated `Mapper` class) stops you from scattering ad-hoc conversion
+logic all over your controllers and services — making it much easier to
+keep your API stable even as your internal entities evolve.

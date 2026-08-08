@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-A custom `Subscriber` lets you precisely control how much data you request and when,
-by implementing all four callback methods yourself. This is more manual than using
-Reactor's `.subscribe(consumer)` shortcut, but it shows you exactly how demand and
-data flow are connected.
+Writing your own `Subscriber` lets you control exactly how much data you ask for
+and when, by implementing all four callback methods yourself. It's more work than
+Reactor's `.subscribe(consumer)` shortcut, but it makes it very clear how demand
+and data actually connect.
 
 ## Simple Example
 
@@ -46,7 +46,8 @@ Flux.range(1, 5).subscribe(new LoggingSubscriber());
 
 ## Why It Matters
 
-In Project Reactor, `BaseSubscriber<T>` is provided specifically so you don't need to
-implement the raw `Subscriber` interface yourself — it gives you sensible defaults and
-hooks (`hookOnSubscribe`, `hookOnNext`, etc.) while still letting you control demand
-manually when needed (e.g., for fine-grained backpressure in a slow consumer).
+Reactor gives you `BaseSubscriber<T>` so you almost never have to implement the
+raw `Subscriber` interface yourself. It comes with sensible defaults and handy
+hooks (`hookOnSubscribe`, `hookOnNext`, etc.), while still letting you control
+demand by hand when you need to — say, to slow things down for a struggling
+downstream consumer.

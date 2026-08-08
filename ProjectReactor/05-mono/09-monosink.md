@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`MonoSink<T>` is the object handed to you inside `Mono.create(sink -> ...)` — it's
-your "microphone" for manually emitting exactly one signal: a success value, an
-error, or nothing (empty). Once you call one of its methods, the `Mono` is done —
-further calls are ignored.
+`MonoSink<T>` is the object handed to you inside `Mono.create(sink -> ...)` —
+your "microphone" for manually announcing exactly one thing: a successful value,
+an error, or nothing. Once you use it, the `Mono` is done — anything you call
+after that is just ignored.
 
 ```java
 public interface MonoSink<T> {
@@ -30,7 +30,7 @@ Mono<String> mono = Mono.create(sink -> {
 });
 ```
 
-Handling potential errors as well:
+Handling errors too:
 
 ```java
 Mono<Integer> divideMono = Mono.create(sink -> {
@@ -45,8 +45,7 @@ Mono<Integer> divideMono = Mono.create(sink -> {
 
 ## Why It Matters
 
-Understanding `MonoSink`'s contract (call exactly one of `success()`, `success(T)`, or
-`error()`, exactly once) is essential when bridging non-reactive callback APIs into
-`Mono`. Calling it multiple times, or forgetting to call it entirely (e.g., a
-callback that's never invoked by the legacy library), leads to a `Mono` that either
-misbehaves or hangs forever.
+The rule to remember: call exactly one of `success()`, `success(value)`, or
+`error()` — exactly once. Call it twice, and the extras are ignored. Forget to
+call it at all (say, because a legacy callback never fires), and the `Mono` just
+hangs forever, waiting for something that will never come.

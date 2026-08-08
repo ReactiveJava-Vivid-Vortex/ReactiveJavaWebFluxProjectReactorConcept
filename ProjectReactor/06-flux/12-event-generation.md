@@ -2,10 +2,9 @@
 
 ## In Simple Terms
 
-"Event generation" refers to the pattern of producing a continuous or periodic
-sequence of application-level events (e.g., "new order created," "temperature
-updated," "price changed") as a `Flux`, so that any interested subscriber can react
-to them as they happen, in real time.
+"Event generation" just means producing a stream of application events — "new
+order created," "temperature updated," "price changed" — as a `Flux`, so anyone
+interested can react to them the moment they happen.
 
 ## Simple Example
 
@@ -32,12 +31,11 @@ publisher.publishOrderCreated("ORD-123");
 // Listener received: Order created: ORD-123
 ```
 
-(Note: `Sinks` — covered later — are the modern, recommended way to generate events
-manually rather than raw `Processor` implementations.)
+(`Sinks`, covered later in this course, are the modern, recommended way to
+generate events by hand — much simpler than the old raw `Processor` approach.)
 
 ## Why It Matters
 
-Event generation via `Flux` is the foundation for reactive features like live
-dashboards, Server-Sent Events (SSE), and internal pub/sub between components — any
-place where "something happened, and multiple parts of the system should react"
-applies.
+Event generation via `Flux` is the foundation for things like live dashboards,
+Server-Sent Events, and simple pub/sub between parts of your app — anywhere the
+pattern is "something happened, and multiple things should react to it."

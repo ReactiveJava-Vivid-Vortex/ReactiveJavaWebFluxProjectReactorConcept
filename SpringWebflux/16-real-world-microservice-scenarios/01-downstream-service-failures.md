@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-In a microservices architecture, any service you call over the network can fail —
-timeouts, 500 errors, connection refused. A resilient reactive service needs a
-deliberate strategy for each downstream call: what to do when it fails, so the
-failure doesn't cascade into your own service failing entirely.
+In a microservices setup, any service you call over the network can fail
+— timeouts, 500 errors, connection refused. A resilient service needs a
+real plan for each downstream call: what happens when it fails, so that
+failure doesn't ripple out and take your own service down with it.
 
 ## Simple Example
 
@@ -22,13 +22,14 @@ public Mono<ProductDetails> getProductDetails(String id) {
 }
 ```
 
-This pipeline: bounds the wait time, retries transient `503` errors with backoff, and
-converts any remaining failure into a clear, well-logged domain exception rather than
-letting a raw `WebClientResponseException` propagate uncontrolled.
+This pipeline puts a limit on the wait, retries brief `503` errors with a
+growing delay, and turns whatever's left into a clear, well-logged
+domain-specific error instead of letting a raw `WebClientResponseException`
+leak out uncontrolled.
 
 ## Why It Matters
 
-Explicitly handling downstream failures at every service-to-service call boundary is
-what prevents a single failing dependency from cascading into a full outage —
-exactly the "Resilient" trait from the Reactive Manifesto ([[resilient]]), applied
-concretely to real microservice communication.
+Explicitly handling failures at every service-to-service boundary is what
+stops one failing dependency from turning into a full outage — exactly the
+"Resilient" trait from the Reactive Manifesto ([[resilient]]), put into
+practice for real microservice communication.

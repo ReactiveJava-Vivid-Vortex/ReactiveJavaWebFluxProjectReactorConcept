@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-Establishing a new TCP (and TLS, if HTTPS) connection is relatively expensive — it
-involves a network round-trip handshake before any actual data can be sent.
-**Connection pooling** avoids this cost by keeping a set of already-established
-connections open and reusing them for subsequent requests to the same host, rather
-than tearing down and re-establishing a connection every time.
+Opening a new TCP (and TLS, for HTTPS) connection isn't free — it takes a
+network round-trip handshake before any actual data can flow. Connection
+pooling avoids paying that cost over and over by keeping a set of
+already-open connections around and reusing them for later requests to the
+same host, instead of tearing one down and building a new one every time.
 
 ## Simple Example
 
@@ -29,8 +29,8 @@ WebClient webClient = WebClient.builder()
 
 ## Why It Matters
 
-Without connection pooling, every single outgoing `WebClient` call would pay the
-full cost of a new TCP/TLS handshake — a significant, unnecessary overhead when
-making frequent calls to the same downstream service. Pooling amortizes that cost
-across many requests, which is essential for high-throughput service-to-service
-communication.
+Without connection pooling, every single outgoing `WebClient` call would
+pay the full price of a new TCP/TLS handshake — real, unnecessary overhead
+when you're calling the same downstream service often. Pooling spreads
+that cost across many requests, which really matters for high-throughput
+service-to-service communication.

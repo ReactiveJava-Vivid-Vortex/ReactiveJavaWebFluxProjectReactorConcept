@@ -1,27 +1,22 @@
-# Reactive Error Handling — Topic Overview
+# Q1. How Should Failures Turn Into HTTP Responses?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of a Hospital's Triage Desk, Not Every Doctor Deciding Alone)
 
-This topic applies Project Reactor's error-handling operators
-(`Mono.error()`, `switchIfEmpty()`) specifically to a Spring WebFlux application's
-needs: turning failures and "not found" results into clean, consistent, predictable
-HTTP responses — instead of leaking raw exceptions or ambiguous empty responses to
-API clients.
-
-The recommended flow: define **custom exceptions** for meaningful domain failures,
-signal them from your service layer with `Mono.error()`/`switchIfEmpty()`, and catch
-them **centrally** in a `@RestControllerAdvice`, which maps each exception type to
-the right HTTP status:
+Without central error handling, every controller method has to individually
+decide "what HTTP status should THIS failure produce?" — inconsistent, duplicated,
+error-prone. A **triage desk** (`@RestControllerAdvice`) instead looks at every
+incoming problem once, and routes it to the right response, consistently, no
+matter which "doctor" (controller) it came from.
 
 ```java
-// Service layer — signal a specific failure
+// Every controller just signals failure — doesn't decide the HTTP response itself
 public Mono<ProductDto> getProduct(String id) {
     return repository.findById(id)
         .switchIfEmpty(Mono.error(new ProductNotFoundException(id)))
         .map(ProductMapper::toDto);
 }
 
-// Centralized handler — every controller benefits automatically
+// ONE triage desk decides the response for every ProductNotFoundException, anywhere
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(ProductNotFoundException.class)
@@ -32,24 +27,90 @@ public class GlobalExceptionHandler {
 }
 ```
 
-The last piece is **response shape consistency** — whether you adopt the RFC
-standard `ProblemDetail` format or your own custom `ErrorResponse` record, every
-error your API returns should follow the *same* structure, so client applications
-can write one generic error-parsing routine instead of custom logic per endpoint.
+---
 
-## Quick Revision Cheat Sheet
+## Q2. Why Custom Exceptions Instead of Generic `RuntimeException`?
 
-| # | Concept | One-Line Summary |
-|---|---|---|
-| 1 | **Custom Exceptions** | Domain-specific exception classes (`ProductNotFoundException`) instead of generic `RuntimeException`. |
-| 2 | **Mono.error()** | The reactive way to signal failure from a service method — a returned value, not a thrown exception. |
-| 3 | **switchIfEmpty()** | Standard pattern to turn "nothing found" into an explicit error (or a fallback value). |
-| 4 | **Exception Factory** | A helper class centralizing exception creation/messages, avoiding duplicated `new SomeException(...)` calls. |
-| 5 | **Controller Advice** | `@RestControllerAdvice` + `@ExceptionHandler` — centralized, consistent exception → HTTP response mapping. |
-| 6 | **Problem Details (RFC 7807/9457)** | Spring's built-in `ProblemDetail` — a standardized JSON error format instead of an ad-hoc one. |
-| 7 | **Standardized error responses** | Whatever shape you pick, keep it consistent across your entire API surface. |
+```java
+public class ProductNotFoundException extends RuntimeException {
+    private final String productId;
+    public ProductNotFoundException(String id) {
+        super("Product not found: " + id);
+        this.productId = id;
+    }
+}
+```
 
-## How It All Fits Together
+Generic exceptions give your `@ControllerAdvice` nothing specific to match
+against. Named, domain-specific exceptions let each one map to exactly the right
+status code and message.
+
+---
+
+## Q3. `Mono.error()` and `switchIfEmpty()` — The Two Signaling Tools
+
+```java
+// Mono.error(): the reactive equivalent of "throw" — a returned VALUE, not a thrown exception
+public Mono<ProductDto> getProduct(String id) {
+    if (id == null) return Mono.error(new IllegalArgumentException("id required"));
+    return repository.findById(id)
+        .switchIfEmpty(Mono.error(new ProductNotFoundException(id))) // empty -> explicit error
+        .map(ProductMapper::toDto);
+}
+```
+
+`switchIfEmpty()` is the standard pattern for turning "nothing found" into either
+an explicit error OR a fallback value — see the Error Handling topic in the
+Project Reactor notes for the full operator toolkit.
+
+---
+
+## Q4. What's the Standard Response Format?
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ProblemDetail handleNotFound(ProductNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Product Not Found");
+        return problem;
+    }
+}
+```
+
+Response (standard RFC 7807/9457 shape):
+```json
+{ "type": "about:blank", "title": "Product Not Found", "status": 404, "detail": "Product not found: abc123" }
+```
+
+Whether you use `ProblemDetail` or your own custom `ErrorResponse` record, **the
+one rule that matters most is consistency** — every error in your API should look
+the same shape, so clients can write one generic parsing routine.
+
+---
+
+## Q5. Interview-Style Q&A
+
+### Does throwing a plain `throw new SomeException()` inside a `.map()` lambda work the same as `Mono.error()`?
+
+Usually yes for synchronous operators — Reactor catches synchronous exceptions and
+converts them into `onError()` signals — but explicitly returning `Mono.error()`
+is clearer and safer, especially in asynchronous contexts.
+
+### Do I need a try/catch in my controller for this to work?
+
+**No** — the error propagates as an `onError()` signal through the reactive chain
+automatically; `@ControllerAdvice` intercepts it without any manual try/catch.
+
+### What HTTP status should an unexpected, unhandled exception return?
+
+Register a catch-all `@ExceptionHandler(Exception.class)` returning `500 Internal
+Server Error` — never let a raw stack trace leak to the client.
+
+---
+
+## Q6. Summary
 
 ```
 Service layer detects a failure
@@ -67,6 +128,8 @@ Error propagates up through the reactive chain (controller does nothing special)
 Consistent, standardized JSON error response (ProblemDetail or custom ErrorResponse)
 ```
 
-Think of this topic as building one centralized "translation layer": domain
-exceptions go in, consistent HTTP error responses come out — every controller
-benefits without repeating the mapping logic itself.
+### One sentence to remember
+
+> **"Signal failures with Mono.error()/custom exceptions, and let ONE
+> centralized @RestControllerAdvice translate every exception type into a
+> consistent HTTP response — never decide the status code in each controller."**

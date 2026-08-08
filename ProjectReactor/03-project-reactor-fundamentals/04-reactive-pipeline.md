@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-A **reactive pipeline** is a chain of operators applied to a `Mono` or `Flux`,
-describing a series of transformations data will go through — **once someone
-subscribes**. It's like assembling a factory assembly line: you set up all the
-stations first (map, filter, etc.), but nothing moves down the line until the
-conveyor belt is switched on (`.subscribe()`).
+A **reactive pipeline** is just a chain of operators attached to a `Mono` or
+`Flux` — a description of what should happen to the data, **once someone
+subscribes.** Think of it like setting up stations on a factory assembly line:
+you build all the stations first (filter, map, and so on), but nothing actually
+moves until you switch the conveyor belt on (`.subscribe()`).
 
 ## Simple Example
 
@@ -35,11 +35,11 @@ About to emit: DATE
 Received: DATE
 ```
 
-Notice each item flows through the *entire* pipeline (filter → map → doOnNext →
-subscribe) one at a time, rather than all items being filtered first, then all mapped.
+Notice each item goes through the *whole* pipeline (filter → map → doOnNext →
+subscribe) one at a time — it's not "filter everything, then map everything."
 
 ## Why It Matters
 
-Understanding that a pipeline is just a **blueprint** until subscribed to (see "Lazy
-Execution") explains many surprising behaviors beginners run into — like a pipeline
-seemingly "doing nothing" because they forgot to call `.subscribe()`.
+Once you get that a pipeline is just a blueprint until someone subscribes, a lot
+of confusing beginner moments make sense — like "why is my pipeline doing
+nothing?" (usually: nobody called `.subscribe()`).

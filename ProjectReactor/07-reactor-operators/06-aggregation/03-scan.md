@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.scan(accumulator)` is like `.reduce()`, but instead of emitting only the final
-result, it emits **every intermediate running total** as it goes — so you get a
-`Flux` of "running sum so far," one value per input item, rather than just one final
-`Mono`.
+`.scan()` is `.reduce()`'s more talkative cousin: instead of only giving you
+the final snowball at the end, it hands you the snowball after *every single
+roll* — a running total that updates with each item, streamed out as it
+grows.
 
 ## Simple Example
 
@@ -24,10 +24,10 @@ Running total: 10
 Running total: 15
 ```
 
-Notice unlike `.reduce()` (which only prints `15`), `.scan()` shows every step along
-the way.
+Notice that unlike `.reduce()` (which would only print `15`), `.scan()`
+shows you every step on the way there.
 
-With an initial seed value:
+With a starting value:
 
 ```java
 Flux.just(1, 2, 3)
@@ -38,7 +38,7 @@ Flux.just(1, 2, 3)
 
 ## Why It Matters
 
-`.scan()` is perfect for live, incrementally-updating displays — e.g., a running
-balance shown on a dashboard as transactions stream in, or a live leaderboard score
-that updates with each new point scored — where you want to see every intermediate
-state, not just the final one.
+`.scan()` is perfect for anything that updates live — a running balance
+shown on a dashboard as transactions come in, or a leaderboard score that
+ticks up point by point — anywhere you want to watch the total change in
+real time, not just see the final number at the end.

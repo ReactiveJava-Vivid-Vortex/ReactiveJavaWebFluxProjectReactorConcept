@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`Flux.just(...)` creates a `Flux` that emits a **fixed, known set of values** (up to
-10 overloaded arguments, or use the varargs form for more), then completes. It's the
-simplest way to create a small, finite stream of already-known data.
+`Flux.just(...)` creates a `Flux` that sends out a **fixed, already-known set of
+values**, then finishes. It's the simplest way to make a small stream out of data
+you already have.
 
 ## Simple Example
 
@@ -26,11 +26,11 @@ Fruit: Cherry
 All fruits emitted!
 ```
 
-Like `Mono.just()`, the values are captured eagerly — no `null` values are allowed
-inside the argument list.
+Just like `Mono.just()`, the values are grabbed right away — and `null` values
+aren't allowed anywhere in the list.
 
 ## Why It Matters
 
-`Flux.just()` is perfect for quick prototyping, unit tests, and small fixed
-collections (e.g., a hardcoded list of supported currencies). For larger or
-dynamically-sized collections, prefer `Flux.fromIterable()` instead.
+`Flux.just()` is great for quick prototypes, tests, and small fixed lists (like a
+hardcoded set of supported currencies). For anything bigger or that comes from a
+real collection, use `Flux.fromIterable()` instead.

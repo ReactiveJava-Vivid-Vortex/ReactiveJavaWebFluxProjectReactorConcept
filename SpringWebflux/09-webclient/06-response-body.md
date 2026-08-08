@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-After `.retrieve()`, `WebClient` gives you several ways to extract the response
-body: `.bodyToMono(Class)` for a single object, `.bodyToFlux(Class)` for a stream of
-objects, or `.toEntity(Class)` if you need the full `ResponseEntity` (including
-headers and status).
+After `.retrieve()`, `WebClient` gives you a few ways to pull out the
+response body: `.bodyToMono(Class)` for a single object, `.bodyToFlux(Class)`
+for a stream of objects, or `.toEntity(Class)` if you need the whole
+`ResponseEntity` (headers and status included).
 
 ## Simple Example
 
@@ -36,8 +36,9 @@ fullResponse.subscribe(response -> {
 
 ## Why It Matters
 
-Choosing the right response extraction method matters for correctness: using
-`.bodyToMono()` on an endpoint that actually returns multiple items would silently
-only capture the first one — understanding whether the remote API returns 0-1 or
-0-N items (and matching it to `bodyToMono`/`bodyToFlux` accordingly) avoids subtle,
-easy-to-miss bugs.
+Choosing the right way to read the response actually matters for
+correctness: calling `.bodyToMono()` on an endpoint that really returns
+multiple items would silently grab only the first one. Knowing whether the
+remote API sends back 0-1 or 0-N items (and matching that to
+`bodyToMono`/`bodyToFlux` accordingly) saves you from a subtle,
+easy-to-miss bug.

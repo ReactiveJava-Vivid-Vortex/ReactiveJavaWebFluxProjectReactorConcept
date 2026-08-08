@@ -2,9 +2,10 @@
 
 ## In Simple Terms
 
-`.defaultIfEmpty(value)` provides a fallback **single, fixed value** to emit if the
-upstream `Mono`/`Flux` completes without emitting anything at all. If the upstream
-does emit at least one item, the default is never used.
+`.defaultIfEmpty(value)` says "if nothing shows up, just use this instead."
+If the stream finishes without ever emitting a single item, it hands out a
+fixed, ready-made backup value. If the stream did produce something, the
+backup is never used at all.
 
 ## Simple Example
 
@@ -34,6 +35,6 @@ Flux.just("a", "b")
 
 ## Why It Matters
 
-`.defaultIfEmpty()` is the simplest way to avoid "nothing happened" outcomes in your
-pipeline when a sensible static fallback exists — e.g., showing "No results" text, or
-defaulting to a standard configuration value when none is set.
+`.defaultIfEmpty()` is the simplest way to avoid an awkward "nothing
+happened" outcome when you have an obvious fallback — showing "No results"
+text, or falling back to a standard setting when nothing was configured.

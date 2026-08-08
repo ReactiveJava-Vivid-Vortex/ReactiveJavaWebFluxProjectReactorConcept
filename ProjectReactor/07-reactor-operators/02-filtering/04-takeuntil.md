@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.takeUntil(predicate)` is similar to `.takeWhile()`, but with a key difference:
-it includes the item that **triggers** the stop condition, then completes.
-`takeWhile` **excludes** the failing item; `takeUntil` **includes** the matching
-item.
+`.takeUntil()` is almost the same idea as `.takeWhile()`, but with one
+difference that trips people up: it **includes** the item that triggers the
+stop, instead of leaving it out. `takeWhile` stops right *before* the bad
+item; `takeUntil` stops right *after* it.
 
 ## Simple Example
 
@@ -23,8 +23,8 @@ Got: 3
 Got: 10
 ```
 
-Notice `10` **is included** (it's the item that satisfies `n > 5`, so `takeUntil`
-stops right after emitting it) — and `4`, `5` are never processed.
+`10` **is included** here — it's the item that made the condition true, so
+`takeUntil` lets it through and then stops. `4` and `5` never get a look-in.
 
 ## Comparison with takeWhile()
 
@@ -35,6 +35,7 @@ takeUntil(n -> n > 5)   on [1,2,3,10,4,5]  ->  1, 2, 3, 10      (stops AFTER the
 
 ## Why It Matters
 
-`.takeUntil()` is useful when the triggering item itself is meaningful and should be
-included in the result — e.g., reading events "until and including" a shutdown
-signal, or processing a batch "up to and including" an error marker.
+Use `.takeUntil()` when the item that triggers the stop is itself important
+and you want to keep it — like reading events "up to and including" a
+shutdown signal, or processing a batch "through" the item that marks an
+error.

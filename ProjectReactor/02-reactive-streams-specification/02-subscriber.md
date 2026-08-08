@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-A `Subscriber` is the **consumer** of the data a `Publisher` produces. It's like a
-viewer tuning in to a TV channel. It reacts to four possible signals from the
-publisher: a subscription being set up, a new item, an error, or completion.
+A `Subscriber` is whoever consumes the data a `Publisher` sends out — like a
+viewer watching a TV channel. It reacts to four things: getting set up, a new item
+arriving, an error, or the show ending.
 
 ```java
 public interface Subscriber<T> {
@@ -41,13 +41,13 @@ Subscriber<String> subscriber = new Subscriber<>() {
 };
 ```
 
-Notice how the subscriber controls its own pace by calling `request(1)` — it only
-asks for one item at a time. This is **backpressure** in action: the subscriber, not
-the publisher, decides how fast data flows.
+Notice this subscriber only ever asks for one item at a time by calling
+`request(1)`. That's backpressure in action — the subscriber, not the publisher,
+decides the pace.
 
 ## Why It Matters
 
-Every time you call `.subscribe(...)` on a `Mono` or `Flux` in Project Reactor, you
-are creating a `Subscriber` under the hood. Understanding its four callbacks
-(`onSubscribe`, `onNext`, `onError`, `onComplete`) explains exactly what can happen
-during any reactive stream's lifecycle.
+Every time you call `.subscribe(...)` on a `Mono` or `Flux`, you're creating a
+`Subscriber` behind the scenes. Its four callbacks — `onSubscribe`, `onNext`,
+`onError`, `onComplete` — cover every single thing that can ever happen during a
+reactive stream's life.

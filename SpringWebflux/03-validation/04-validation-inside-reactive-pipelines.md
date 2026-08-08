@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-Beyond annotation-based validation, you often need to weave validation logic
-directly into a reactive chain — especially when validation depends on
-asynchronous data (a database check, an external service call). This means using
-operators like `.flatMap()` and `Mono.error()` to express "validate, then proceed
-only if valid."
+Beyond simple annotations, you'll often need to weave validation right
+into a reactive chain — especially when the check itself depends on
+something async, like a database lookup or an external call. That means
+using `.flatMap()` and `Mono.error()` to say "validate first, and only
+move on if it passes."
 
 ## Simple Example
 
@@ -28,13 +28,14 @@ private Mono<Void> validateInventory(CreateOrderRequest request) {
 }
 ```
 
-If any validation step in the chain emits an error (via `Mono.error()` inside a
-service call), the whole chain short-circuits and the error propagates to the
-controller, ready to be handled centrally.
+If any validation step in the chain raises an error (through
+`Mono.error()` inside a service call), the whole chain stops right there
+and the error flows through to the controller, ready to be handled
+centrally.
 
 ## Why It Matters
 
-Expressing validation as part of the reactive chain (rather than blocking to check
-conditions upfront) keeps your entire request-handling logic consistently
-non-blocking — critical for maintaining WebFlux's scalability benefits even when
-validation itself requires I/O.
+Writing validation as part of the reactive chain — instead of blocking to
+check conditions up front — keeps your whole request handling consistently
+non-blocking, which matters if you want to keep WebFlux's scalability
+benefits even when validation itself needs to reach out and do I/O.

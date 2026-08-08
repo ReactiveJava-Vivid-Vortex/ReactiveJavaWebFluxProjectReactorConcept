@@ -2,9 +2,10 @@
 
 ## In Simple Terms
 
-A logging `WebFilter` records details about every request/response passing through
-your application — method, path, status code, and duration — in one centralized
-place, rather than adding logging statements to every controller method individually.
+A logging `WebFilter` records what's happening with every request and
+response passing through your app — method, path, status code, duration —
+all in one central place, instead of sprinkling logging statements across
+every controller method individually.
 
 ## Simple Example
 
@@ -31,12 +32,12 @@ public class RequestLoggingFilter implements WebFilter {
 }
 ```
 
-Using `.doFinally()` (rather than `.doOnSuccess()`) ensures logging happens even if
-the request fails with an error or is cancelled by the client.
+Using `.doFinally()` instead of `.doOnSuccess()` makes sure logging still
+happens even if the request fails or the client cancels partway through.
 
 ## Why It Matters
 
-Centralized request logging via `WebFilter` gives you consistent observability
-across your entire API surface — essential for debugging production issues and
-monitoring overall application health — without scattering logging calls throughout
-individual controller methods.
+Centralized request logging through a `WebFilter` gives you consistent
+visibility across your whole API — essential for debugging production
+issues and keeping an eye on overall health — without scattering logging
+calls throughout individual controllers.

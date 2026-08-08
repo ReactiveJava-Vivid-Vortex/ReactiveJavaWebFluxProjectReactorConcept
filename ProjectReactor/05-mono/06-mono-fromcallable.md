@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`Mono.fromCallable(callable)` is like `Mono.fromSupplier()`, but for code that **can
-throw a checked exception** (a `Callable<T>` instead of a `Supplier<T>`). It's lazy
-(runs only on subscription) and automatically converts any thrown exception into an
-`onError()` signal instead of propagating it as a raw exception.
+`Mono.fromCallable(callable)` is basically the same as `Mono.fromSupplier()`,
+except it's for code that **might throw a checked exception** — like reading a
+file. It's lazy (runs only when subscribed), and if the code throws, that
+exception is automatically turned into an `onError()` signal instead of blowing
+up your program.
 
 ## Simple Example
 
@@ -21,16 +22,17 @@ mono.subscribe(
 );
 ```
 
-If `config.txt` doesn't exist, the `IOException` is automatically caught and turned
-into an `onError()` signal — you never need a manual `try/catch` around it.
+If `config.txt` doesn't exist, the `IOException` gets caught automatically and
+turned into an `onError()` signal — no manual try/catch needed on your end.
 
 ## Why It Matters
 
-`Mono.fromCallable()` is the go-to wrapper for any **blocking, synchronous** call that
-might throw a checked exception — like file I/O or legacy JDBC code — that you need
-to bridge into a reactive pipeline. It's very commonly combined with
-`.subscribeOn(Schedulers.boundedElastic())` to make sure that blocking call runs on a
-thread pool designed for blocking work, not on a limited event-loop thread.
+`Mono.fromCallable()` is the tool for wrapping any **blocking, synchronous** call
+that might throw a checked exception — like file I/O or old-style JDBC code —
+into the reactive world. It's often paired with
+`.subscribeOn(Schedulers.boundedElastic())` to make sure that blocking call runs
+on a thread pool built for blocking work, not one of the few limited event-loop
+threads.
 
 ```java
 Mono.fromCallable(() -> legacyBlockingJdbcCall())

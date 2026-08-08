@@ -1,49 +1,109 @@
-# Reactive Streaming — Topic Overview
+# Q1. Does Returning a Flux Automatically Mean My Endpoint "Streams"?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of a Delivery Truck vs a Conveyor Belt)
 
-By default, a WebFlux endpoint returning `Flux<T>` still waits for the **entire**
-`Flux` to complete before writing anything — it just writes one big JSON array at
-the end. This topic is about actually streaming: sending each item to the client
-**as soon as it's ready**, using a streaming media type like NDJSON, instead of
-buffering everything first.
+Surprisingly, **no.** By default, a WebFlux endpoint returning `Flux<T>` still
+waits for the **entire truck to be loaded** (the whole `Flux` to complete) before
+driving off (writing the response) — it just writes one big JSON array at the end.
 
 ```java
-// Default: waits for the WHOLE Flux, then writes one big JSON array
+// Default: waits for the WHOLE Flux, THEN writes one big JSON array — a delivery truck
 @GetMapping("/products")
 public Flux<ProductDto> getAllProducts() { return repository.findAll().map(...); }
 
-// Streaming: writes each item as soon as it's available
+// Streaming: each item leaves the moment it's ready — a conveyor belt
 @GetMapping(value = "/products/stream", produces = MediaType.APPLICATION_NDJSON_VALUE)
 public Flux<ProductDto> streamProducts() { return repository.findAll().map(...); }
 ```
 
-**NDJSON** (newline-delimited JSON) is the key format enabling this — each line is
-an independently-parseable JSON object, so a client can start processing results the
-instant the first line arrives, rather than waiting for a closing `]` bracket that
-only appears at the very end of a normal JSON array.
+The **media type** is what actually flips the switch from truck to conveyor belt.
 
-This same streaming principle applies in both directions: **large file
-uploads/downloads** stream bytes incrementally (never loading a whole file into
-memory), and a reactive **repository** returning `Flux<Entity>` means you can export
-millions of database rows while keeping server memory usage roughly constant
-throughout — as long as you avoid accidentally collecting everything into a `List`
-first.
+---
 
-## Quick Revision Cheat Sheet
+## Q2. What Is NDJSON, and Why Does It Enable True Streaming?
 
-| # | Concept | One-Line Summary |
-|---|---|---|
-| 1 | **Server Streaming** | Endpoint sends response data incrementally as it's produced, via a streaming media type. |
-| 2 | **Client Streaming** | Endpoint accepts a request body that itself streams in incrementally (e.g., `Flux<Dto>` upload). |
-| 3 | **Large File Uploads** | `FilePart.transferTo()` streams bytes directly to disk — never buffers the whole file in memory. |
-| 4 | **Large File Downloads** | `DataBufferUtils.read()` streams a file to the response in small chunks, constant memory usage. |
-| 5 | **JSON Lines (NDJSON)** | Newline-delimited JSON — each line independently parseable, ideal for incremental streaming. |
-| 6 | **Streaming Millions of Records** | Reactive repository (`Flux`) + NDJSON = export huge datasets with roughly constant server memory. |
-| 7 | **text/event-stream** | The MIME type for Server-Sent Events — server-to-client push, covered in depth in the SSE topic. |
-| 8 | **Memory-efficient processing** | Avoid `.collectList()` on huge streams — use `.reduce()`/incremental processing to keep memory usage bounded. |
+```json
+[
+  {"id": "1", "name": "Widget"},
+  {"id": "2", "name": "Gadget"}
+]
+```
+vs
+```
+{"id": "1", "name": "Widget"}
+{"id": "2", "name": "Gadget"}
+```
 
-## How It All Fits Together
+A normal JSON array can't be safely parsed until the closing `]` arrives — forcing
+a client to wait for everything. **NDJSON** (newline-delimited JSON) — each line is
+an independently-parseable object — lets a client start processing the instant the
+first line arrives.
+
+---
+
+## Q3. How Does This Apply to File Uploads/Downloads?
+
+```java
+// Upload: streams bytes DIRECTLY to disk — never holds the whole file in memory
+public Mono<String> uploadFile(@RequestPart("file") Mono<FilePart> filePartMono) {
+    return filePartMono.flatMap(fp -> fp.transferTo(Path.of("/uploads", fp.filename()))
+        .then(Mono.just("Uploaded: " + fp.filename())));
+}
+
+// Download: reads the file in small chunks, streamed to the response
+public Mono<Void> downloadFile(ServerHttpResponse response) {
+    Flux<DataBuffer> fileStream = DataBufferUtils.read(path, response.bufferFactory(), 4096);
+    return response.writeWith(fileStream);
+}
+```
+
+Both keep server memory usage **constant**, regardless of file size — critical for
+multi-gigabyte files.
+
+---
+
+## Q4. How Do I Export Millions of Database Rows Without Running Out of Memory?
+
+```java
+@GetMapping(value = "/products/export", produces = MediaType.APPLICATION_NDJSON_VALUE)
+public Flux<ProductDto> exportAllProducts() {
+    return productRepository.findAll() // streamed FROM the database, not pre-loaded into a List
+        .map(ProductMapper::toDto);
+}
+```
+
+Because the R2DBC repository itself returns a `Flux` (not a pre-materialized
+`List`), rows flow from database → server → client incrementally, never all
+sitting in server memory at once.
+
+**The one thing that would break this:** accidentally calling `.collectList()`
+somewhere in the chain — that forces the entire dataset into memory before
+anything is emitted.
+
+---
+
+## Q5. Interview-Style Q&A
+
+### If I return `Flux<T>` with the default `application/json` media type, does the client get data incrementally?
+
+**No** — the client waits for the entire response (one JSON array), just like a
+non-streaming endpoint. You need NDJSON (or SSE) to actually stream.
+
+### Is NDJSON the same thing as Server-Sent Events?
+
+**No** — NDJSON is a generic streaming JSON format for any client. SSE
+(`text/event-stream`) is browser-specific, consumed via the `EventSource` API —
+covered in its own dedicated topic.
+
+### What's the biggest risk when streaming millions of records?
+
+Accidentally introducing a `.collectList()` or similar "gather everything first"
+operator somewhere in the chain, which silently defeats the whole point of
+streaming.
+
+---
+
+## Q6. Summary
 
 ```
 Data source (DB rows, file bytes, upload body)
@@ -61,7 +121,8 @@ Data flows incrementally, server memory stays roughly constant
 regardless of total dataset/file size
 ```
 
-The one habit to build from this topic: **before returning `Flux<T>` from an
-endpoint, ask "should this actually stream?"** — if the dataset could be large or
-slow to produce, NDJSON (or SSE, for browsers) is almost always the better choice
-over the default buffered JSON array.
+### One sentence to remember
+
+> **"Flux<T> alone doesn't stream — it's the media type (NDJSON or SSE) that
+> turns a delivery truck (wait for everything) into a conveyor belt (send as
+> it's ready)."**

@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`.reduce(accumulator)` combines all items in a `Flux` into a **single final value**,
-by repeatedly applying a function that takes the "running total so far" and the
-"next item," producing a new running total. Only the final result is emitted (as a
-`Mono`), once the stream completes.
+`.reduce()` boils down every item in a `Flux` into one single final answer.
+It works like a snowball rolling downhill: it keeps a "running total," and
+for each new item, it combines the running total with that item to get a
+new running total. When the stream ends, you only get the very last
+snowball — the final result — as a `Mono`.
 
 ## Simple Example
 
@@ -20,8 +21,7 @@ Output:
 Sum: 15
 ```
 
-With an explicit initial/seed value (using the overload that takes a starting
-value):
+You can also give it a starting point instead of using the first item:
 
 ```java
 Flux.just(1, 2, 3, 4, 5)
@@ -30,7 +30,7 @@ Flux.just(1, 2, 3, 4, 5)
 // Sum: 115
 ```
 
-A practical example — computing a running total of order values:
+A practical example — adding up order totals:
 
 ```java
 orderFlux
@@ -41,7 +41,7 @@ orderFlux
 
 ## Why It Matters
 
-`.reduce()` is the general-purpose tool for turning "many values" into "one summary
-value" — sums, products, string concatenation, finding a max/min manually, or
-building up any custom aggregate — whenever you need just the final result, not each
-intermediate step.
+`.reduce()` is your general-purpose tool for turning "lots of values" into
+"one summary value" — totals, products, joined strings, a manually-tracked
+max or min, or any custom running calculation — whenever all you care about
+is the final number, not every step along the way.

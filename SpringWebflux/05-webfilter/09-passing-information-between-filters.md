@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-Filters often need to share data with each other (and with the eventual controller)
-— e.g., an authentication filter determining the current user, which a later
-authorization filter and the controller both need to access. `ServerWebExchange`
-provides an **attributes map** specifically for this purpose.
+Filters often need to share data with each other (and with the eventual
+controller) — an authentication filter figuring out the current user,
+which a later authorization filter and the controller both need to see.
+`ServerWebExchange` provides an attributes map made exactly for this.
 
 ## Simple Example
 
@@ -32,15 +32,17 @@ public Mono<ProfileDto> getProfile(ServerWebExchange exchange) {
 }
 ```
 
-**Important gotcha:** avoid using `ThreadLocal` for this purpose in reactive code —
-since a request's processing may hop across multiple threads
-(see [[thread-affinity]] in the ProjectReactor notes), `ThreadLocal` values set in
-one filter may not be visible later in the chain. `ServerWebExchange` attributes (or
-Reactor's `Context`) are the reactive-safe alternative.
+**Watch out for this:** avoid using `ThreadLocal` for this in reactive
+code — since one request's processing can hop across several threads
+(see [[thread-affinity]] in the Project Reactor notes), a `ThreadLocal`
+value set in one filter might not even be visible later in the chain.
+`ServerWebExchange` attributes (or Reactor's `Context`) are the safe way to
+do this reactively.
 
 ## Why It Matters
 
-Understanding this attribute-passing mechanism avoids a very common reactive
-mistake: trying to use `ThreadLocal` (which works in traditional Spring MVC, but
-breaks unpredictably in WebFlux due to thread-hopping) to share request-scoped data
-between filters and controllers.
+Knowing about this attribute-passing mechanism helps you avoid a really
+common reactive mistake: reaching for `ThreadLocal` (which works fine in
+traditional Spring MVC, but breaks unpredictably in WebFlux due to
+thread-hopping) to share request-scoped data between filters and
+controllers.

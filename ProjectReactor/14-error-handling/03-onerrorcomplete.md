@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.onErrorComplete()` catches an error and simply **completes the stream silently**
-(as if it had ended successfully with no more items), instead of propagating the
-error or providing a fallback value. It effectively says "if this fails, just stop
-quietly."
+`.onErrorComplete()` catches an error and just quietly wraps up the stream
+— as if it finished normally with nothing more to say — instead of passing
+the error along or offering a fallback value. It basically says "if this
+fails, just stop, no drama."
 
 ## Simple Example
 
@@ -30,7 +30,7 @@ Item: 2
 Completed (silently, due to error)
 ```
 
-You can also restrict it to specific exception types:
+You can also limit it to specific exception types:
 
 ```java
 someFlux.onErrorComplete(SpecificException.class);
@@ -38,7 +38,7 @@ someFlux.onErrorComplete(SpecificException.class);
 
 ## Why It Matters
 
-`.onErrorComplete()` is useful when an error genuinely means "there's nothing more to
-report" rather than "something went wrong that the caller needs to know about" — for
-example, an optional enrichment step where failure should just mean "skip this extra
-data," not fail the whole operation.
+`.onErrorComplete()` fits when an error really just means "nothing else to
+report" rather than "something's genuinely wrong here" — like an optional
+enrichment step where failing just means skipping some extra data, not
+failing the whole operation.

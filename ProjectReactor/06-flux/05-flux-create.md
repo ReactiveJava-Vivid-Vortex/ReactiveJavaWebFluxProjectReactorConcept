@@ -2,12 +2,11 @@
 
 ## In Simple Terms
 
-`Flux.create()` gives you a `FluxSink` you can use to emit items **from any thread, at
-any time**, including from external, asynchronous, event-driven sources (like a
-message listener, a WebSocket handler, or a hardware sensor callback). Unlike
-`Flux.generate()`, it's not restricted to one-at-a-time synchronous emission — you can
-push multiple items per callback invocation, from multiple threads even (with the
-right sink configuration).
+`Flux.create()` hands you a `FluxSink` that you can use to push items into a
+stream **from anywhere, at any time** — including from an outside, async source
+like a message listener, a WebSocket, or a sensor callback. Unlike
+`Flux.generate()`, you're not limited to one item at a time — you can push
+several items per callback, even from different threads.
 
 ## Simple Example
 
@@ -25,9 +24,8 @@ Flux<String> eventFlux = Flux.create(sink -> {
 eventFlux.subscribe(event -> System.out.println("Received event: " + event));
 ```
 
-Because `Flux.create()` doesn't automatically pace emission to match downstream
-demand, you should configure an overflow strategy for when the producer is faster
-than the consumer:
+Because `Flux.create()` doesn't automatically slow down to match demand, you
+should tell it what to do if the producer gets ahead of the consumer:
 
 ```java
 Flux.create(sink -> { /* ... */ }, FluxSink.OverflowStrategy.BUFFER);
@@ -35,8 +33,8 @@ Flux.create(sink -> { /* ... */ }, FluxSink.OverflowStrategy.BUFFER);
 
 ## Why It Matters
 
-`Flux.create()` is the primary bridge for integrating **push-based, external event
-sources** (message queues, WebSockets, sensor data, legacy async callback APIs) into
-a reactive pipeline. It's more flexible (and more dangerous if misused — e.g.,
-unbounded buffering) than `Flux.generate()`, so it's best reserved for genuinely
-asynchronous, multi-threaded sources.
+`Flux.create()` is the main way to plug **push-based, outside event sources**
+(message queues, WebSockets, sensors, legacy callback APIs) into a reactive
+pipeline. It's more flexible than `Flux.generate()` — but also easier to misuse
+(unbounded buffering, for instance) — so save it for genuinely async,
+multi-threaded sources.

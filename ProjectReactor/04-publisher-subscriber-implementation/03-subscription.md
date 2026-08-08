@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-When implementing a `Publisher` from scratch, you must also implement your own
-`Subscription` object — the thing responsible for tracking outstanding demand and
-actually pushing items to the subscriber when `request(n)` is called. This is the
-trickiest part to get right, since it must safely handle concurrent calls to
-`request()` and `cancel()`.
+When you write your own `Publisher`, you also have to write your own
+`Subscription` — the object that keeps track of how much has been requested and
+actually sends items when `request(n)` is called. This is the trickiest part to
+get right, because it has to safely deal with `request()` and `cancel()` being
+called at any time, even from different threads.
 
 ## Simple Example
 
@@ -42,8 +42,9 @@ class SimpleSubscription implements Subscription {
 
 ## Why It Matters
 
-A correctly implemented `Subscription` guarantees that a subscriber is never sent more
-items than it asked for, and that cancellation stops emissions promptly. Getting this
-logic wrong (e.g., ignoring `cancel()`, or not tracking demand precisely) is a classic
-source of subtle reactive bugs — which is exactly why almost nobody hand-writes this
-in real projects and instead relies on Project Reactor's tested implementations.
+A correctly built `Subscription` guarantees two things: the subscriber is never
+sent more than it asked for, and cancelling actually stops things promptly.
+Getting either wrong — like ignoring `cancel()`, or losing track of how much
+was requested — causes exactly the kind of subtle bugs that are painful to track
+down. That's why almost nobody writes this by hand in real projects and just
+trusts Reactor's tested implementations instead.

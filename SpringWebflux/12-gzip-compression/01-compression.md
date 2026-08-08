@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-HTTP compression shrinks the response body (typically using gzip) before sending it
-over the network, and the client decompresses it upon arrival. This trades a small
-amount of CPU time (to compress/decompress) for a significant reduction in the
-amount of data transferred — especially effective for text-based formats like JSON.
+HTTP compression shrinks a response body (usually with gzip) before
+sending it over the network, and the client unpacks it once it arrives.
+You trade a small bit of CPU time (to compress and decompress) for a much
+smaller amount of data actually going over the wire — especially effective
+for text-heavy formats like JSON.
 
 ## Simple Example
 
@@ -19,13 +20,13 @@ server:
     min-response-size: 1024 # only compress responses larger than 1KB
 ```
 
-With this enabled, a client sending `Accept-Encoding: gzip` (which browsers do by
-default) receives a compressed response, with `Content-Encoding: gzip` in the
-response headers.
+With this on, a client that sends `Accept-Encoding: gzip` (which browsers
+do by default) gets back a compressed response, with `Content-Encoding: gzip`
+in the headers.
 
 ## Why It Matters
 
-For JSON-heavy APIs, gzip compression can reduce response sizes dramatically (often
-60-80% smaller for repetitive, text-based JSON) — a substantial win for bandwidth
-usage and perceived latency, especially for clients on slower network connections
-(mobile devices, for example).
+For JSON-heavy APIs, gzip compression can shrink response sizes a lot —
+often 60-80% smaller for repetitive, text-based JSON — a real win for
+bandwidth and how fast things feel, especially for clients on slower
+connections like mobile devices.

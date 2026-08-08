@@ -2,15 +2,15 @@
 
 ## In Simple Terms
 
-Just like any other `Mono`/`Flux`, a `WebClient` call can be bounded with
-`.timeout(Duration)` to ensure it fails fast rather than waiting indefinitely for a
-slow or unresponsive downstream service. Additionally, `WebClient`'s underlying HTTP
-client (Netty by default) supports connection-level and response-level timeout
-configuration.
+Just like any other `Mono`/`Flux`, a `WebClient` call can be given a
+`.timeout(Duration)` so it fails fast instead of waiting forever on a slow
+or stuck downstream service. On top of that, `WebClient`'s underlying HTTP
+client (Netty by default) also lets you configure timeouts at the
+connection and response level.
 
 ## Simple Example
 
-Applying a timeout to the reactive chain itself:
+Applying a timeout right on the reactive chain:
 
 ```java
 public Mono<UserDto> getUser(String id) {
@@ -25,8 +25,8 @@ public Mono<UserDto> getUser(String id) {
 }
 ```
 
-Configuring connection and response timeouts at the client-builder level (applies to
-every call made with this `WebClient` instance):
+Configuring connection and response timeouts at the client-builder level
+(applies to every call made through this `WebClient` instance):
 
 ```java
 HttpClient httpClient = HttpClient.create()
@@ -41,8 +41,8 @@ WebClient webClient = WebClient.builder()
 
 ## Why It Matters
 
-Without timeouts, a single unresponsive downstream dependency can cause requests to
-hang indefinitely, eventually exhausting connection pools and degrading the entire
-application. Configuring both call-level (`.timeout()`) and client-level (connection/
-response) timeouts is essential resilience practice for any production
-service-to-service communication.
+Without timeouts, one unresponsive downstream dependency can leave
+requests hanging indefinitely, eventually exhausting connection pools and
+dragging down the whole app. Setting both call-level (`.timeout()`) and
+client-level timeouts is basic resilience hygiene for talking to other
+services in production.

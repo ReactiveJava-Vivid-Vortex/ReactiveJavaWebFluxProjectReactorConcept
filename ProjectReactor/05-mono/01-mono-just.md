@@ -2,13 +2,13 @@
 
 ## In Simple Terms
 
-`Mono.just(value)` creates a `Mono` that emits **exactly one, already-known value**
-immediately when subscribed to. It's the simplest way to wrap a value you already
-have into a reactive type.
+`Mono.just(value)` wraps a value you **already have** into a `Mono` that hands it
+out the instant someone subscribes. It's the simplest possible way to turn a
+plain value into a reactive one.
 
-**Important gotcha:** the value must not be `null` — `Mono.just(null)` throws a
-`NullPointerException` immediately, because Reactive Streams forbids `null` as a
-valid element. Use `Mono.justOrEmpty()` if the value might be `null`.
+**Watch out:** the value can't be `null` — `Mono.just(null)` blows up with a
+`NullPointerException` right away, because Reactive Streams doesn't allow `null`
+as a value. If the value might be `null`, use `Mono.justOrEmpty()` instead.
 
 ## Simple Example
 
@@ -19,19 +19,20 @@ mono.subscribe(value -> System.out.println("Got: " + value));
 // Output: Got: Hello, Reactor!
 ```
 
-Since the value is eagerly captured at creation time (not lazily computed), be
-careful with expensive calls:
+The value gets grabbed right away, not lazily — so be careful with anything
+expensive:
 
 ```java
-// BAD: fetchFromDatabase() runs immediately when this line executes,
-// even before anyone subscribes!
+// BAD: fetchFromDatabase() runs THE MOMENT this line executes,
+// even if nobody ever subscribes!
 Mono<User> mono = Mono.just(fetchFromDatabase());
 ```
 
-For lazy, deferred computation, use `Mono.fromSupplier()` or `Mono.defer()` instead.
+If you need the value computed lazily, use `Mono.fromSupplier()` or
+`Mono.defer()` instead.
 
 ## Why It Matters
 
-`Mono.just()` is extremely common for wrapping constants, test fixtures, or values
-already available in memory (e.g., a default fallback value) into the reactive world
-so they compose cleanly with other `Mono`/`Flux` pipelines.
+`Mono.just()` is great for wrapping constants, test values, or anything already
+sitting in memory (like a default fallback) so it fits neatly into the rest of
+your `Mono`/`Flux` pipeline.

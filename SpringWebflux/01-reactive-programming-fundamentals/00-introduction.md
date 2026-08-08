@@ -1,18 +1,26 @@
-# Reactive Programming Fundamentals — Topic Overview
+# Q1. What Problem Does Spring WebFlux Actually Solve?
 
-## What Is This Topic About? (In Simple Terms)
+## Simple Explanation (Think of a Restaurant with One Waiter per Table vs a Shared Team)
 
-This topic is the "why" behind Spring WebFlux, before you write a single line of
-WebFlux code. The core problem: traditional Spring MVC gives each incoming request
-its own dedicated thread, which **freezes** for the entire duration of any slow I/O
-(a database call, an external API call). Freeze enough threads at once (say, 10,000
-concurrent slow requests) and you run out of memory/threads long before the CPU
-itself is actually busy.
+Traditional Spring MVC assigns **one dedicated waiter (thread) per table
+(request)**. If that table's order takes forever to cook (a slow DB/API call), the
+waiter just **stands there frozen**, unable to serve anyone else, for the entire
+wait.
 
-WebFlux flips this: it uses a small, fixed pool of non-blocking **event-loop**
-threads that are never frozen — the instant a thread would have to wait, it's
-released to service a different request, and resumes the original one later when
-data arrives.
+```
+Spring MVC:  Table A gets Waiter A, frozen until food's ready
+             Table B gets Waiter B, frozen until food's ready
+             ... 10,000 tables need 10,000 waiters (threads)!
+```
+
+Spring WebFlux uses a **small shared team** of waiters who never freeze — the
+instant a wait begins, that waiter moves to help another table, and comes back the
+moment the food is actually ready.
+
+```
+Spring WebFlux:  8-16 waiters, NEVER frozen
+                 Serve 10,000 tables by constantly cycling to whoever's food is ready
+```
 
 ```java
 // Spring MVC — thread FREEZES here until the DB responds
@@ -24,38 +32,132 @@ public User getUser(@PathVariable String id) { return repo.findById(id); }
 public Mono<User> getUser(@PathVariable String id) { return repo.findById(id); }
 ```
 
-Underpinning all of this is the **Reactive Manifesto**: a well-built reactive system
-should be **Responsive** (bounded, predictable response times), **Resilient**
-(failures in one part don't cascade), **Elastic** (scales gracefully under load
-spikes), and **Message Driven** (components talk via async events, which is what
-enables the other three). Everything WebFlux does — `Mono`/`Flux`, `WebClient`,
-R2DBC — is designed in service of these four traits.
+---
 
-Crucially, WebFlux isn't automatically the right choice everywhere — it shines for
-high-concurrency, I/O-heavy workloads, but adds real complexity that isn't worth it
-for CPU-bound work, low-concurrency apps, or teams reliant on blocking libraries
-(like JPA) with no migration plan.
+## Q2. What Is the Reactive Manifesto, and Why Should I Care?
 
-## Quick Revision Cheat Sheet
+Four traits a well-built reactive system should have:
 
-| # | Concept | One-Line Summary |
+| Trait | Meaning | WebFlux Feature Enabling It |
 |---|---|---|
-| 1 | **Why Reactive Programming exists** | Blocking servers waste threads waiting on I/O; reactive frees threads instead of freezing them. |
-| 2 | **Blocking vs Non-Blocking I/O** | Blocking freezes the thread until data arrives; non-blocking moves on and gets notified later. |
-| 3 | **Reactive Manifesto** | The 4 traits of a good reactive system: Responsive, Resilient, Elastic, Message Driven. |
-| 4 | **Responsive** | Timely, bounded response times, even under load or failure — fail fast and clearly, don't hang. |
-| 5 | **Resilient** | Failures in one part (a downstream service) don't cascade into a total system outage. |
-| 6 | **Elastic** | Stays responsive across a wide range of load, without needing proportionally more hardware. |
-| 7 | **Message Driven** | Components communicate via async events, not direct blocking calls — the foundation enabling the other 3 traits. |
-| 8 | **Publisher/Subscriber model** | Everything in WebFlux speaks the same Mono/Flux publisher language, built from exactly 3 signals: `onNext`/`onComplete`/`onError`. |
-| 9 | **Backpressure** | Lets a slow client control how fast a server streams data, preventing memory overload. |
-| 10 | **Why WebFlux scales better than MVC** | Small event-loop pool never blocks vs. MVC's thread-per-request pool that freezes on I/O. |
-| 11 | **When NOT to use WebFlux** | CPU-bound work, low concurrency, or heavy reliance on blocking libraries (JPA) with no migration plan. |
-| 12 | **Browser streaming demo** | A `Flux.interval()` endpoint visibly streaming data to a browser incrementally — makes streaming concrete. |
-| 13 | **Cancellation of requests** | WebFlux auto-cancels the pipeline if a client disconnects — no wasted work for an absent client. |
-| 14 | **Reactive pipeline** | The entire request lifecycle — controller → service → repository/WebClient → response — as one continuous non-blocking chain. |
+| **Responsive** | Timely, bounded response times, even under load | `.timeout()` |
+| **Resilient** | Failures in one part don't cascade | `.onErrorResume()`, fallbacks |
+| **Elastic** | Stays responsive across varying load | Event-loop thread model |
+| **Message Driven** | Components talk via async events, not blocking calls | `Mono`/`Flux` everywhere |
 
-## How It All Fits Together
+```
+        Responsive
+            ^
+            |
+Resilient <-+-> Elastic
+            |
+     Message Driven (the foundation enabling the other 3)
+```
+
+---
+
+## Q3. Blocking vs Non-Blocking I/O — Applied to WebFlux Specifically
+
+```java
+// Blocking: thread FREEZES until data arrives — one thread per slow operation
+int data = socket.getInputStream().read();
+
+// Non-blocking: thread is freed instantly, notified LATER when data is ready
+// This is what Netty (WebFlux's engine) does under the hood, automatically
+```
+
+WebFlux runs on **Netty**, using I/O multiplexing (`epoll`/`kqueue`) — this is
+literally why a handful of threads can serve tens of thousands of concurrent
+connections.
+
+---
+
+## Q4. Why Does WebFlux Scale Better Than Spring MVC? (The Concrete Numbers)
+
+```
+Spring MVC, 200-thread pool, 50ms downstream calls:
+  200 concurrent slow requests -> ALL threads busy/blocked
+  -> request #201 must WAIT in queue, even though the CPU is mostly idle
+
+Spring WebFlux, ~8-16 event-loop threads:
+  10,000 concurrent slow requests -> threads NEVER blocked waiting
+  -> they cycle through servicing whichever request's data is ready
+```
+
+**This gap is biggest for I/O-bound, high-concurrency workloads** — exactly the
+profile of most public APIs and microservices.
+
+---
+
+## Q5. When Should I NOT Use WebFlux?
+
+| Situation | Verdict |
+|---|---|
+| Team unfamiliar with reactive debugging/testing | ❌ Real learning-curve cost may not be worth it |
+| Heavy reliance on blocking libraries (JPA) with no migration plan | ❌ You'd wrap everything in `boundedElastic()`, losing most of the benefit |
+| CPU-bound workload (image processing) | ❌ Reactive doesn't speed up CPU work |
+| Low concurrency (internal admin tool, 10 users) | ❌ Added complexity isn't worth it |
+| High-concurrency, I/O-heavy public API | ✅ WebFlux shines here |
+
+---
+
+## Q6. Everything Is a Publisher — What Does That Actually Mean?
+
+```java
+@RestController
+public class UserController {
+    @GetMapping("/users/{id}")
+    public Mono<User> getUser(@PathVariable String id) { // Mono = Publisher of 0-1 User
+        return userRepository.findById(id); // WebFlux subscribes internally
+    }
+}
+```
+
+You never call `.subscribe()` in a controller — WebFlux subscribes to whatever
+`Mono`/`Flux` you return, streams the result back, and — critically — **the
+entire vocabulary of that data flow is exactly three signal types**:
+`onNext`/`onComplete`/`onError`. See [[the-three-signal-types]] in the Project
+Reactor notes for the full breakdown of that grammar.
+
+---
+
+## Q7. What Happens If a Client Disconnects Mid-Request?
+
+```java
+@GetMapping(value = "/live-feed", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+public Flux<String> liveFeed() {
+    return Flux.interval(Duration.ofSeconds(1))
+        .doOnCancel(() -> System.out.println("Client disconnected — stopping feed"))
+        .map(tick -> "Update #" + tick);
+}
+```
+
+WebFlux **automatically cancels** the underlying pipeline — the connection close
+propagates as a `cancel()` signal down through the entire chain, so no server work
+continues for a client that's no longer listening.
+
+---
+
+## Q8. Interview-Style Q&A
+
+### Does WebFlux make a single request faster?
+
+**No.** The database/network latency is identical either way. WebFlux improves
+**throughput under high concurrency**, not per-request speed.
+
+### Is a WebFlux controller method's Mono/Flux subscribed to immediately when the method is called?
+
+**No.** WebFlux subscribes to it as part of handling the HTTP request lifecycle —
+the method just *returns a description* of what should happen.
+
+### Can you mix blocking and non-blocking code in a WebFlux app?
+
+**Yes**, but any unavoidable blocking call must be isolated on
+`Schedulers.boundedElastic()` — never left on an event-loop thread.
+
+---
+
+## Q9. Summary
 
 ```
 Client request arrives
@@ -65,13 +167,15 @@ Small pool of event-loop threads (never blocks)
         │
         ▼
 Mono/Flux pipeline: controller → service → repository/WebClient
-        │            (all non-blocking, Publisher/Subscriber under the hood)
+        │            (all non-blocking, built from onNext/onComplete/onError signals)
         ▼
 Response streamed back — backpressure paces it to the client's speed
         │
    (if client disconnects, cancellation propagates automatically)
 ```
 
-Internalize this: WebFlux's value isn't "faster per-request" — it's "the same
-hardware handles vastly more *concurrent* slow requests." Keep that distinction in
-mind for every topic that follows.
+### One sentence to remember
+
+> **"WebFlux's value isn't 'faster per-request' — it's 'the same hardware
+> handles vastly more concurrent slow requests,' by never letting a thread
+> freeze while waiting."**

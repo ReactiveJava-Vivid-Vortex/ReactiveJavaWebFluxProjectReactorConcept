@@ -2,11 +2,12 @@
 
 ## In Simple Terms
 
-`Flux.combineLatest(source1, source2, combiner)` combines multiple publishers by
-always pairing each new item with the **most recent (latest)** item from the other
-source(s) — unlike `zip()`, which strictly pairs items 1-to-1 in order. It emits a
-new combined value every time **any** source produces a new item (once all sources
-have emitted at least once).
+`Flux.combineLatest()` pairs each new item with whatever the *most recent*
+item from the other stream happened to be — not a strict 1-to-1 match like
+`zip()`. Every time either side updates, it recombines using the newest
+value it has from each side. Think of a weather app showing temperature and
+humidity together — every time either reading updates, the display
+refreshes using the latest of both, not waiting for them to update in sync.
 
 ## Simple Example
 
@@ -25,8 +26,9 @@ Possible output (exact interleaving depends on timing):
 25C / 45%
 ```
 
-Notice it doesn't wait for a matching pair like `zip()` would — it recombines
-whenever *either* side updates, using the latest known value from the other side.
+Notice it doesn't wait for a matching pair the way `zip()` would — it
+recombines whenever *either* side updates, always using the latest known
+value from the other side.
 
 ## zip() vs combineLatest()
 
@@ -38,6 +40,7 @@ whenever *either* side updates, using the latest known value from the other side
 
 ## Why It Matters
 
-`.combineLatest()` is ideal for **live dashboards** — e.g., always showing the most
-recent stock price combined with the most recent exchange rate, recalculating
-whenever either value updates, rather than waiting for both to tick in lockstep.
+`.combineLatest()` is perfect for live dashboards — always showing the
+freshest stock price alongside the freshest exchange rate, recalculating
+the moment either value changes, instead of waiting for both to tick in
+lockstep.

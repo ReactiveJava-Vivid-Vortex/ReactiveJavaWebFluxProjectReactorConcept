@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`Flux.concatDelayError(source1, source2, ...)` is like `.concat()`, but if one of the
-sources errors, it **doesn't stop immediately** — it continues processing the
-remaining sources first, and only surfaces the error at the very end, after
-everything that could succeed has been emitted.
+`Flux.concatDelayError()` behaves like `.concat()`, except if one source
+fails, it doesn't stop the whole show right away — it keeps going through
+the remaining sources first, and only reports the failure at the very end,
+after everything that *could* succeed has had its turn.
 
 ## Simple Example
 
@@ -29,13 +29,12 @@ Got: 4
 Error (at the end): First failed
 ```
 
-Compare with regular `.concat()`, where the error from `first` would immediately
-terminate the whole sequence — `second`'s items (3, 4) would **never** be emitted.
+Compare with plain `.concat()`, where `first`'s error would immediately end
+everything — `second`'s items (3, 4) would never show up at all.
 
 ## Why It Matters
 
-`.concatDelayError()` is useful in batch-processing scenarios where you want to
-attempt **all** operations (e.g., sending 10 emails) even if some fail partway
-through, and only report the failure(s) after everything that could succeed has been
-given a chance to run — rather than aborting early and leaving later, unrelated work
-undone.
+`.concatDelayError()` is useful for batch jobs where you want to try
+*everything* (like sending out 10 emails) even if some fail along the way,
+and only find out about the failures at the end — rather than giving up
+early and leaving the rest of the work undone.

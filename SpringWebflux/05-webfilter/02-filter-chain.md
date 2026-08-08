@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-The **filter chain** is the sequence of registered `WebFilter`s that a request passes
-through before reaching your controller (and again on the way back, for the
-response). Each filter decides whether to pass control to the next filter/controller
-(via `chain.filter(exchange)`) — and can run logic both before and after that call.
+The filter chain is the line of registered `WebFilter`s a request passes
+through on its way to your controller (and again on the way back, for the
+response). Each filter decides whether to hand off to the next filter or
+controller (via `chain.filter(exchange)`) — and can run logic both before
+and after that call.
 
 ## Simple Example
 
@@ -43,12 +44,13 @@ Second filter: after
 First filter: after
 ```
 
-Notice the "after" logic runs in **reverse order** — like nested function calls,
-the last filter to run "before" is the first to finish "after."
+Notice the "after" part runs in *reverse* order — just like nested
+function calls, the last filter to start "before" is the first to finish
+"after."
 
 ## Why It Matters
 
-Understanding the chain's nested, ordered execution model is essential for
-correctly layering concerns — e.g., an authentication filter should typically run
-*before* a logging filter that records the authenticated user, meaning the auth
-filter needs a lower `@Order` value (runs earlier).
+Understanding this nested, ordered execution model matters for layering
+concerns correctly — an authentication filter should usually run *before*
+a logging filter that records who's authenticated, meaning the auth filter
+needs a lower `@Order` value (it runs earlier).

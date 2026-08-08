@@ -3,10 +3,10 @@
 ## In Simple Terms
 
 A `RouterFunction<ServerResponse>` is the functional-style alternative to
-`@RestController`/`@GetMapping` — instead of annotations, you explicitly declare
-routes (URL patterns + HTTP methods) mapped to handler functions, using a fluent
-builder API. Many production WebFlux projects prefer this style for its explicitness
-and testability.
+`@RestController`/`@GetMapping` — instead of annotations, you write out
+your routes (URL patterns plus HTTP methods) explicitly, mapped to handler
+functions, using a fluent builder. Many production WebFlux projects prefer
+this style because it's explicit and easy to test.
 
 ## Simple Example
 
@@ -27,8 +27,8 @@ public class ProductRoutes {
 }
 ```
 
-Compare with the annotation-based equivalent (functionally identical, different
-style):
+Compare with the annotation-based version (does the exact same thing,
+different style):
 
 ```java
 @RestController
@@ -42,7 +42,7 @@ public class ProductController {
 
 ## Why It Matters
 
-`RouterFunction` makes routing configuration explicit and centralized — all your
-routes are visible in one place, rather than scattered across annotations on
-individual controller methods — which many teams find easier to review, test, and
-reason about as an API surface grows large.
+`RouterFunction` makes your routing explicit and all in one place — every
+route is visible together, instead of scattered across annotations on
+different controller methods — which many teams find easier to review,
+test, and reason about as an API grows.

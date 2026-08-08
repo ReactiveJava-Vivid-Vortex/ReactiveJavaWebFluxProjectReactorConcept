@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.timeout(duration)` makes a `Mono`/`Flux` fail with a `TimeoutException` if it
-doesn't emit anything (or complete) within the given time window. It's essential for
-avoiding indefinitely-hanging operations — e.g., a downstream service that never
-responds.
+`.timeout()` makes a `Mono`/`Flux` give up and fail if it doesn't produce
+anything within a set amount of time — like hanging up a phone call if
+nobody answers after a while. It's essential for stopping things from
+waiting forever on a service that just never responds.
 
 ## Simple Example
 
@@ -36,7 +36,7 @@ slowCall
 
 ## Why It Matters
 
-`.timeout()` is a critical resilience tool for any call to an external system —
-without it, a single unresponsive downstream dependency could cause requests to hang
-indefinitely, eventually exhausting resources (like connections or threads) across
-your entire application.
+`.timeout()` is a must-have safety net for any call to an outside system —
+without it, one unresponsive dependency could leave requests hanging
+forever, eventually eating up resources (connections, threads) across your
+whole app.

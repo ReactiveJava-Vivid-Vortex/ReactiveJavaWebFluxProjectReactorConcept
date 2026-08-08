@@ -2,11 +2,11 @@
 
 ## In Simple Terms
 
-**HTTP/2** is a major revision of the HTTP protocol, designed to fix several
-performance limitations of HTTP/1.1: it introduces multiplexing (see
-[[multiplexing]]), header compression (HPACK), binary framing (instead of
-human-readable text), and server push — all while remaining semantically compatible
-with HTTP/1.1 (same methods, status codes, headers).
+HTTP/2 is a major overhaul of the HTTP protocol, built to fix several
+performance issues with HTTP/1.1: it brings multiplexing (see
+[[multiplexing]]), header compression (HPACK), a more efficient binary
+format (instead of plain text), and optional server push — all while still
+behaving the same way HTTP/1.1 does (same methods, status codes, headers).
 
 ## Simple Example
 
@@ -24,7 +24,7 @@ server:
     key-store-type: PKCS12
 ```
 
-Verifying the protocol used, from a client:
+Checking which protocol got used, from a client:
 
 ```bash
 curl -v --http2 https://localhost:8443/api/products
@@ -33,8 +33,8 @@ curl -v --http2 https://localhost:8443/api/products
 
 ## Why It Matters
 
-HTTP/2 pairs particularly well with reactive, non-blocking servers like WebFlux —
-both are designed around efficiently handling many concurrent operations with
-minimal overhead. Combining HTTP/2's connection efficiency with WebFlux's thread
-efficiency compounds the overall performance and scalability benefits for
-high-concurrency APIs.
+HTTP/2 pairs naturally with reactive, non-blocking servers like WebFlux —
+both are built around handling lots of concurrent work efficiently. Put
+HTTP/2's connection efficiency together with WebFlux's thread efficiency,
+and the performance and scalability benefits stack for high-concurrency
+APIs.

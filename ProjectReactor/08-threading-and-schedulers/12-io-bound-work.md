@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-**I/O-bound** work spends most of its time **waiting** for something external — a
-database response, an HTTP call to another service, reading a file from disk. The
-CPU is mostly idle during this wait; the bottleneck is network/disk latency, not
-processing power.
+I/O-bound work spends most of its time just *waiting* — for a database to
+respond, for another service to answer an HTTP call, for a file to load
+from disk. The CPU is mostly sitting idle during that wait; the real
+bottleneck is how long the network or disk takes, not how fast the
+processor is.
 
 ## Simple Example
 
@@ -25,10 +26,10 @@ Mono.fromCallable(() -> legacyBlockingHttpCall(userId))
 
 ## Why It Matters
 
-This is precisely the category of work reactive programming and non-blocking I/O
-were designed to optimize. A truly non-blocking I/O call (like Spring's
-`WebClient`) doesn't need a dedicated thread while waiting — the thread is freed
-immediately and reused for other work, with a callback resuming processing once data
-arrives. Legacy *blocking* I/O calls, however, must be explicitly isolated (with
-`subscribeOn(Schedulers.boundedElastic())`) so they don't stall the small number of
-event-loop threads meant for non-blocking work.
+This is exactly the kind of work reactive programming and non-blocking I/O
+were built to handle well. A truly non-blocking call (like Spring's
+`WebClient`) doesn't hog a thread while it waits — the thread gets freed up
+immediately and reused elsewhere, with a callback picking things back up
+once data actually arrives. Old-style *blocking* calls, though, need to be
+deliberately fenced off (with `subscribeOn(Schedulers.boundedElastic())`) so
+they don't clog the small handful of threads meant for non-blocking work.

@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`Flux.firstWithSignal(source1, source2, ...)` subscribes to multiple publishers at
-once and takes **only the first one to emit any signal** (a value, an error, or
-completion) — the "winner" — and cancels all the others. It's a race between
-sources; whichever responds first wins entirely.
+`Flux.firstWithSignal()` starts several streams at once and just keeps
+whichever one responds first — a value, an error, or completion, doesn't
+matter which — and cancels all the rest. It's a straight-up race: first to
+answer wins, everyone else gets called off.
 
 ## Simple Example
 
@@ -24,10 +24,11 @@ Winner: Response from B
 
 ## Why It Matters
 
-`.firstWithSignal()` is a powerful pattern for **redundant/fallback calls** — e.g.,
-querying two replica servers or a primary/backup data source simultaneously, and
-using whichever responds first, cancelling the slower one to save resources. This is
-a common resilience pattern for reducing tail latency in distributed systems.
+`.firstWithSignal()` is a solid pattern for redundant or fallback calls —
+querying two replica servers, or a primary and backup source, at the same
+time and just using whichever answers first, calling off the slower one to
+save resources. It's a common trick for cutting down worst-case latency in
+distributed systems.
 
-(Note: this operator replaced the older, now-deprecated `firstEmitting()`/`first()`
+(This operator replaced the older, now-deprecated `firstEmitting()`/`first()`
 methods in newer Reactor versions.)

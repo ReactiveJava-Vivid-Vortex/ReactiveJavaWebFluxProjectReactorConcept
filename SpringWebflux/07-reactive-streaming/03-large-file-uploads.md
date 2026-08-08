@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-WebFlux can handle large file uploads reactively — processing the file's bytes as a
-`Flux<DataBuffer>` incrementally, rather than loading the entire file into memory
-before beginning to write it to disk (or wherever it needs to go).
+WebFlux can handle big file uploads reactively — processing the file's
+bytes as a `Flux<DataBuffer>` incrementally, instead of loading the whole
+file into memory before it even starts writing it somewhere.
 
 ## Simple Example
 
@@ -19,13 +19,14 @@ public Mono<String> uploadFile(@RequestPart("file") Mono<FilePart> filePartMono)
 }
 ```
 
-`FilePart.transferTo()` streams the incoming file data directly to the destination
-without ever holding the entire file content in memory at once — critical for
-handling multi-gigabyte uploads without risking `OutOfMemoryError`.
+`FilePart.transferTo()` streams the incoming file straight to its
+destination without ever holding the whole thing in memory at once —
+critical if you want to accept multi-gigabyte uploads without risking an
+`OutOfMemoryError`.
 
 ## Why It Matters
 
-Large file uploads are a classic case where the reactive streaming model shines:
-memory usage stays roughly constant regardless of file size, since data flows
-through the pipeline (network -> processing -> disk) incrementally instead of being
-fully buffered at any single point.
+Large file uploads are a textbook case where reactive streaming really
+pays off: memory usage stays roughly flat no matter how big the file is,
+since data flows through the pipeline (network → processing → disk)
+incrementally instead of piling up at any one point.

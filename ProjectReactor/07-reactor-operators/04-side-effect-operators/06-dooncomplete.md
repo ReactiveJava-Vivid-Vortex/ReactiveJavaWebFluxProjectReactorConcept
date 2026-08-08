@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.doOnComplete(runnable)` runs a side effect **only when the stream completes
-successfully** (i.e., `onComplete()` fires) — it does NOT run if the stream errors
-out or is cancelled. This makes it different from `.doFinally()`, which runs in all
-three cases.
+`.doOnComplete()` runs something only when the stream finishes the good
+way — everything went fine, no errors. If the stream fails or gets
+cancelled instead, this never fires. That makes it different from
+`.doFinally()`, which fires no matter how things end.
 
 ## Simple Example
 
@@ -23,7 +23,7 @@ Item: 3
 All items processed successfully!
 ```
 
-Contrast with an error case — `doOnComplete()` never fires:
+Compare that with an error case, where `doOnComplete()` simply never runs:
 
 ```java
 Flux.just(1, 2, 0)
@@ -37,7 +37,8 @@ Flux.just(1, 2, 0)
 
 ## Why It Matters
 
-`.doOnComplete()` is the right hook for logic that should run **only on success** —
-e.g., marking a batch job as "finished successfully," sending a completion
-notification, or committing a transaction — distinct from cleanup logic that should
-run regardless of outcome (which belongs in `.doFinally()`).
+`.doOnComplete()` is the right spot for logic that should only run on a
+clean finish — marking a batch job "done successfully," sending a
+completion notification, committing a transaction — as opposed to cleanup
+work that has to happen regardless of outcome (that belongs in
+`.doFinally()`).

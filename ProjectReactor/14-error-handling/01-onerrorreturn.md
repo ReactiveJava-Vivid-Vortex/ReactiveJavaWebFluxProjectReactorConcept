@@ -2,10 +2,9 @@
 
 ## In Simple Terms
 
-`.onErrorReturn(fallbackValue)` catches an error and replaces it with a single,
-**static fallback value**, letting the stream complete successfully instead of
-propagating the failure. It's the simplest way to say "if this fails, just use this
-default instead."
+`.onErrorReturn()` catches an error and swaps it out for one fixed backup
+value, letting the stream wrap up as if nothing went wrong. It's the
+simplest way to say "if this breaks, just use this instead."
 
 ## Simple Example
 
@@ -18,7 +17,7 @@ result.subscribe(value -> System.out.println("Result: " + value));
 // Result: -1
 ```
 
-You can also match specific exception types:
+You can also target a specific kind of exception:
 
 ```java
 Flux.just("1", "2", "notanumber", "4")
@@ -30,13 +29,12 @@ Flux.just("1", "2", "notanumber", "4")
 // Got: -1   (stream ENDS here - onErrorReturn still terminates the sequence)
 ```
 
-**Important:** `.onErrorReturn()` still ends the stream after emitting the fallback
-— it doesn't let the original sequence continue from where it left off (notice `4`
-never appears above).
+**Good to know:** `.onErrorReturn()` still ends the stream right after
+handing out the fallback — it doesn't let the rest of the original sequence
+continue (notice `4` never shows up above).
 
 ## Why It Matters
 
-`.onErrorReturn()` is the simplest error-recovery tool, perfect for cases where a
-fixed default value makes sense on failure — e.g., returning `0` for a failed
-calculation, or an empty result placeholder — without needing any additional async
-logic.
+`.onErrorReturn()` is the simplest recovery tool around, perfect for when a
+fixed default makes sense on failure — returning `0` for a failed
+calculation, or a placeholder result — without needing any extra logic.

@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`Sinks.One<T>` is the modern, safe way to manually produce a **single value** (like a
-programmatic `Mono`), replacing older, more error-prone approaches like
-`MonoProcessor`. You create it, hold onto it, and call `tryEmitValue()` /
-`tryEmitError()` from anywhere in your code whenever the result becomes available.
+`Sinks.One<T>` is the modern, safe way to manually produce a single value —
+think of it as a `Mono` you control by hand. You create it, hang onto it,
+and whenever the result is ready — from anywhere in your code — you call
+`tryEmitValue()` or `tryEmitError()` to deliver it. It replaces older,
+trickier tools like `MonoProcessor`.
 
 ## Simple Example
 
@@ -35,12 +36,12 @@ errorSink.asMono().subscribe(
 errorSink.tryEmitError(new RuntimeException("Something failed"));
 ```
 
-**Important:** a `Sinks.One` can only be completed **once** — calling
-`tryEmitValue()` a second time returns a failure result (`EmitResult.FAIL_TERMINATED`)
-instead of throwing, giving you a chance to handle it explicitly.
+**Good to know:** a `Sinks.One` can only be completed once — calling
+`tryEmitValue()` a second time doesn't throw, it just quietly returns a
+failure result (`EmitResult.FAIL_TERMINATED`) that you can check for.
 
 ## Why It Matters
 
-`Sinks.One` is the correct, modern tool for bridging an external, single-result
-callback API into a `Mono` — safer and clearer than the deprecated `MonoProcessor`,
-with explicit `EmitResult` return values instead of silent failures.
+`Sinks.One` is the right tool for bridging some external, callback-based
+API into a `Mono` — safer and clearer than the old `MonoProcessor`, since it
+gives you an explicit answer back instead of silently failing.

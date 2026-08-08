@@ -2,8 +2,8 @@
 
 ## In Simple Terms
 
-Testing a `Flux` with `StepVerifier` typically involves asserting the sequence and
-count of emitted items, in addition to how the stream terminates.
+Testing a `Flux` with `StepVerifier` usually means checking the sequence and
+count of items it emits, plus how it finally ends.
 
 ## Simple Example
 
@@ -18,7 +18,7 @@ void testFluxSequence() {
 }
 ```
 
-Asserting just the count, without checking every individual value:
+Just asserting the count, without checking every single value:
 
 ```java
 @Test
@@ -31,7 +31,7 @@ void testFluxCount() {
 }
 ```
 
-Testing with a custom predicate on each item:
+Testing with a custom check on each item:
 
 ```java
 @Test
@@ -48,7 +48,8 @@ void testFluxWithPredicate() {
 
 ## Why It Matters
 
-Being able to assert both exact sequences and looser conditions (counts, predicates)
-gives you the flexibility to write precise tests for small, deterministic streams,
-and more resilient tests for large or loosely-specified ones — without your tests
-becoming brittle to minor, irrelevant changes.
+Being able to check both exact sequences and looser conditions (counts,
+custom checks) gives you the flexibility to write tight tests for small,
+predictable streams, and looser, more forgiving tests for big or
+loosely-defined ones — without your tests breaking over tiny, irrelevant
+changes.

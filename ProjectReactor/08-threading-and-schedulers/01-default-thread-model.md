@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-By default, a Project Reactor pipeline runs **entirely on the thread that called
-`.subscribe()`** — no automatic thread switching happens unless you explicitly ask
-for it (via `subscribeOn()`/`publishOn()`). This surprises many beginners who assume
-"reactive" automatically means "multi-threaded" or "parallel."
+By default, a Reactor pipeline just stays on whatever thread called
+`.subscribe()` — nothing hops to another thread automatically. That trips
+up a lot of newcomers, since "reactive" sounds like it should mean
+"multi-threaded" or "parallel." It doesn't, not unless you explicitly ask
+for it.
 
 ## Simple Example
 
@@ -33,11 +34,13 @@ map() runs on: main
 subscribe() runs on: main
 ```
 
-Everything runs on the `main` thread — nothing switched threads automatically.
+Everything ran right there on the `main` thread — no automatic switching
+happened.
 
 ## Why It Matters
 
-Understanding this default is crucial: reactive programming's power comes from
-**not blocking** threads, not from automatically parallelizing work. If you need work
-to run on a different thread (e.g., to avoid blocking an event-loop thread with a
-CPU-heavy task), you must explicitly say so using `subscribeOn()` or `publishOn()`.
+This default is important to understand: reactive programming's real power
+comes from **not tying up threads while waiting**, not from magically
+spreading work across many threads. If you want work to run somewhere else
+— say, so a heavy task doesn't clog up an important thread — you have to
+say so explicitly with `subscribeOn()` or `publishOn()`.

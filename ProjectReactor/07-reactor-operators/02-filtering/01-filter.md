@@ -2,9 +2,10 @@
 
 ## In Simple Terms
 
-`.filter(predicate)` only lets through items that satisfy a condition (`predicate`
-returns `true`); items that don't match are silently dropped from the stream. It's
-the reactive equivalent of `Stream.filter()`.
+`.filter()` is a bouncer at the door: it checks each item against a rule you
+give it, and only the ones that pass the check get let through. Anything
+that fails is quietly turned away — no error, no fuss, it just doesn't make
+it into the stream.
 
 ## Simple Example
 
@@ -23,7 +24,7 @@ Even: 8
 Even: 10
 ```
 
-A realistic example: only forwarding orders above a certain value.
+A realistic example: only letting through orders above a certain value.
 
 ```java
 orderFlux
@@ -33,6 +34,6 @@ orderFlux
 
 ## Why It Matters
 
-`.filter()` is one of the most fundamental operators — used constantly to narrow down
-a stream to only the items relevant for further processing, without needing manual
-`if` checks inside every downstream operator.
+You'll use `.filter()` constantly — anytime you want to narrow a stream down
+to just the items you care about, without writing a manual `if` check inside
+every operator that comes after it.

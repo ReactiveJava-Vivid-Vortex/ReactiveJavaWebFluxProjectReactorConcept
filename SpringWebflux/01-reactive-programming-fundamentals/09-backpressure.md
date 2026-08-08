@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-Backpressure lets a slow consumer (e.g., a client with a slow network connection)
-control how fast a fast producer (e.g., a server streaming a huge file) sends it
-data — preventing the consumer from being overwhelmed with more data than it can
-handle at once.
+Backpressure lets a slow consumer (say, a client on a slow network
+connection) control how fast a fast producer (say, a server streaming a
+huge file) sends it data — so the consumer never gets flooded with more
+than it can actually handle.
 
 ## Simple Example
 
@@ -18,16 +18,17 @@ public Flux<Record> streamRecords() {
 }
 ```
 
-If the HTTP client (or its network connection) can only consume data slowly, the
-underlying Netty/Reactor infrastructure naturally applies backpressure — the
-database query is paced to only fetch as much data as the client can currently
-absorb, rather than loading everything into server memory upfront and hoping the
-client keeps up.
+If the HTTP client (or its network) can only take data slowly, the
+underlying Netty/Reactor machinery naturally applies backpressure — the
+database query only fetches as much as the client can currently handle,
+instead of pulling everything into server memory upfront and hoping the
+client can keep up.
 
 ## Why It Matters
 
-Without backpressure, a fast server could stream data faster than a slow client (or
-network) can receive it, causing the server to buffer huge amounts of unsent data in
-memory. Backpressure — baked into the Reactive Streams specification that WebFlux is
-built on — ensures memory usage stays bounded and proportional to actual throughput,
-even when producer and consumer speeds differ significantly.
+Without backpressure, a fast server could stream data much faster than a
+slow client (or network) can receive it, forcing the server to pile up
+huge amounts of unsent data in memory. Backpressure — baked into the
+Reactive Streams spec that WebFlux is built on — keeps memory usage
+bounded and tied to actual throughput, even when producer and consumer
+speeds are wildly different.

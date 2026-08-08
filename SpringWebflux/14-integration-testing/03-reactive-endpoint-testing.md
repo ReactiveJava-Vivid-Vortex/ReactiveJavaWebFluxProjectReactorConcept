@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-Testing reactive endpoints has a few nuances beyond traditional Spring MVC testing —
-particularly around testing **streaming** responses (`Flux` with NDJSON/SSE media
-types), which `WebTestClient` supports through its `.returnResult()` and
-`FluxExchangeResult` APIs.
+Testing reactive endpoints has a few extra wrinkles compared to
+traditional Spring MVC testing — mostly around testing streaming responses
+(a `Flux` with NDJSON/SSE media types), which `WebTestClient` supports
+through its `.returnResult()` and `FluxExchangeResult` APIs.
 
 ## Simple Example
 
@@ -27,7 +27,7 @@ void streamProducts_returnsMultipleItems() {
 }
 ```
 
-Testing an SSE endpoint similarly:
+Testing an SSE endpoint the same way:
 
 ```java
 @Test
@@ -48,8 +48,8 @@ void streamNotifications_emitsEvents() {
 
 ## Why It Matters
 
-Combining `WebTestClient` (for the HTTP layer) with `StepVerifier` (for asserting on
-the streamed response body) gives you full test coverage over both the request/
-response contract and the actual streaming behavior — essential for correctly
-verifying endpoints that stream large or continuous data (see [[reactive-streaming]]
-and [[server-sent-events-sse]]).
+Pairing `WebTestClient` (for the HTTP side) with `StepVerifier` (for
+checking the streamed body) gives you complete coverage over both the
+request/response contract and the actual streaming behavior — essential
+for properly testing endpoints that stream large or ongoing data (see
+[[reactive-streaming]] and [[server-sent-events-sse]]).

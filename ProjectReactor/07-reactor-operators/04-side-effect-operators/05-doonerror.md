@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-`.doOnError(consumer)` runs a side effect (typically logging) when an error passes
-through this point in the pipeline — **without** handling or recovering from the
-error. The error still propagates downstream afterward, unlike `onErrorResume()`
-which actually replaces it.
+`.doOnError()` lets you react to an error going by — usually to log it —
+without actually catching or fixing it. The error keeps traveling downstream
+afterward exactly as before. This is different from `.onErrorResume()`,
+which actually replaces the error with something else.
 
 ## Simple Example
 
@@ -24,12 +24,12 @@ Logging error: Database connection failed
 Final handler saw: Database connection failed
 ```
 
-Notice the error is still delivered to the final `subscribe()` error handler — 
-`.doOnError()` only observes it, it doesn't consume or replace it.
+Notice the error still reaches the final `subscribe()` error handler —
+`.doOnError()` only watches it go by, it doesn't swallow or change it.
 
 ## Why It Matters
 
-`.doOnError()` is the standard place to add centralized error **logging** (e.g., to a
-monitoring system) at any point in a pipeline, while leaving the actual error handling
-/recovery decision (via `onErrorResume`, `onErrorReturn`, etc.) to a separate,
-dedicated operator further downstream.
+`.doOnError()` is the natural place to add central error **logging** (say,
+to a monitoring system), while leaving the actual decision of how to
+recover — via `onErrorResume`, `onErrorReturn`, and friends — to a separate
+operator further down the chain.

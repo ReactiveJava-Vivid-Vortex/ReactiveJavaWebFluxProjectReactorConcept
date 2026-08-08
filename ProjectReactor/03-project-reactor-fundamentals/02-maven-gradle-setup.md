@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-To use Project Reactor, you just need to add its dependency to your build tool. If
-you're using Spring Boot with WebFlux, it's already included transitively — but
-you can also use Reactor standalone in any plain Java project.
+To use Project Reactor, you just add it as a dependency in your build file. If
+you're using Spring Boot with WebFlux, you already have it — it comes along
+automatically. You can also use it on its own, in any plain Java project.
 
 ## Simple Example
 
@@ -35,7 +35,7 @@ dependencies {
 }
 ```
 
-If you're building a Spring Boot WebFlux app, you typically just add:
+If you're building a Spring Boot WebFlux app, you usually just add this instead:
 
 ```xml
 <dependency>
@@ -44,10 +44,10 @@ If you're building a Spring Boot WebFlux app, you typically just add:
 </dependency>
 ```
 
-...and `reactor-core` comes along automatically as a transitive dependency.
+...and `reactor-core` tags along automatically.
 
 ## Why It Matters
 
-Getting the setup right — including the `reactor-test` module for `StepVerifier` —
-means you can start writing and testing reactive pipelines immediately, without
-chasing down missing classes or version mismatches later.
+Getting the setup right from the start — especially adding `reactor-test` for
+`StepVerifier` — means you can start writing and testing reactive code right
+away, instead of hunting down missing classes later.

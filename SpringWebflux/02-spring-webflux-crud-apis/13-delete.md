@@ -3,8 +3,8 @@
 ## In Simple Terms
 
 A DELETE endpoint removes a resource. In WebFlux, `repository.deleteById(id)`
-returns `Mono<Void>` — there's no meaningful "value" to return, just a completion
-signal indicating the operation finished (successfully or with an error).
+returns `Mono<Void>` — there's no real "value" to hand back, just a signal
+that the operation finished, one way or the other.
 
 ## Simple Example
 
@@ -19,7 +19,7 @@ public Mono<ResponseEntity<Void>> deleteProduct(@PathVariable String id) {
 }
 ```
 
-A simpler version, without checking existence first (returns 204 either way):
+A simpler version, skipping the existence check (returns 204 either way):
 
 ```java
 @DeleteMapping("/products/{id}")
@@ -31,8 +31,9 @@ public Mono<Void> deleteProduct(@PathVariable String id) {
 
 ## Why It Matters
 
-Whether to return `404` for deleting a non-existent resource, versus always
-returning `204 No Content` regardless (a common, simpler REST convention — deleting
-something that's already gone is often considered a no-op success), is a deliberate
-API design decision. Both patterns are common in production; consistency across your
-API matters more than which one you pick.
+Whether to return `404` for deleting something that isn't there, versus
+always returning `204 No Content` regardless (a common, simpler
+convention — deleting something already gone is often treated as a
+harmless success), is a deliberate design choice. Both are common in
+production; being consistent across your whole API matters more than which
+one you pick.

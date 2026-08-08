@@ -2,9 +2,10 @@
 
 ## In Simple Terms
 
-`.doOnNext(consumer)` lets you run a side effect (like logging) every time an item
-passes through this point in the pipeline, **without modifying the item itself**.
-The value is passed through unchanged to the next operator.
+`.doOnNext()` lets you peek at each item as it flows by and do something
+with it — like log it — without touching or changing the item itself. It's
+a security camera, not a checkpoint: it watches, it doesn't interfere. The
+value keeps moving on to the next step exactly as it was.
 
 ## Simple Example
 
@@ -25,7 +26,7 @@ About to process: 3
 Result: 30
 ```
 
-Very commonly used for logging or metrics at multiple stages of a pipeline:
+Very commonly used to log or track things at different stages of a pipeline:
 
 ```java
 orderFlux
@@ -37,6 +38,6 @@ orderFlux
 
 ## Why It Matters
 
-`.doOnNext()` is the standard way to add observability (logging, metrics, tracing)
-into a reactive pipeline without altering its actual data flow — a "read-only tap"
-into the stream at any point you choose.
+`.doOnNext()` is your standard way to add visibility — logging, metrics,
+tracing — into a pipeline without changing what actually flows through it.
+It's a window you can open at any point in the chain to see what's going by.

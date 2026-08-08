@@ -2,15 +2,14 @@
 
 ## In Simple Terms
 
-**Project Reactor** is a Java library that implements the Reactive Streams
-specification and gives you two main building blocks: `Mono` (0 or 1 item) and `Flux`
-(0 to N items). It's the reactive engine underneath Spring WebFlux, and it comes
-packed with hundreds of operators to transform, combine, and control asynchronous
-streams of data — without you needing to hand-write `Publisher`/`Subscriber` code
-yourself.
+**Project Reactor** is a Java library that gives you two main tools —
+`Mono` (0 or 1 item) and `Flux` (0 to many items) — plus hundreds of ready-made
+operators for shaping, combining, and controlling streams of data. It's the
+engine that Spring WebFlux runs on, and it saves you from ever having to
+hand-write your own `Publisher`/`Subscriber` code.
 
-Think of it as: **Reactive Streams defines the rules (interfaces); Project Reactor
-provides a rich, production-ready toolkit built on top of those rules.**
+Simple way to think about it: **Reactive Streams is the rulebook. Project Reactor
+is the fully-built toolkit that follows those rules for you.**
 
 ## Simple Example
 
@@ -36,8 +35,7 @@ PROGRAMMING
 
 ## Why It Matters
 
-Without Project Reactor, implementing correct backpressure, error handling, and
-cancellation by hand (using raw `Publisher`/`Subscriber`) would be extremely tedious
-and error-prone. Reactor abstracts all of that complexity behind a rich, fluent,
-well-tested API — which is exactly what Spring WebFlux, R2DBC, and reactive
-`WebClient` are all built on top of.
+Without Reactor, you'd have to build correct backpressure, error handling, and
+cancellation entirely by hand — tedious and easy to get wrong. Reactor hides all
+of that behind a clean, well-tested API, which is exactly what Spring WebFlux,
+R2DBC, and `WebClient` are all built on top of.

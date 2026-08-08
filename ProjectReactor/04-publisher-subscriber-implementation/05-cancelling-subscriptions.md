@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-Cancelling a subscription tells the publisher to **stop producing/sending data** and
-release any resources tied to that particular subscriber. This is important for
-things like infinite streams, open database cursors, or file handles — without
-cancellation, they could leak resources forever.
+Cancelling tells the publisher to **stop sending data** and clean up anything it
+was holding onto for that subscriber. This matters a lot for things like endless
+streams, open database cursors, or open files — without cancelling, they could
+just leak forever.
 
 ## Simple Example
 
@@ -20,7 +20,7 @@ subscription.dispose(); // triggers Subscription.cancel() under the hood
 System.out.println("Cancelled! No more ticks will print.");
 ```
 
-You can also react to cancellation explicitly with `.doOnCancel()`:
+You can also hook into cancellation directly with `.doOnCancel()`:
 
 ```java
 Flux.interval(Duration.ofSeconds(1))
@@ -30,8 +30,7 @@ Flux.interval(Duration.ofSeconds(1))
 
 ## Why It Matters
 
-In a web application, if a client disconnects mid-request (closes the browser tab,
-network drops), Spring WebFlux automatically cancels the underlying subscription so
-the server doesn't waste CPU/memory continuing to process a response nobody will
-receive. This automatic cancellation propagation is one of reactive programming's
-underrated efficiency wins.
+If a user closes their browser tab mid-request, Spring WebFlux automatically
+cancels the subscription behind that request — so the server doesn't keep
+burning CPU and memory building a response nobody will ever see. This automatic
+cancellation is one of the underrated ways reactive programming saves resources.

@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-`onComplete()` is the signal a `Publisher` sends to say **"I'm done — there is no
-more data coming, and everything succeeded."** It is called at most once, and only if
-the stream didn't fail with an error.
+`onComplete()` is the signal a publisher sends to say **"I'm done — nothing more
+is coming, and it all worked."** It only ever fires once, and only if nothing
+went wrong along the way.
 
 ```java
 public interface Subscriber<T> {
@@ -29,12 +29,12 @@ Flux.just("a", "b", "c")
 // All done, successfully!
 ```
 
-Note: a `Mono.empty()` still calls `onComplete()` even though it never emits any item
-— "completed with zero items" is a perfectly valid, successful outcome.
+Worth noting: `Mono.empty()` still fires `onComplete()` even though it never sent
+a single item — "finished with nothing to give you" still counts as a success.
 
 ## Why It Matters
 
-`onComplete()` is your cue to run any "finalization" logic that should only happen on
-**success** — as opposed to `doFinally()`, which runs on success, error, *or*
-cancellation. It's commonly used to know when it's safe to, say, close a resource or
-mark a batch job as finished.
+`onComplete()` is your cue to run any cleanup that should only happen when things
+went right — different from `doFinally()`, which runs no matter what (success,
+error, or cancellation). It's often used to know when it's safe to close a
+resource or mark a job as finished.

@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-Beyond just pooling, "efficient client connections" means correctly sizing your
-pool and configuring its behavior (idle timeouts, max connections, queuing behavior)
-to match your actual traffic patterns — too small a pool causes requests to queue
-and wait; too large wastes resources and can overwhelm the downstream service.
+Beyond just having a pool, "efficient client connections" means actually
+sizing that pool correctly and configuring its behavior (idle timeouts,
+max connections, how it handles waiting requests) to match your real
+traffic — too small a pool means requests queue up and wait; too large
+wastes resources and can even overwhelm the downstream service.
 
 ## Simple Example
 
@@ -18,8 +19,8 @@ ConnectionProvider provider = ConnectionProvider.builder("api-pool")
     .build();
 ```
 
-Monitoring pool health (via Micrometer metrics, if configured) helps validate
-whether the pool size is well-tuned:
+Watching pool health (through Micrometer metrics, if you've set that up)
+helps confirm whether your pool size is actually well-tuned:
 
 ```
 reactor.netty.connection.provider.active.connections
@@ -28,8 +29,8 @@ reactor.netty.connection.provider.pending.connections
 
 ## Why It Matters
 
-An under-sized pool causes requests to queue and experience added latency waiting
-for a free connection; an over-sized pool can overwhelm a downstream service with
-more concurrent connections than it can handle. Tuning pool size based on real,
-observed traffic (rather than guessing) is essential for reliable, efficient
-service-to-service communication at scale.
+Too small a pool means requests sit around waiting for a free connection,
+adding latency; too big a pool can throw more concurrent connections at a
+downstream service than it can actually handle. Tuning pool size off real,
+observed traffic — instead of guessing — is important for reliable,
+efficient service-to-service calls at scale.

@@ -2,13 +2,11 @@
 
 ## In Simple Terms
 
-A `Publisher` is anything that **produces a stream of data over time** and can send
-that data to whoever subscribes to it. It's the source — like a TV channel
-broadcasting a show. On its own, a `Publisher` does nothing; it only starts producing
-data once someone (a `Subscriber`) subscribes to it.
+A `Publisher` is anything that hands out data over time to whoever asks for it —
+like a TV channel broadcasting a show. It doesn't do anything on its own. It only
+starts sending data once someone (a `Subscriber`) tunes in.
 
-In the Reactive Streams specification (`org.reactivestreams.Publisher`), it has one
-single method:
+The whole interface is just one method:
 
 ```java
 public interface Publisher<T> {
@@ -41,6 +39,6 @@ publisher.subscribe(new Subscriber<Integer>() {
 
 ## Why It Matters
 
-`Mono` and `Flux` in Project Reactor are both implementations of `Publisher`. Every
-reactive pipeline you write starts with a `Publisher` producing data — understanding
-this interface is understanding the root of the entire reactive model.
+`Mono` and `Flux` are both just `Publisher`s under the hood. Every reactive
+pipeline you write starts with a `Publisher` producing data — so this one
+interface is really the root of everything else in this course.

@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`.buffer(n)` collects items into `List`s of a fixed size, emitting a new `List` every
-time `n` items have accumulated. Instead of processing items one at a time, you get
-them grouped into batches — useful for reducing the number of downstream operations
-(e.g., doing one bulk database insert instead of many single-row inserts).
+`.buffer(n)` gathers items into little groups of a fixed size instead of
+handing them to you one at a time — like a cashier who waits for 3
+customers to line up before ringing them through together instead of
+processing each one separately. Every time `n` items pile up, you get a
+`List` with all of them.
 
 ## Simple Example
 
@@ -23,9 +24,9 @@ Batch: [7, 8, 9]
 Batch: [10]
 ```
 
-Note the last batch can be smaller if the total count isn't evenly divisible.
+Notice the last batch can be smaller if things don't divide evenly.
 
-A practical example — batching records for bulk insert:
+A practical example — grouping records together for a bulk insert:
 
 ```java
 recordFlux
@@ -36,6 +37,7 @@ recordFlux
 
 ## Why It Matters
 
-`.buffer()` is a key tool for **efficiency**: instead of making one network/database
-call per item (slow, chatty), you batch items together and make far fewer, larger
-calls — a huge performance win for high-volume data processing pipelines.
+`.buffer()` is a big deal for efficiency: instead of making one network or
+database call per item (slow and chatty), you group items together and
+make far fewer, bigger calls — a real performance win for anything handling
+lots of data.

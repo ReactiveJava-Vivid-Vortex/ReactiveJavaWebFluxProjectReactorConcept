@@ -2,10 +2,10 @@
 
 ## In Simple Terms
 
-By default, `WebClient`'s `.retrieve()` treats any 4xx/5xx HTTP status as an error,
-converting it into a `WebClientResponseException` delivered via the reactive
-error channel. You can customize this behavior using `.onStatus()` to map specific
-status codes to your own custom exceptions.
+By default, `WebClient`'s `.retrieve()` treats any 4xx/5xx status as a
+failure, turning it into a `WebClientResponseException` sent through the
+reactive error channel. You can customize this with `.onStatus()` to map
+specific status codes to your own exceptions instead.
 
 ## Simple Example
 
@@ -39,8 +39,8 @@ webClient.get()
 
 ## Why It Matters
 
-Properly handling `WebClient` errors — mapping remote HTTP failures into meaningful
-domain exceptions — is essential for building resilient service-to-service
-communication; without it, a downstream 500 error might propagate as an opaque
-`WebClientResponseException` all the way to your API's own clients, with none of the
-context needed to understand or recover from it.
+Handling `WebClient` errors properly — turning remote HTTP failures into
+meaningful, specific exceptions — matters a lot for keeping services
+resilient. Without it, a downstream 500 error might travel all the way to
+your own API's clients as an opaque `WebClientResponseException`, with
+none of the context they'd need to understand or recover from it.

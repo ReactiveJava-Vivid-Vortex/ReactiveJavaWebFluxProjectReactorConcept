@@ -2,9 +2,9 @@
 
 ## In Simple Terms
 
-An **infinite stream** is a `Flux` that, by design, never calls `onComplete()` — it
-just keeps emitting items indefinitely, until explicitly cancelled. Examples include
-live sensor feeds, stock price tickers, or `Flux.interval()`.
+An **infinite stream** is a `Flux` that, by design, never calls `onComplete()` —
+it just keeps sending items until something explicitly cancels it. Live sensor
+feeds, stock tickers, and `Flux.interval()` are all classic examples.
 
 ## Simple Example
 
@@ -31,9 +31,8 @@ Operators commonly used to tame infinite streams:
 
 ## Why It Matters
 
-Infinite streams are extremely useful for real-time features (live prices, chat
-messages, SSE feeds), but they carry a risk: if you forget to bound them (via
-`.take()`, cancellation on client disconnect, etc.), they can run forever and leak
-resources. In Spring WebFlux, an infinite `Flux` returned from a controller is
-automatically cancelled when the client disconnects — but standalone code needs
-explicit management.
+Infinite streams are great for real-time features (live prices, chat, live
+updates), but they come with a risk: forget to bound them, and they can run
+forever, quietly leaking resources. In Spring WebFlux, an infinite `Flux`
+returned from a controller is automatically cancelled once the client
+disconnects — but standalone code needs to manage this itself.

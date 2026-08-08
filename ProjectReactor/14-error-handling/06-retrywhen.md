@@ -2,10 +2,11 @@
 
 ## In Simple Terms
 
-`.retryWhen(retrySpec)` gives you full, fine-grained control over retry behavior —
-how many times to retry, how long to wait between attempts (including exponential
-backoff), and which errors are even worth retrying. Project Reactor provides a
-built-in `Retry` builder (`reactor.util.retry.Retry`) for common patterns.
+`.retryWhen()` gives you fine control over how retries work — how many
+times to try, how long to wait between attempts (including gradually
+increasing the wait, known as backoff), and which errors are even worth
+retrying in the first place. Reactor ships a handy `Retry` builder for
+common patterns like this.
 
 ## Simple Example
 
@@ -25,7 +26,7 @@ Mono.fromCallable(() -> callFlakyService())
     );
 ```
 
-Simple fixed-delay retries (no exponential backoff):
+A simpler fixed-delay version (no gradually increasing wait):
 
 ```java
 Mono.fromCallable(() -> callFlakyService())
@@ -35,8 +36,8 @@ Mono.fromCallable(() -> callFlakyService())
 
 ## Why It Matters
 
-`.retryWhen()` is the production-grade tool for handling transient failures against
-real external systems — exponential backoff avoids hammering an already-struggling
-service, and filtering by exception type ensures you only retry errors that are
-actually worth retrying (e.g., not retrying a `400 Bad Request`, which will never
-succeed no matter how many times you try).
+`.retryWhen()` is the real-world tool for handling flaky external systems —
+gradually increasing the wait between tries avoids piling more pressure on
+a service that's already struggling, and filtering by error type makes sure
+you're only retrying things worth retrying (there's no point retrying a
+`400 Bad Request` — it'll never succeed, no matter how many times you try).

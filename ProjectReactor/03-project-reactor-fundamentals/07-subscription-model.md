@@ -2,11 +2,10 @@
 
 ## In Simple Terms
 
-The **subscription model** describes how data actually starts flowing in a reactive
-pipeline: everything is driven **bottom-up**, starting from the final `.subscribe()`
-call. The subscription (and the demand `request(n)`) travels **upstream** first
-(from subscriber to publisher), and only then does data flow **downstream** (from
-publisher to subscriber) in response.
+Here's how data actually starts flowing: everything begins at the very end, with
+`.subscribe()`, and works its way **backward first**. The request for data
+travels **upstream**, from subscriber all the way back to the source. Only then
+does the actual data travel **downstream**, from source back to subscriber.
 
 ```
 subscribe() call
@@ -40,12 +39,12 @@ Output:
 4. Received: 3
 ```
 
-Notice the subscription and request signals happen first (traveling up to the
-source), and only then do the actual data items flow back down, one at a time.
+Subscribing and asking for data happen first (traveling all the way up to the
+source), and only then do the actual items travel back down, one at a time.
 
 ## Why It Matters
 
-Understanding this bottom-up subscription flow (versus top-down data flow) explains
-why nothing in a reactive pipeline runs until `.subscribe()` is called at the very
-end, and why demand (backpressure) requests always originate at the consumer and
-travel toward the producer — never the other way around.
+Once you see that data flows "up then down," it explains why nothing in a
+pipeline runs until `.subscribe()` is called at the very end — and why requests
+for more data always start at the consumer and move toward the source, never the
+other way around.
